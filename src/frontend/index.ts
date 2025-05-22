@@ -1,4 +1,4 @@
-import './styles.css';
+import './styles.less';
 import { Spinner } from './spinner';
 
 interface Card {

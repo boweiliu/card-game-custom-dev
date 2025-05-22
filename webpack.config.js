@@ -10,10 +10,9 @@ module.exports = {
     clean: true, // Ensure dist is cleaned before each build
   },
   devServer: {
-    static: {
-      directory: path.join(__dirname, 'public'),
-      publicPath: '/',
-    },
+    static: './dist',
+    hot: true,
+    watchFiles: ['src/frontend/**/*.less'],
     compress: true,
     port: process.env.PORT || 9000, // Use PORT from environment variables
     proxy: [
