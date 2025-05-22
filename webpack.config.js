@@ -8,10 +8,11 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, 'dist')
+      directory: path.join(__dirname, 'public'),
+      publicPath: '/',
     },
     compress: true,
-    port: 9001,
+    port: 9002,
     proxy: [
       {
         context: ['/api'],
