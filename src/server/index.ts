@@ -8,7 +8,7 @@ app.use(express.static('../public')); // Serve static files from public director
 
 // API endpoints
 app.get('/api/ping', (req, res) => {
-  console.log('pinged from ', req.ip, ' at ', new Date().toISOString() , ' with headers ', req.headers );
+  console.log('pinged from ', req.ip, ' at ', new Date().toISOString() , ' with host ', req.headers.host);
   res.json({ message: 'pong' });
 });
 
@@ -16,11 +16,15 @@ app.get('/api/ping', (req, res) => {
 app.get('/*', (req, res) => {
   // if in dev mode, serve a redirect to the correct port
   if (process.env.NODE_ENV === 'development') {
-    console.log('redirecting to ', process.env.FE_PORT);
-    const DEFAULT_FE_PORT = 4321;
-    res.redirect(`http://localhost:${process.env.FE_PORT || DEFAULT_FE_PORT}`);
+    const DEFAULT_FE_PORT = 9001;
+    const FE_PORT = process.env.FE_PORT || DEFAULT_FE_PORT;
+    console.log('redirecting to ', FE_PORT);
+    res.redirect(`http://localhost:${FE_PORT}`);
     return;
   }
+
+  // why doesnt this work?
+  console.log('env is ', process.env.NODE_ENV)
 
   // otherwise serve file at that path
   res.sendFile(req.path, { root: './dist' });
