@@ -8,14 +8,14 @@ app.use(express.static('../public')); // Serve static files from public director
 
 // API endpoints
 app.get('/api/ping', (req, res) => {
-    res.json({ message: 'pong' });
+  res.json({ message: 'pong' });
 });
 
 app.get('/', (req, res) => {
-    res.sendFile('index.html', { root: '../public' });
+  res.sendFile('index.html', { root: '../public' });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
