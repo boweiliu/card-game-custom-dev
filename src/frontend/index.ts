@@ -1,4 +1,5 @@
 import './styles.css';
+import { Spinner } from './spinner';
 
 interface Card {
   id: number;
@@ -11,10 +12,12 @@ class CardManager {
   private cards: Card[] = [];
   private $container: JQuery;
   private $loadingIndicator: JQuery;
+  private spinner: Spinner;
 
   constructor() {
     this.$container = $('#card-container');
     this.$loadingIndicator = $('#loading-indicator');
+    this.spinner = new Spinner();
     this.initialize();
   }
 
@@ -25,17 +28,15 @@ class CardManager {
   }
 
   private async checkBackendStatus() {
-    this.$loadingIndicator.show();
+    this.spinner.show();
     try {
-      await $.ajax({
-        url: '/api/ping',
-        method: 'GET',
-      });
-      console.log('Backend is up');
+      const response = await fetch('/api/ping');
+      const data = await response.json();
+      console.log('Backend is up:', data);
     } catch (error) {
       console.error('Backend is down:', error);
     } finally {
-      this.$loadingIndicator.hide();
+      this.spinner.hide();
     }
   }
 

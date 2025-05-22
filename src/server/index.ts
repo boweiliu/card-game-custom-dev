@@ -8,6 +8,7 @@ app.use(express.static('../public')); // Serve static files from public director
 
 // API endpoints
 app.get('/api/ping', (req, res) => {
+  console.log('pinged from ', req.ip, ' at ', new Date().toISOString() , ' with headers ', req.headers );
   res.json({ message: 'pong' });
 });
 
@@ -15,13 +16,14 @@ app.get('/api/ping', (req, res) => {
 app.get('/*', (req, res) => {
   // if in dev mode, serve a redirect to the correct port
   if (process.env.NODE_ENV === 'development') {
+    console.log('redirecting to ', process.env.FE_PORT);
     const DEFAULT_FE_PORT = 4321;
     res.redirect(`http://localhost:${process.env.FE_PORT || DEFAULT_FE_PORT}`);
     return;
   }
 
   // otherwise serve file at that path
-  res.sendFile(req.path, { root: './public' });
+  res.sendFile(req.path, { root: './dist' });
 });
 
 const PORT = process.env.PORT || 3000;
