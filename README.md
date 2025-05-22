@@ -24,7 +24,8 @@ This project is a web application that manages cards. Users can create, edit, an
 ## Running the Application
 To start the application, run:
 ```bash
-npm start
+PORT=9009 npm run start:dev # just webpack, proxies to localhost:3000
+PORT=4321 npm run dev # both FE and BE, BE operates on localhost:43210
 ```
 
 ## Development
