@@ -4,7 +4,7 @@
   "description": "A card game/sticky note simulator",
   "main": "src/server/index.ts",
   "scripts": {
-    "dev": "webpack-dev-server --config webpack.config.js --mode development",
+    "dev": "concurrently \"npm run dev-server\" \"PORT=$PORT webpack-dev-server --config webpack.config.js --mode development --port ${PORT:-4000}0\"",
     "start": "node dist/server/index.js",
     "dev-server": "ts-node-dev --respawn --transpile-only src/server/index.ts",
     "build": "tsc",
@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "body-parser": "^1.20.2",
+    "concurrently": "^7.6.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "sqlite3": "^5.1.6"
