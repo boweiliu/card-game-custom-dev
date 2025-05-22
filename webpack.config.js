@@ -12,7 +12,7 @@ module.exports = {
       publicPath: '/',
     },
     compress: true,
-    port: 9002,
+    port: 43210,
     proxy: [
       {
         context: ['/api'],

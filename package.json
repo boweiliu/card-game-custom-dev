@@ -4,13 +4,13 @@
   "description": "A card game/sticky note simulator",
   "main": "src/server/index.ts",
   "scripts": {
-    "dev": "concurrently \"npm run dev-server\" \"PORT=$PORT webpack-dev-server --config webpack.config.js --mode development --port ${PORT:-4000}0\"",
-    "start": "node dist/server/index.js",
-    "dev-server": "ts-node-dev --respawn --transpile-only src/server/index.ts",
+    "dev": "concurrently \"PORT=${BE_PORT:-${PORT:-4321}0} npm run dev:be\" \"BE_PORT=${BE_PORT:-${PORT:-4321}0} PORT=${PORT:-4321} npm run dev:fe\"",
+    "dev:be": "PORT=${PORT:-3000} ts-node-dev --respawn --transpile-only src/server/index.ts",
+    "dev:fe": "webpack-dev-server --config webpack.config.js --mode development --port ${PORT:-9000}",
     "build": "tsc",
+    "prod:be": "PORT=${PORT:-3000} node dist/server/index.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "start:dev": "webpack-dev-server --config webpack.config.js --mode development --port ${PORT:-9002}",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
