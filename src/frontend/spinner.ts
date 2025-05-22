@@ -1,3 +1,5 @@
+import './styles.less';
+
 export class Spinner {
   private spinnerElement: HTMLElement;
 
