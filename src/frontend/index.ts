@@ -8,15 +8,33 @@ interface Card {
 class CardManager {
   private cards: Card[] = [];
   private $container: JQuery;
+  private $loadingIndicator: JQuery;
 
   constructor() {
     this.$container = $('#card-container');
+    this.$loadingIndicator = $('#loading-indicator');
     this.initialize();
   }
 
   private initialize() {
+    this.checkBackendStatus();
     this.loadCards();
     this.setupEventListeners();
+  }
+
+  private async checkBackendStatus() {
+    this.$loadingIndicator.show();
+    try {
+      await $.ajax({
+        url: '/api/ping',
+        method: 'GET',
+      });
+      console.log('Backend is up');
+    } catch (error) {
+      console.error('Backend is down:', error);
+    } finally {
+      this.$loadingIndicator.hide();
+    }
   }
 
   private setupEventListeners() {
