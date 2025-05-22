@@ -1,3 +1,9 @@
+# HOSTING
+
+https://card-game-custom-dev.fly.dev/
+
+see deploy.sh
+
 # SETUP
 
 `npm i`
