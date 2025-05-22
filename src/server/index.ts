@@ -21,7 +21,7 @@ app.get('/*', (req, res) => {
   }
 
   // otherwise serve file at that path
-  res.sendFile(req.path, { root: '../public' });
+  res.sendFile(req.path, { root: './public' });
 });
 
 const PORT = process.env.PORT || 3000;
