@@ -5,12 +5,13 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   entry: './src/frontend/index.ts',
   output: {
+    path: path.resolve(__dirname, 'dist/frontend'),
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/',
     clean: true, // Ensure dist is cleaned before each build
   },
   devServer: {
-    static: './dist',
+    static: './dist/frontend',
     hot: true,
     watchFiles: ['src/frontend/**/*.less'],
     compress: true,

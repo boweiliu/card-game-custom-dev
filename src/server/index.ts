@@ -23,11 +23,8 @@ app.get('/*', (req, res) => {
     return;
   }
 
-  // why doesnt this work?
-  console.log('env is ', process.env.NODE_ENV)
-
   // otherwise serve file at that path
-  res.sendFile(req.path, { root: './dist' });
+  res.sendFile(req.path, { root: './dist/frontend' });
 });
 
 const PORT = process.env.PORT || 3000;
