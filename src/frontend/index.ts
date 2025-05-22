@@ -23,7 +23,7 @@ class CardManager {
 
   private initialize() {
     this.checkBackendStatus();
-    this.loadCards();
+    // this.loadCards();
     this.setupEventListeners();
   }
 
@@ -31,10 +31,21 @@ class CardManager {
     this.spinner.show();
     try {
       const response = await fetch('/api/ping');
-      const data = await response.json();
-      console.log('Backend is up:', data);
+      if (response.ok) {
+        this.$loadingIndicator.hide();
+        // log a bit
+        console.log('Backend is up:', response);
+        const data = await response.json();
+        console.log('Backend is up:', data);
+      } else {
+        const text = `Not Connected to ${response.url} - server ${response.status}`;
+        this.$loadingIndicator.css('color', 'red');
+        this.$loadingIndicator.text(text);
+        console.log(text);
+      }
     } catch (error) {
       console.error('Backend is down:', error);
+      this.$loadingIndicator.text('Not Connected ' + error);
     } finally {
       this.spinner.hide();
     }
