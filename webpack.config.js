@@ -12,11 +12,11 @@ module.exports = {
       publicPath: '/',
     },
     compress: true,
-    port: 43210,
+    port: process.env.PORT || 9000, // Use PORT from environment variables
     proxy: [
       {
         context: ['/api'],
-        target: 'http://localhost:3000',
+        target: `http://localhost:${process.env.BE_PORT || 3000}`, // Use BE_PORT for the proxy target
       },
     ],
   },
