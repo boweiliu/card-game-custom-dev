@@ -1,3 +1,5 @@
+import './styles.css';
+
 interface Card {
   id: number;
   content: string;
