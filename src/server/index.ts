@@ -8,6 +8,7 @@ app.use(express.static('../public')); // Serve static files from public director
 
 // API endpoints
 app.get('/api/ping', (req, res) => {
+  res.set('Cache-Control', 'no-store');
   console.log('pinged from ', req.ip, ' at ', new Date().toISOString() , ' with host ', req.headers.host);
   res.json({ message: 'pong' });
 });

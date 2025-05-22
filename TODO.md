@@ -10,6 +10,6 @@
 8. [DONE] BE's / route should error when run in `npm run dev` mode - why is the dev mode check failing?
 9. [DONE] Set up less for css
 10. [DONE] Make the FE webpack build into ./dist/frontend and then point BE and serve to dist/frontend rather n than just dist -- this should prevent server code from leaking into FE
-11. Disable /api/ping from being 304'd (need to set it on both FE and BE probably)
+11. [DONE] Disable /api/ping from being 304'd (need to set it on both FE and BE probably)
 12. Make spinner into a standalone reusable component that can elide what else is being loaded
 13. 
