@@ -7,9 +7,12 @@ app.use(express.json());
 app.use(express.static('../public')); // Serve static files from public directory
 
 // API endpoints
-app.get('/api/ping', (req, res) => {
+app.get('/api/ping', async (req, res) => {
   res.set('Cache-Control', 'no-store');
   console.log('pinged from ', req.ip, ' at ', new Date().toISOString() , ' with host ', req.headers.host);
+
+  await new Promise((resolve) => setTimeout(resolve, 10000));
+
   res.json({ message: 'pong' });
 });
 
