@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import sqlite3 from 'sqlite3';
 import path from 'path';
-import { CreateProtocardRequest, UpdateProtocardRequest, Protocard } from '@/shared/types';
+import { CreateProtocardRequest, UpdateProtocardRequest, Protocard, ProtocardCountResponse } from '@/shared/types';
 
 const app = express();
 app.use(cors());
@@ -81,6 +81,18 @@ app.get('/api/protocards', (req, res) => {
       return;
     }
     res.json(rows);
+  });
+});
+
+app.get('/api/protocards/count', (req, res) => {
+  db.get('SELECT COUNT(*) as count FROM protocards', (err, row: any) => {
+    if (err) {
+      console.error('Error counting protocards:', err);
+      res.status(500).json({ error: 'Database error' });
+      return;
+    }
+    const response: ProtocardCountResponse = { count: row.count };
+    res.json(response);
   });
 });
 

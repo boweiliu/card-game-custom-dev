@@ -20,3 +20,7 @@ export interface ProtocardResponse {
   text_body: string;
   message: string;
 }
+
+export interface ProtocardCountResponse {
+  count: number;
+}

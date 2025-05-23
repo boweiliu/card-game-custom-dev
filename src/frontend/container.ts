@@ -13,6 +13,7 @@ import {
   $id,
 } from './div-ids';
 import * as styles from './container.module.less';
+import { ProtocardCountResponse } from '@/shared/types';
 
 const fullScreenContainerTemplate = () => `
   <div id="${FULLSCREEN_PARENT}" class="${styles.fullScreenContainerParent}">
@@ -40,13 +41,33 @@ const fullScreenContainerTemplate = () => `
 
 class ScreenManager {
   private $placeholderContainer: JQuery;
+  private protocardCount: number = 0;
 
   constructor() {
     this.$placeholderContainer = $id(FULLSCREEN).find(
       `.${styles.placeholderContainer}`
     );
     this.setupEventListeners();
+    this.loadProtocardCount();
     this.showScreen(0);
+  }
+
+  private async loadProtocardCount() {
+    try {
+      const response = await fetch('/api/protocards/count');
+      if (response.ok) {
+        const data: ProtocardCountResponse = await response.json();
+        this.protocardCount = data.count;
+        // Update screen 2 if it's currently showing
+        if (this.$placeholderContainer.hasClass(styles.screen2)) {
+          this.showScreen(2);
+        }
+      } else {
+        console.error('Failed to fetch protocard count:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching protocard count:', error);
+    }
   }
 
   private setupEventListeners() {
@@ -121,8 +142,14 @@ class ScreenManager {
   private getScreen2Content(): string {
     return `
       <div>
-        <h1>Screen 2 - Alt View</h1>
+        <h1>Screen 2 - Protocards View</h1>
         <p>Sample screen with light pink background.</p>
+        <div style="margin: 20px 0; padding: 20px; background-color: rgba(255,255,255,0.7); border-radius: 8px;">
+          <h3>Protocards Count</h3>
+          <p style="font-size: 24px; font-weight: bold; color: #333;">
+            Total: ${this.protocardCount}
+          </p>
+        </div>
         <div style="margin: 20px 0;">
           <button style="margin: 5px; padding: 10px;">Sample Button A</button>
           <button style="margin: 5px; padding: 10px;">Sample Button B</button>
