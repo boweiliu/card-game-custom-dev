@@ -1,7 +1,7 @@
-import './spinner.less';
+import styles from './spinner.module.less';
 
 function spinnerTemplate() {
-  return `<div id="spinner" class="spinner"></div>`;
+  return `<div id="spinner" class="${styles.spinner}"></div>`;
 }
 
 export class Spinner {

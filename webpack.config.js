@@ -26,15 +26,23 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.less$/,
+        test: /\.module\.less$/,
         use: [
-          'style-loader',
+          MiniCssExtractPlugin.loader,
           {
             loader: 'css-loader',
             options: {
               modules: true
             }
           },
+          'less-loader'
+        ]
+      },
+      {
+        test: /(?<!\.module)\.less$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
           'less-loader'
         ]
       },
