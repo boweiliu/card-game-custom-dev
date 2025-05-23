@@ -1,25 +1,22 @@
 import * as styles from '@/frontend/spinner.module.less';
 import { SPINNER, $id, APP_ROOT } from './div-ids';
 
-function spinnerTemplate() {
-  return `<div id="${SPINNER}" class="${styles.spinner}"></div>`;
+function createSpinnerElement(): JQuery<HTMLElement> {
+  return $(`<div id="${SPINNER}" class="${styles.spinner}"></div>`);
 }
 
 export class Spinner {
   private spinnerElement: JQuery<HTMLElement>;
 
   constructor() {
-    const tempDiv = $('<div>');
-    tempDiv.html(spinnerTemplate());
-    this.spinnerElement = tempDiv.children().first();
+    this.spinnerElement = createSpinnerElement();
   }
 
-  show() {
-    const appRoot = $id(APP_ROOT);
-    appRoot.append(this.spinnerElement);
+  show(): void {
+    $id(APP_ROOT).append(this.spinnerElement);
   }
 
-  hide() {
+  hide(): void {
     this.spinnerElement.detach();
   }
 }
