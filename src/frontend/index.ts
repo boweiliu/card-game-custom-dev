@@ -1,5 +1,7 @@
 import './styles.less';
 import { Spinner } from './spinner';
+import { loadFullScreenContainer } from './container';
+import { cardTemplate } from './cards';
 
 interface Card {
   id: number;
@@ -137,12 +139,7 @@ class CardManager {
   private renderCards() {
     this.$container.empty();
     this.cards.forEach((card) => {
-      const $card = $(`
-                <div class="card" data-id="${card.id}">
-                    <div class="card-content">${card.content}</div>
-                    <button class="delete-card">Delete</button>
-                </div>
-            `);
+      const $card = $(cardTemplate(card.id, card.content));
       this.$container.append($card);
     });
   }
@@ -150,8 +147,6 @@ class CardManager {
 
 // Initialize when DOM is ready
 jQuery(() => {
-  const appRoot = $('#app-root');
-  appRoot.addClass('global-body-style');
-  appRoot.append('<div id="fullscreen-container-parent"><div id="full-screen-container" class="full-screen-container"><div class="container"><h1>Card Game Simulator</h1><div id="content-container"><button id="add-card">Add Card</button><div id="card-container"></div></div><div id="loading-indicator"></div></div></div></div>');
+  loadFullScreenContainer();
   new CardManager();
 });
