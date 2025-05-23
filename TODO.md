@@ -1,6 +1,5 @@
 # TODO List
 
-0. Fix why things are happening twice on first render. lets make all the jquery stuff idempotent
 1. Make a container that occupies the entire screen area, we will put other stuff into it soon.
 2. add a /api/count endpoint, POST, and hook it up to sqlite table which just records the number of times it was called. it should write to a file in the /db/ directory.
 3. Bottom "start bar" - put an area there at the bottom, we will put more stuff into it later. There will eventually be a hud, a hamburger menu, and some other buttons
