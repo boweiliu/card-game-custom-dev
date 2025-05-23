@@ -68,6 +68,9 @@ This is a full-stack TypeScript card game/sticky note simulator with:
   - **Positioning classes**: Handle `position`, `inset`, `z-index` (how element fits in its parent)
   - **Layout classes**: Handle `display`, `flex-direction`, `background-color` (how element arranges its children)
   - This makes styles more reusable and easier to maintain
+- **CSS Modules Class Names**: Always use `styles.className` instead of string literals like `'className'`
+  - Use `styles.active` not `'active'`, `styles.hidden` not `'hidden'`, etc.
+  - This ensures proper CSS module scoping and prevents class name conflicts
 
 ### TODO Workflow
 

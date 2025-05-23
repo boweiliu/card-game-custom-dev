@@ -35,6 +35,43 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  gap: 10px;
+  padding: 0 20px;
+}
+
+.screenButton {
+  padding: 8px 16px;
+  background-color: #ddd;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.screenButton:hover {
+  background-color: #ccc;
+  border-color: #888;
+}
+
+.active {
+  background-color: #007acc;
+  color: white;
+  border-color: #005a9e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.active:hover {
+  background-color: #0066aa;
+  border-color: #004488;
+}
+
+.screen1 {
+  background-color: #e8f4f8;
+}
+
+.screen2 {
+  background-color: #f8e8f4;
 }
 
 .globalBodyStyle {
