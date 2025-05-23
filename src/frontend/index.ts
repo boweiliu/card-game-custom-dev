@@ -149,22 +149,9 @@ class CardManager {
 }
 
 // Initialize when DOM is ready
-$(document).ready(() => {
-  $('body').append('<div id="full-screen-container"></div>');
-  $('body').css({
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh',
-    margin: '0'
-  });
-  const containerStyle = `#full-screen-container {
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-    z-index: 1000;
-  }`;
-  document.styleSheets[0].insertRule(containerStyle, document.styleSheets[0].cssRules.length);
+jQuery(() => {
+  const appRoot = $('#app-root');
+  appRoot.addClass('global-body-style');
+  appRoot.append('<div id="fullscreen-container-parent"><div id="full-screen-container" class="full-screen-container"><div class="container"><h1>Card Game Simulator</h1><div id="content-container"><button id="add-card">Add Card</button><div id="card-container"></div></div><div id="loading-indicator"></div></div></div></div>');
   new CardManager();
 });

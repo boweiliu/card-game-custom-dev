@@ -1,7 +1,16 @@
 @primary-color: #2196F3; // Changed to blue
 
-body {
+.global-body-style {
   font-family: Arial, sans-serif;
+}
+
+.full-screen-container {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: white; // TODO: move this into another class
+  z-index: 1000;
 }
 
 .container {
