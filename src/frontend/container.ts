@@ -31,7 +31,5 @@ export async function loadFullScreenContainer() {
 
   console.trace('loadFullScreenContainer');
 
-  await new Promise((resolve) => setTimeout(resolve, 10000));
-
   appRoot.append(fullScreenContainerTemplate());
 }
