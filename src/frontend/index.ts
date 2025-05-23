@@ -150,5 +150,21 @@ class CardManager {
 
 // Initialize when DOM is ready
 $(document).ready(() => {
+  $('body').append('<div id="full-screen-container"></div>');
+  $('body').css({
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
+    margin: '0'
+  });
+  const containerStyle = `#full-screen-container {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    z-index: 1000;
+  }`;
+  document.styleSheets[0].insertRule(containerStyle, document.styleSheets[0].cssRules.length);
   new CardManager();
 });
