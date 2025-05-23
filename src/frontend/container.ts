@@ -29,7 +29,5 @@ export async function loadFullScreenContainer() {
   const appRoot = $id(APP_ROOT);
   appRoot.addClass(styles.globalBodyStyle);
 
-  console.trace('loadFullScreenContainer');
-
   appRoot.append(fullScreenContainerTemplate());
 }

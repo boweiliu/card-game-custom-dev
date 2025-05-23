@@ -4,8 +4,6 @@ import { loadFullScreenContainer } from '@/frontend/container';
 import { cardTemplate } from '@/frontend/cards';
 import { $id, ADD_CARD, CARD, LOADING } from './div-ids';
 
-console.trace('index.ts loaded')
-
 interface Card {
   id: number;
   content: string;
@@ -149,9 +147,7 @@ class CardManager {
 
 // Initialize when DOM is ready
 jQuery(async () => {
-  console.trace('jQuery ready handler executed');
-
   await loadFullScreenContainer();
-  // const cardManager = new CardManager();
-  // cardManager.setupEventListeners();
+  const cardManager = new CardManager();
+  cardManager.setupEventListeners();
 });
