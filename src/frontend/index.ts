@@ -4,6 +4,8 @@ import { loadFullScreenContainer } from '@/frontend/container';
 import { cardTemplate } from '@/frontend/cards';
 import { $id, ADD_CARD, CARD, LOADING } from './div-ids';
 
+console.trace('index.ts loaded')
+
 interface Card {
   id: number;
   content: string;
