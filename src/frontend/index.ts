@@ -21,13 +21,7 @@ class CardManager {
     this.$container = $id(CARD);
     this.$loadingIndicator = $id(LOADING);
     this.spinner = new Spinner();
-    this.initialize();
-  }
-
-  private initialize() {
     this.checkBackendStatus();
-    // this.loadCards();
-    this.setupEventListeners();
   }
 
   private async checkBackendStatus() {
@@ -36,7 +30,6 @@ class CardManager {
       const response = await fetch('/api/ping');
       if (response.ok) {
         this.$loadingIndicator.hide();
-        // log a bit
         console.log('Backend is up:', response);
         const data = await response.json();
         console.log('Backend is up:', data);
@@ -54,52 +47,24 @@ class CardManager {
     }
   }
 
-  private setupEventListeners() {
-    $(document).on('click', '.card', (e) => {
-      const $card = $(e.currentTarget);
-      this.editCard($card);
-    });
-
-    $(document).on('click', '.delete-card', (e) => {
-      const $card = $(e.currentTarget).closest('.card');
-      this.deleteCard($card.data('id'));
-    });
-
-    $id(ADD_CARD).on('click', () => this.createCard());
-  }
-
-  private async loadCards() {
-    try {
-      const response = await $.ajax({
-        url: '/api/cards',
-        method: 'GET',
+  public setupEventListeners() {
+    $(document)
+      .off('click', '.card')
+      .on('click', '.card', (e) => {
+        const $card = $(e.currentTarget);
+        this.editCard($card);
       });
-      this.cards = response;
-      this.renderCards();
-    } catch (error) {
-      console.error('Error loading cards:', error);
-    }
-  }
 
-  private async createCard() {
-    const content = prompt('Enter card content:');
-    if (!content) return;
-
-    try {
-      const response = await $.ajax({
-        url: '/api/cards',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          content,
-          x_position: 100,
-          y_position: 100,
-        }),
+    $(document)
+      .off('click', '.delete-card')
+      .on('click', '.delete-card', (e) => {
+        const $card = $(e.currentTarget).closest('.card');
+        this.deleteCard($card.data('id'));
       });
-      this.loadCards();
-    } catch (error) {
-      console.error('Error creating card:', error);
-    }
+
+    $id(ADD_CARD)
+      .off('click')
+      .on('click', () => this.createCard());
   }
 
   private async editCard($card: JQuery) {
@@ -137,6 +102,19 @@ class CardManager {
     }
   }
 
+  private async loadCards() {
+    try {
+      const response = await $.ajax({
+        url: '/api/cards',
+        method: 'GET',
+      });
+      this.cards = response;
+      this.renderCards();
+    } catch (error) {
+      console.error('Error loading cards:', error);
+    }
+  }
+
   private renderCards() {
     this.$container.empty();
     this.cards.forEach((card) => {
@@ -144,10 +122,32 @@ class CardManager {
       this.$container.append($card);
     });
   }
+
+  private async createCard() {
+    const content = prompt('Enter card content:');
+    if (!content) return;
+
+    try {
+      const response = await $.ajax({
+        url: '/api/cards',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          content,
+          x_position: 100,
+          y_position: 100,
+        }),
+      });
+      this.loadCards();
+    } catch (error) {
+      console.error('Error creating card:', error);
+    }
+  }
 }
 
 // Initialize when DOM is ready
 jQuery(() => {
   loadFullScreenContainer();
-  new CardManager();
+  const cardManager = new CardManager();
+  cardManager.setupEventListeners();
 });

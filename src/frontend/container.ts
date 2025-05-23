@@ -1,4 +1,13 @@
-import { APP_ROOT, FULLSCREEN_PARENT, FULLSCREEN, CONTENT, ADD_CARD, CARD, LOADING, $id } from './div-ids';
+import {
+  APP_ROOT,
+  FULLSCREEN_PARENT,
+  FULLSCREEN,
+  CONTENT,
+  ADD_CARD,
+  CARD,
+  LOADING,
+  $id,
+} from './div-ids';
 import * as styles from './container.module.less';
 
 const fullScreenContainerTemplate = () => `

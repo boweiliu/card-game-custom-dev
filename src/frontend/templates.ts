@@ -1,4 +1,11 @@
-import { FULLSCREEN_PARENT, FULLSCREEN, CONTENT, ADD_CARD, CARD, LOADING } from './div-ids';
+import {
+  FULLSCREEN_PARENT,
+  FULLSCREEN,
+  CONTENT,
+  ADD_CARD,
+  CARD,
+  LOADING,
+} from './div-ids';
 
 export const fullScreenContainerTemplate = () => `
   <div id="${FULLSCREEN_PARENT}">

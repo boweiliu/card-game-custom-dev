@@ -16,10 +16,11 @@
     "clean": "rm -rf dist",
     "test": "jest",
     "test:watch": "jest --watch",
-    "format": "prettier --write .",
+    "format": "npm run format:fix && npm run lint:eslint && npm run lint:css",
+    "format:fix": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint .",
-    "lint:css": "stylelint '**/*.less'"
+    "lint:eslint": "eslint .",
+    "lint:css": "stylelint '**/*.less' '**/*.css' --fix"
   },
   "dependencies": {
     "body-parser": "^1.20.2",

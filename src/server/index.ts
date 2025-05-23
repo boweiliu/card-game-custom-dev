@@ -9,7 +9,14 @@ app.use(express.static('../public')); // Serve static files from public director
 // API endpoints
 app.get('/api/ping', async (req, res) => {
   res.set('Cache-Control', 'no-store');
-  console.log('pinged from ', req.ip, ' at ', new Date().toISOString() , ' with host ', req.headers.host);
+  console.log(
+    'pinged from ',
+    req.ip,
+    ' at ',
+    new Date().toISOString(),
+    ' with host ',
+    req.headers.host
+  );
 
   await new Promise((resolve) => setTimeout(resolve, 10000));
 

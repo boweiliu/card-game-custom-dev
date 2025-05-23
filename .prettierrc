@@ -2,10 +2,5 @@
   "semi": true,
   "singleQuote": true,
   "trailingComma": "es5",
-  "tabWidth": 2,
-  "importOrder": [
-    "^/", // Absolute imports
-    "^[./]" // Relative imports
-  ],
-  "importOrderSeparation": true
+  "tabWidth": 2
 }

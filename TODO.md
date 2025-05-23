@@ -13,4 +13,3 @@
 10. Card interaction - when one is selected it takes up the ENTIRE screen, then actions are available like highlight it, move it somewhere
 11. Interact with the deck to: view it unsorted, sorted, or bubble shuffle it
 12. Store the entire player-side game state into a base64 in the url: refer to cards by their protoids and specify their positions.
-
