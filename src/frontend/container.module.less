@@ -1,10 +1,19 @@
+.fullScreenContainerParent {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
 .fullScreenContainer {
   display: flex;
-  flex: 1;
   justify-content: center;
   align-items: center;
   background-color: white; /* TODO: move this into another class */
   z-index: 1000;
+  position: absolute;
+  inset: 0;
 }
 
 .container {
@@ -14,4 +23,15 @@
 
 .globalBodyStyle {
   font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  
+  /* Global reset applied to app-root */
+  :global(html), :global(body) {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
 }

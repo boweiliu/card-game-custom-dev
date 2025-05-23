@@ -11,7 +11,7 @@ import {
 import * as styles from './container.module.less';
 
 const fullScreenContainerTemplate = () => `
-  <div id="${FULLSCREEN_PARENT}">
+  <div id="${FULLSCREEN_PARENT}" class="${styles.fullScreenContainerParent}">
     <div id="${FULLSCREEN}" class="${styles.fullScreenContainer}">
       <div class="${styles.container}">
         <h1>Card Game Simulator</h1>
