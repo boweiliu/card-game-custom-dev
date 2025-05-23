@@ -64,6 +64,10 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 - **Use CSS Modules**: All new component styles should go in `.module.less` files
 - **Global Styles**: Apply global styles through the app-root element or component-specific modules
 - **Scoped Styling**: Use CSS modules' `:global()` syntax only when absolutely necessary for global resets
+- **Separation of Concerns**: Split CSS classes by purpose:
+  - **Positioning classes**: Handle `position`, `inset`, `z-index` (how element fits in its parent)
+  - **Layout classes**: Handle `display`, `flex-direction`, `background-color` (how element arranges its children)
+  - This makes styles more reusable and easier to maintain
 
 ### TODO Workflow
 

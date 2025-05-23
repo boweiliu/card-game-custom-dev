@@ -8,6 +8,7 @@ export const CARD = 'card-container';
 export const LOADING = 'loading-indicator';
 export const SPINNER = 'spinner';
 export const APP_ROOT = 'app-root';
+export const START_BAR = 'start-bar';
 
 // Helper function to get jQuery selector string by ID
 export const getJQuerySelector = (id: string): string => `#${id}`;
