@@ -1,4 +1,4 @@
-import { APP_ROOT, FULLSCREEN_PARENT, FULLSCREEN, CONTENT, ADD_CARD, CARD, LOADING } from './div-ids';
+import { APP_ROOT, FULLSCREEN_PARENT, FULLSCREEN, CONTENT, ADD_CARD, CARD, LOADING, $id } from './div-ids';
 
 const fullScreenContainerTemplate = () => `
   <div id="${FULLSCREEN_PARENT}">
