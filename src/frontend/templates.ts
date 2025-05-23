@@ -1,15 +1,15 @@
-import { FULLSCREEN_CONTAINER_PARENT_ID, FULL_SCREEN_CONTAINER_ID, CONTENT_CONTAINER_ID, ADD_CARD_ID, CARD_CONTAINER_ID, LOADING_INDICATOR_ID } from './div-ids';
+import { FULLSCREEN_PARENT, FULLSCREEN, CONTENT, ADD_CARD, CARD, LOADING } from './div-ids';
 
 export const fullScreenContainerTemplate = () => `
-  <div id="${FULLSCREEN_CONTAINER_PARENT_ID}">
-    <div id="${FULL_SCREEN_CONTAINER_ID}" class="full-screen-container">
+  <div id="${FULLSCREEN_PARENT}">
+    <div id="${FULLSCREEN}" class="full-screen-container">
       <div class="container">
         <h1>Card Game Simulator</h1>
-        <div id="${CONTENT_CONTAINER_ID}">
-          <button id="${ADD_CARD_ID}">Add Card</button>
-          <div id="${CARD_CONTAINER_ID}"></div>
+        <div id="${CONTENT}">
+          <button id="${ADD_CARD}">Add Card</button>
+          <div id="${CARD}"></div>
         </div>
-        <div id="${LOADING_INDICATOR_ID}"></div>
+        <div id="${LOADING}"></div>
       </div>
     </div>
   </div>

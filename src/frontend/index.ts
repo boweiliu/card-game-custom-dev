@@ -2,7 +2,7 @@ import '@/frontend/styles.less';
 import { Spinner } from '@/frontend/spinner';
 import { loadFullScreenContainer } from '@/frontend/container';
 import { cardTemplate } from '@/frontend/cards';
-import { $id, CARD_CONTAINER_ID, LOADING_INDICATOR_ID } from './div-ids';
+import { $id, ADD_CARD, CARD, LOADING } from './div-ids';
 
 interface Card {
   id: number;
@@ -18,8 +18,8 @@ class CardManager {
   private spinner: Spinner;
 
   constructor() {
-    this.$container = $id(CARD_CONTAINER_ID);
-    this.$loadingIndicator = $id(LOADING_INDICATOR_ID);
+    this.$container = $id(CARD);
+    this.$loadingIndicator = $id(LOADING);
     this.spinner = new Spinner();
     this.initialize();
   }
@@ -65,7 +65,7 @@ class CardManager {
       this.deleteCard($card.data('id'));
     });
 
-    $id('add-card').on('click', () => this.createCard());
+    $id(ADD_CARD).on('click', () => this.createCard());
   }
 
   private async loadCards() {

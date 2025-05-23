@@ -1,8 +1,8 @@
 import * as styles from '@/frontend/spinner.module.less';
-import { SPINNER_ID } from './div-ids';
+import { SPINNER } from './div-ids';
 
 function spinnerTemplate() {
-  return `<div id="${SPINNER_ID}" class="${styles.spinner}"></div>`;
+  return `<div id="${SPINNER}" class="${styles.spinner}"></div>`;
 }
 
 export class Spinner {
