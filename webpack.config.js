@@ -13,7 +13,8 @@ module.exports = {
   devServer: {
     static: './dist/frontend',
     hot: true,
-    watchFiles: ['src/frontend/**/*.less'],
+    liveReload: true,
+    // watchFiles: ['src/frontend/**/*.less'],
     compress: true,
     port: process.env.PORT || 9000, // Use PORT from environment variables
     proxy: [

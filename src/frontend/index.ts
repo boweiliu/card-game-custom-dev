@@ -146,8 +146,10 @@ class CardManager {
 }
 
 // Initialize when DOM is ready
-jQuery(() => {
-  loadFullScreenContainer();
-  const cardManager = new CardManager();
-  cardManager.setupEventListeners();
+jQuery(async () => {
+  console.trace('jQuery ready handler executed');
+
+  await loadFullScreenContainer();
+  // const cardManager = new CardManager();
+  // cardManager.setupEventListeners();
 });
