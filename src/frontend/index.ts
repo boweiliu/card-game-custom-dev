@@ -1,7 +1,7 @@
-import './styles.less';
-import { Spinner } from './spinner';
-import { loadFullScreenContainer } from './container';
-import { cardTemplate } from './cards';
+import '@/frontend/styles.less';
+import { Spinner } from '@/frontend/spinner';
+import { loadFullScreenContainer } from '@/frontend/container';
+import { cardTemplate } from '@/frontend/cards';
 
 interface Card {
   id: number;
