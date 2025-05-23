@@ -1,10 +1,24 @@
 import express from 'express';
 import cors from 'cors';
+import sqlite3 from 'sqlite3';
+import path from 'path';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('../public')); // Serve static files from public directory
+
+// Initialize SQLite database
+const dbPath = path.join(__dirname, '../../db/app.db');
+const db = new sqlite3.Database(dbPath);
+
+// Create count table if it doesn't exist
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS count_calls (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+});
 
 // API endpoints
 app.get('/api/ping', async (req, res) => {
@@ -21,6 +35,33 @@ app.get('/api/ping', async (req, res) => {
   await new Promise((resolve) => setTimeout(resolve, 10000));
 
   res.json({ message: 'pong' });
+});
+
+// Count endpoint - records each call in SQLite
+app.post('/api/count', (req, res) => {
+  db.run('INSERT INTO count_calls DEFAULT VALUES', function (err) {
+    if (err) {
+      console.error('Error inserting count record:', err);
+      res.status(500).json({ error: 'Database error' });
+      return;
+    }
+
+    // Get total count
+    db.get('SELECT COUNT(*) as total FROM count_calls', (err, row: any) => {
+      if (err) {
+        console.error('Error getting count:', err);
+        res.status(500).json({ error: 'Database error' });
+        return;
+      }
+
+      console.log(`Count endpoint called. Total calls: ${row.total}`);
+      res.json({
+        message: 'Count recorded',
+        total: row.total,
+        id: this.lastID,
+      });
+    });
+  });
 });
 
 // All non-API endpoints should serve the index.html
