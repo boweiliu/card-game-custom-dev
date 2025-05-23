@@ -57,6 +57,7 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 - **Template System**: String-based HTML templates for dynamic content generation
 - **CSS Modules**: Scoped styling with `.module.less` files for component isolation
 - **Proxy Setup**: Frontend dev server proxies `/api` requests to backend
+- **Shared Types**: TypeScript interfaces in `src/shared/types.ts` used by both frontend and backend
 
 ### Styling Guidelines
 

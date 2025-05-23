@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import sqlite3 from 'sqlite3';
 import path from 'path';
+import { CreateProtocardRequest, UpdateProtocardRequest, Protocard } from '@/shared/types';
 
 const app = express();
 app.use(cors());
@@ -12,11 +13,18 @@ app.use(express.static('../public')); // Serve static files from public director
 const dbPath = path.join(__dirname, '../../db/app.db');
 const db = new sqlite3.Database(dbPath);
 
-// Create count table if it doesn't exist
+// Create tables if they don't exist
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS count_calls (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+  
+  db.run(`CREATE TABLE IF NOT EXISTS protocards (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text_body TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 });
 
@@ -61,6 +69,93 @@ app.post('/api/count', (req, res) => {
         id: this.lastID,
       });
     });
+  });
+});
+
+// Protocards API endpoints
+app.get('/api/protocards', (req, res) => {
+  db.all('SELECT * FROM protocards ORDER BY created_at DESC', (err, rows: Protocard[]) => {
+    if (err) {
+      console.error('Error fetching protocards:', err);
+      res.status(500).json({ error: 'Database error' });
+      return;
+    }
+    res.json(rows);
+  });
+});
+
+app.post('/api/protocards', (req, res) => {
+  const { text_body }: CreateProtocardRequest = req.body;
+  
+  if (!text_body || typeof text_body !== 'string') {
+    res.status(400).json({ error: 'text_body is required and must be a string' });
+    return;
+  }
+  
+  db.run('INSERT INTO protocards (text_body) VALUES (?)', [text_body], function(err) {
+    if (err) {
+      console.error('Error creating protocard:', err);
+      res.status(500).json({ error: 'Database error' });
+      return;
+    }
+    
+    res.status(201).json({ 
+      id: this.lastID,
+      text_body,
+      message: 'Protocard created successfully'
+    });
+  });
+});
+
+app.put('/api/protocards/:id', (req, res) => {
+  const { id } = req.params;
+  const { text_body }: UpdateProtocardRequest = req.body;
+  
+  if (!text_body || typeof text_body !== 'string') {
+    res.status(400).json({ error: 'text_body is required and must be a string' });
+    return;
+  }
+  
+  db.run(
+    'UPDATE protocards SET text_body = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [text_body, id],
+    function(err) {
+      if (err) {
+        console.error('Error updating protocard:', err);
+        res.status(500).json({ error: 'Database error' });
+        return;
+      }
+      
+      if (this.changes === 0) {
+        res.status(404).json({ error: 'Protocard not found' });
+        return;
+      }
+      
+      res.json({ 
+        id: parseInt(id),
+        text_body,
+        message: 'Protocard updated successfully'
+      });
+    }
+  );
+});
+
+app.delete('/api/protocards/:id', (req, res) => {
+  const { id } = req.params;
+  
+  db.run('DELETE FROM protocards WHERE id = ?', [id], function(err) {
+    if (err) {
+      console.error('Error deleting protocard:', err);
+      res.status(500).json({ error: 'Database error' });
+      return;
+    }
+    
+    if (this.changes === 0) {
+      res.status(404).json({ error: 'Protocard not found' });
+      return;
+    }
+    
+    res.json({ message: 'Protocard deleted successfully' });
   });
 });
 
