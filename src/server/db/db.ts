@@ -8,7 +8,8 @@ export function initializeDatabase(serverRoot: string): {
   db: Database;
   repository: DatabaseRepository;
 } {
-  const dbPath = path.join(serverRoot, '../db/app.db');
+  const dbPath = path.join(serverRoot, '../../db/app.db');
+  console.log('loading dbPath', { dbPath, serverRoot });
   const db = new sqlite3.Database(dbPath);
 
   // Create tables if they don't exist

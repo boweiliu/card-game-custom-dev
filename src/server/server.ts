@@ -4,11 +4,14 @@ import { createProtocardRoutes } from '@/server/routes/protocards';
 import { createSSERoutes } from '@/server/routes/sse';
 import { createMiscRoutes } from '@/server/routes/misc';
 import { initializeDatabase } from '@/server/db/db';
+import { errorHandler } from '@/server/middleware/error-handler';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('../public')); // Serve static files from public directory
+
+// Basic middleware
 
 // Initialize database
 const { db, repository } = initializeDatabase(__dirname);
@@ -17,6 +20,9 @@ const { db, repository } = initializeDatabase(__dirname);
 app.use('/api', createMiscRoutes(repository));
 app.use('/api/protocards', createProtocardRoutes(repository));
 app.use('/api/events', createSSERoutes());
+
+// Error handling middleware (must be last)
+app.use(errorHandler);
 
 // All non-API endpoints should serve the index.html
 app.get('/*', (req, res) => {
