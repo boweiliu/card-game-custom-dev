@@ -1,10 +1,7 @@
 import { Router } from 'express';
 import { DatabaseRepository } from '@/server/db/repository';
 import { asyncHandler } from '@/server/middleware/async-handler';
-import {
-  noBodyValidator,
-  protocardValidator,
-} from '@/server/validators';
+import { noBodyValidator, protocardValidator } from '@/server/validators';
 import {
   GetAllProtocardsRequest,
   GetAllProtocardsResponse,
@@ -17,7 +14,7 @@ import {
   DeleteProtocardRequest,
   DeleteProtocardResponse,
   ProtocardParams,
-} from '@/shared/types/route-types';
+} from '@/shared/types/api';
 
 export function createProtocardRoutes(repository: DatabaseRepository): Router {
   const router = Router();

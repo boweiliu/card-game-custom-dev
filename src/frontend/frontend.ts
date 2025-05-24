@@ -26,14 +26,25 @@ class CardManager {
   }
 
   private async checkBackendStatus() {
+    await this.pingBackend(10);
+  }
+
+  // Public method to test ping with optional delay (for debugging spinner)
+  public async pingBackend(delaySeconds: number = 0) {
     this.spinner.show();
     try {
-      const response = await fetch('/api/ping');
+      const url = delaySeconds > 0 
+        ? `/api/ping?delay=${delaySeconds}` 
+        : '/api/ping';
+      
+      console.log(`Pinging backend with ${delaySeconds}s delay...`);
+      const response = await fetch(url);
+      
       if (response.ok) {
         this.$loadingIndicator.hide();
         console.log('Backend is up:', response);
         const data = await response.json();
-        console.log('Backend is up:', data);
+        console.log('Backend response:', data);
       } else {
         const text = `Not Connected to ${response.url} - server ${response.status}`;
         this.$loadingIndicator.css('color', 'red');
@@ -151,4 +162,9 @@ jQuery(async () => {
   await loadFullScreenContainer();
   const cardManager = new CardManager();
   cardManager.setupEventListeners();
+  
+  // Expose for debugging in console
+  (window as any).cardManager = cardManager;
+  console.log('CardManager available globally as window.cardManager');
+  console.log('Try: cardManager.pingBackend(5) for 5-second delay test');
 });

@@ -68,7 +68,8 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 - **Absolute imports only**: Use `@/` prefix for all imports, no relative imports (`./` or `../`)
 - **Separated types**: Organize types by domain:
   - `@/shared/types/db.ts` - Database entity types
-  - `@/shared/types/api.ts` - Request/response types
+  - `@/shared/types/api.ts` - API request/response types for all routes
+  - `@/shared/types/responses.ts` - Transport wrapper types (Response<T>, ErrorResponse, ApiResponse<T>)
   - `@/shared/types/sse.ts` - Server-Sent Events types
 
 #### Import Standards

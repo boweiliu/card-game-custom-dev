@@ -9,7 +9,7 @@ import { errorHandler } from '@/server/middleware/error-handler';
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('../public')); // Serve static files from public directory
+// app.use(express.static('../frontend')); // Serve static files from public directory
 
 // Basic middleware
 

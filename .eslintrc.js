@@ -21,7 +21,6 @@ module.exports = {
       },
     ],
     // Disable some TypeScript rules that might be too strict for this project
-    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
   },
   ignorePatterns: ['dist/**', 'webpack.config.js'],

@@ -4,7 +4,7 @@ import { BadRequestError } from '@/server/errors/http-errors';
 import {
   CreateProtocardRequest,
   UpdateProtocardRequest,
-} from '@/shared/types/route-types';
+} from '@/shared/types/api';
 
 // Empty validator for requests with no body
 export async function noBodyValidator(

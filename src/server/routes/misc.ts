@@ -6,7 +6,7 @@ import {
   PingResponse,
   CountRequest,
   CountResponse,
-} from '@/shared/types/route-types';
+} from '@/shared/types/api';
 import { noBodyValidator } from '@/server/validators';
 
 export function createMiscRoutes(repository: DatabaseRepository): Router {

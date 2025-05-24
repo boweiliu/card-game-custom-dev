@@ -15,11 +15,12 @@ import {
   $id,
 } from '@/frontend/div-ids';
 import * as styles from '@/frontend/container.module.less';
-import { ProtocardCountResponse } from '@/shared/types/api';
+import { GetProtocardCountResponse } from '@/shared/types/api';
 import { sseService } from '@/frontend/sse-service';
 import { getStartScreenContent } from '@/frontend/screens/start-screen';
 import { getScreen1Content } from '@/frontend/screens/screen1';
 import { getScreen2Content } from '@/frontend/screens/screen2';
+import { ApiResponse } from '@/shared/types/responses';
 
 const fullScreenContainerTemplate = () => `
   <div id="${FULLSCREEN_PARENT}" class="${styles.fullScreenContainerParent}">
@@ -65,8 +66,12 @@ class ScreenManager {
     try {
       const response = await fetch('/api/protocards/count');
       if (response.ok) {
-        const data: ProtocardCountResponse = await response.json();
-        this.protocardCount = data.count;
+        const data: ApiResponse<GetProtocardCountResponse> = await response.json();
+        if (!data.success) {
+          console.error('Failed to fetch protocard count:', data.error.message);
+          return;
+        }
+        this.protocardCount = data.data.count;
         // Update screen 2 if it's currently showing
         if (this.$placeholderContainer.hasClass(styles.screen2)) {
           this.showScreen(2);
