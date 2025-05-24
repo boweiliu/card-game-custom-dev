@@ -17,6 +17,9 @@ import {
 import * as styles from './container.module.less';
 import { ProtocardCountResponse } from '@/shared/types';
 import { sseService } from './sse-service';
+import { getStartScreenContent } from './screens/start-screen';
+import { getScreen1Content } from './screens/screen1';
+import { getScreen2Content } from './screens/screen2';
 
 const fullScreenContainerTemplate = () => `
   <div id="${FULLSCREEN_PARENT}" class="${styles.fullScreenContainerParent}">
@@ -104,72 +107,20 @@ class ScreenManager {
     let content: string;
     switch (screenNumber) {
       case 0:
-        content = this.getStartScreenContent();
+        content = getStartScreenContent();
         break;
       case 1:
-        content = this.getScreen1Content();
+        content = getScreen1Content();
         break;
       case 2:
-        content = this.getScreen2Content();
+        content = getScreen2Content(this.protocardCount);
         break;
       default:
-        content = this.getStartScreenContent();
+        content = getStartScreenContent();
     }
     this.$placeholderContainer.html(content);
   }
 
-  private getStartScreenContent(): string {
-    return `
-      <div>
-        <h1>Card Game Simulator</h1>
-        <div id="${CONTENT}">
-          <button id="${ADD_CARD}">Add Card</button>
-          <div id="${CARD}"></div>
-        </div>
-        <div id="${LOADING}"></div>
-      </div>
-    `;
-  }
-
-  private getScreen1Content(): string {
-    return `
-      <div>
-        <h1>Screen 1 - User View</h1>
-        <p>Sample screen with light blue background.</p>
-        <div id="${CONTENT}">
-          <button id="${ADD_CARD}">Add Card</button>
-          <div id="${CARD}"></div>
-        </div>
-        <div id="${LOADING}"></div>
-      </div>
-    `;
-  }
-
-  private getScreen2Content(): string {
-    const sseStatus = sseService.isSSEConnected() ? '🟢 Connected' : '🔴 Disconnected';
-    return `
-      <div>
-        <h1>Screen 2 - Protocards View</h1>
-        <div id="${CONTENT}">
-          <div class="${styles.infoBox}">
-            <h3>Protocards Count</h3>
-            <div id="${PROTOCARD_COUNT}" class="${styles.countDisplay}">
-              Total: ${this.protocardCount}
-            </div>
-          </div>
-          <div class="${styles.infoBox}">
-            <h3>Server Connection</h3>
-            <div id="${SSE_STATUS}" class="${styles.statusDisplay}">
-              SSE Status: ${sseStatus}
-            </div>
-          </div>
-          <button id="${ADD_CARD}">Add Protocard</button>
-          <div id="${CARD}"></div>
-        </div>
-        <div id="${LOADING}"></div>
-      </div>
-    `;
-  }
 }
 
 export async function loadFullScreenContainer() {
