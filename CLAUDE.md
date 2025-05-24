@@ -31,7 +31,7 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 
 ### Frontend Architecture
 
-- **Entry Point**: `src/frontend/index.ts` - Initializes CardManager and sets up the application
+- **Entry Point**: `src/frontend/frontend.ts` - Initializes CardManager and sets up the application
 - **Module System**: Uses CSS modules for styling (`.module.less` files) with localized class names
 - **Component Pattern**: Template-based components using jQuery for DOM manipulation
 - **State Management**: CardManager class handles card CRUD operations and backend communication
@@ -39,7 +39,7 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 
 ### Backend Architecture
 
-- **Server**: Express.js server in `src/server/index.ts`
+- **Server**: Express.js server in `src/server/server.ts`
 - **API Pattern**: RESTful endpoints under `/api/` prefix
 - **Development Mode**: Backend redirects non-API routes to frontend dev server
 - **Production Mode**: Backend serves static frontend files from `dist/frontend`
@@ -57,9 +57,39 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 - **Template System**: String-based HTML templates for dynamic content generation
 - **CSS Modules**: Scoped styling with `.module.less` files for component isolation
 - **Proxy Setup**: Frontend dev server proxies `/api` requests to backend
-- **Shared Types**: TypeScript interfaces in `src/shared/types.ts` used by both frontend and backend
+- **Shared Types**: TypeScript interfaces organized by domain in `src/shared/types/` used by both frontend and backend
 
-### Styling Guidelines
+### Code Style & Organization Guidelines
+
+#### File Naming & Structure
+
+- **No index.ts files**: Name files descriptively (e.g., `frontend.ts`, `server.ts`, `db.ts`)
+- **No re-exports**: Import directly from source files, avoid `export { ... } from '...'`
+- **Absolute imports only**: Use `@/` prefix for all imports, no relative imports (`./` or `../`)
+- **Separated types**: Organize types by domain:
+  - `@/shared/types/db.ts` - Database entity types
+  - `@/shared/types/api.ts` - Request/response types
+  - `@/shared/types/sse.ts` - Server-Sent Events types
+
+#### Import Standards
+
+- **Enforced by ESLint**: Relative imports (`./` or `../`) are banned
+- **Absolute imports**: Always use `@/` prefix (e.g., `@/frontend/container`, `@/server/db/repository`)
+- **Direct imports**: Import types and functions directly from their source files
+- **No convenience re-exports**: Each file should import exactly what it needs from the originating module
+
+#### Database & Backend Patterns
+
+- **Repository pattern**: Database operations wrapped in async methods with proper error handling
+- **Route modularity**: Express routes organized by domain (protocards, sse, misc)
+- **Database initialization**: Pass server root path explicitly rather than detecting git root
+- **Separation of concerns**:
+  - `schemas.ts` - Table creation SQL
+  - `queries.ts` - Query templates
+  - `repository.ts` - Database operations
+  - `db.ts` - Initialization and setup
+
+#### Styling Guidelines
 
 - **DEPRECATED**: `src/frontend/styles.less` is deprecated - do not add new styles here
 - **Use CSS Modules**: All new component styles should go in `.module.less` files
