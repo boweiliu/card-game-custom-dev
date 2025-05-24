@@ -4,12 +4,11 @@ import { TABLE_SCHEMAS } from '@/server/db/schemas';
 import { DatabaseRepository } from '@/server/db/repository';
 
 // Database initialization
-export function initializeDatabase(serverRoot: string): {
+export function initializeDatabase(dbPath: string): {
   db: Database;
   repository: DatabaseRepository;
 } {
-  const dbPath = path.join(serverRoot, '../../db/app.db');
-  console.log('loading dbPath', { dbPath, serverRoot });
+  console.log('loading dbPath', { dbPath });
   const db = new sqlite3.Database(dbPath);
 
   // Create tables if they don't exist

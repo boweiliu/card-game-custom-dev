@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { DatabaseRepository } from '@/server/db/repository';
 import { asyncHandler } from '@/server/middleware/async-handler';
-import { noBodyValidator, protocardValidator } from '@/server/validators';
+import { noBodyValidator, protocardValidator } from '@/server/validators/validators';
 import {
   GetAllProtocardsRequest,
   GetAllProtocardsResponse,

@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import { createProtocardRoutes } from '@/server/routes/protocards';
 import { createSSERoutes } from '@/server/routes/sse';
 import { createMiscRoutes } from '@/server/routes/misc';
@@ -14,7 +15,8 @@ app.use(express.json());
 // Basic middleware
 
 // Initialize database
-const { db, repository } = initializeDatabase(__dirname);
+const dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), 'db/app.db');
+const { db, repository } = initializeDatabase(dbPath);
 
 // Mount route modules
 app.use('/api', createMiscRoutes(repository));
