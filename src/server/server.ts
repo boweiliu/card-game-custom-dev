@@ -6,6 +6,7 @@ import { createSSERoutes } from '@/server/routes/sse';
 import { createMiscRoutes } from '@/server/routes/misc';
 import { initializeDatabase } from '@/server/db/db';
 import { errorHandler } from '@/server/middleware/error-handler';
+import { ROUTES } from '@/shared/routes';
 
 const app = express();
 app.use(cors());
@@ -15,13 +16,14 @@ app.use(express.json());
 // Basic middleware
 
 // Initialize database
-const dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), 'db/app.db');
+const dbPath =
+  process.env.DATABASE_PATH || path.join(process.cwd(), 'db/app.db');
 const { db, repository } = initializeDatabase(dbPath);
 
 // Mount route modules
-app.use('/api', createMiscRoutes(repository));
-app.use('/api/protocards', createProtocardRoutes(repository));
-app.use('/api/events', createSSERoutes());
+app.use(ROUTES.BASE, createMiscRoutes(repository));
+app.use(ROUTES.PROTOCARDS.BASE, createProtocardRoutes(repository));
+app.use(ROUTES.SSE, createSSERoutes());
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

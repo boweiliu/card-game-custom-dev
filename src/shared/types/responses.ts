@@ -1,6 +1,8 @@
 // JSON-RPC 2.0 inspired response types for consistent API and SSE responses
 
-export type MessageID = (string | number | null | undefined) & { __message_id: true };
+export type MessageID = (string | number | null | undefined) & {
+  __message_id: true;
+};
 
 export interface SuccessResponse<T = unknown> {
   id?: MessageID;

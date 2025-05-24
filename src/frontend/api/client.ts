@@ -25,7 +25,7 @@ export class ApiClient {
   private readonly baseUrl: string;
   private readonly defaultTimeout: number;
 
-  constructor(baseUrl = '/api', defaultTimeout = 10000) {
+  constructor(baseUrl = '/', defaultTimeout = 10000) {
     this.baseUrl = baseUrl.replace(/\/$/, ''); // Remove trailing slash
     this.defaultTimeout = defaultTimeout;
   }
@@ -34,18 +34,18 @@ export class ApiClient {
    * Make an API request
    */
   async request<T>(
-    endpoint: string, 
+    endpoint: string,
     options: ApiRequestOptions = {}
   ): Promise<ApiResponse<T>> {
     const {
       method = 'GET',
       body,
       correlationId,
-      timeout = this.defaultTimeout
+      timeout = this.defaultTimeout,
     } = options;
 
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     // Build request config
     const requestConfig: RequestInit = {
       method,
@@ -58,7 +58,7 @@ export class ApiClient {
 
     // Add body for non-GET requests
     if (method !== 'GET' && body !== undefined) {
-      const bodyWithId = correlationId 
+      const bodyWithId = correlationId
         ? { ...body, id: correlationId as MessageID }
         : body;
       requestConfig.body = JSON.stringify(bodyWithId);
@@ -78,11 +78,7 @@ export class ApiClient {
 
       // Check if the API returned an error response
       if (!data.success) {
-        throw new ApiError(
-          data.error.message,
-          response.status,
-          data
-        );
+        throw new ApiError(data.error.message, response.status, data);
       }
 
       return data;
@@ -90,15 +86,15 @@ export class ApiClient {
       if (error instanceof ApiError) {
         throw error;
       }
-      
+
       if (error instanceof DOMException && error.name === 'TimeoutError') {
         throw new ApiError(`Request timeout after ${timeout}ms`, 408);
       }
-      
+
       if (error instanceof TypeError) {
         throw new ApiError('Network error: Unable to connect to server', 0);
       }
-      
+
       throw new ApiError(
         `Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`,
         0
@@ -109,10 +105,23 @@ export class ApiClient {
   /**
    * GET request
    */
-  async get<T>(endpoint: string, correlationId?: string): Promise<T> {
-    const response = await this.request<T>(endpoint, { 
-      method: 'GET', 
-      correlationId 
+  async get<T>(
+    endpoint: string,
+    params?: Record<string, string | number>,
+    correlationId?: string
+  ): Promise<T> {
+    let url = endpoint;
+    if (params && Object.keys(params).length > 0) {
+      const searchParams = new URLSearchParams();
+      for (const [key, value] of Object.entries(params)) {
+        searchParams.append(key, String(value));
+      }
+      url += `?${searchParams.toString()}`;
+    }
+
+    const response = await this.request<T>(url, {
+      method: 'GET',
+      correlationId,
     });
     if (!response.success) {
       throw new ApiError('Response was not successful', 500, response);
@@ -124,14 +133,14 @@ export class ApiClient {
    * POST request
    */
   async post<T>(
-    endpoint: string, 
-    body: unknown, 
+    endpoint: string,
+    body: unknown,
     correlationId?: string
   ): Promise<T> {
-    const response = await this.request<T>(endpoint, { 
-      method: 'POST', 
-      body, 
-      correlationId 
+    const response = await this.request<T>(endpoint, {
+      method: 'POST',
+      body,
+      correlationId,
     });
     if (!response.success) {
       throw new ApiError('Response was not successful', 500, response);
@@ -143,14 +152,14 @@ export class ApiClient {
    * PUT request
    */
   async put<T>(
-    endpoint: string, 
-    body: unknown, 
+    endpoint: string,
+    body: unknown,
     correlationId?: string
   ): Promise<T> {
-    const response = await this.request<T>(endpoint, { 
-      method: 'PUT', 
-      body, 
-      correlationId 
+    const response = await this.request<T>(endpoint, {
+      method: 'PUT',
+      body,
+      correlationId,
     });
     if (!response.success) {
       throw new ApiError('Response was not successful', 500, response);
@@ -162,9 +171,9 @@ export class ApiClient {
    * DELETE request
    */
   async delete<T>(endpoint: string, correlationId?: string): Promise<T> {
-    const response = await this.request<T>(endpoint, { 
-      method: 'DELETE', 
-      correlationId 
+    const response = await this.request<T>(endpoint, {
+      method: 'DELETE',
+      correlationId,
     });
     if (!response.success) {
       throw new ApiError('Response was not successful', 500, response);

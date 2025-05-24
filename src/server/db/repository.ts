@@ -2,7 +2,10 @@ import { Database } from 'sqlite3';
 import { QUERIES } from '@/server/db/sql/queries';
 import { Protocard, ProtocardId } from '@/server/db/types';
 import { DatabaseError, NotFoundError } from '@/server/errors/http-errors';
-import { validateProtocard, validateRowCount } from '@/server/db/validators/input';
+import {
+  validateProtocard,
+  validateRowCount,
+} from '@/server/db/validators/input';
 import { GenericValidation } from '@/shared/validation/validation';
 
 export class DatabaseRepository {
@@ -41,10 +44,12 @@ export class DatabaseRepository {
           return;
         }
         try {
-          const validatedCards = rows.map(row => validateProtocard(row));
+          const validatedCards = rows.map((row) => validateProtocard(row));
           resolve(validatedCards);
         } catch (validationError) {
-          reject(new DatabaseError('validating protocards', validationError as Error));
+          reject(
+            new DatabaseError('validating protocards', validationError as Error)
+          );
         }
       });
     });
@@ -66,18 +71,27 @@ export class DatabaseRepository {
   async createProtocord(textBody: string): Promise<Protocard> {
     GenericValidation.validateString(textBody);
     return new Promise((resolve, reject) => {
-      this.db.get(QUERIES.PROTOCARDS.INSERT, [textBody], (err, row: unknown) => {
-        if (err) {
-          reject(new DatabaseError('creating protocard', err));
-          return;
+      this.db.get(
+        QUERIES.PROTOCARDS.INSERT,
+        [textBody],
+        (err, row: unknown) => {
+          if (err) {
+            reject(new DatabaseError('creating protocard', err));
+            return;
+          }
+          try {
+            const validatedCard = validateProtocard(row);
+            resolve(validatedCard);
+          } catch (validationError) {
+            reject(
+              new DatabaseError(
+                'validating created protocard',
+                validationError as Error
+              )
+            );
+          }
         }
-        try {
-          const validatedCard = validateProtocard(row);
-          resolve(validatedCard);
-        } catch (validationError) {
-          reject(new DatabaseError('validating created protocard', validationError as Error));
-        }
-      });
+      );
     });
   }
 
@@ -86,26 +100,37 @@ export class DatabaseRepository {
     GenericValidation.validateString(textBody);
 
     return new Promise((resolve, reject) => {
-      this.db.get(QUERIES.PROTOCARDS.UPDATE, [textBody, id], (err, row: unknown) => {
-        if (err) {
-          reject(new DatabaseError('updating protocard', err));
-          return;
+      this.db.get(
+        QUERIES.PROTOCARDS.UPDATE,
+        [textBody, id],
+        (err, row: unknown) => {
+          if (err) {
+            reject(new DatabaseError('updating protocard', err));
+            return;
+          }
+          if (!row) {
+            reject(new NotFoundError('Protocard'));
+            return;
+          }
+          try {
+            const validatedCard = validateProtocard(row);
+            resolve(validatedCard);
+          } catch (validationError) {
+            reject(
+              new DatabaseError(
+                'validating updated protocard',
+                validationError as Error
+              )
+            );
+          }
         }
-        if (!row) {
-          reject(new NotFoundError('Protocard'));
-          return;
-        }
-        try {
-          const validatedCard = validateProtocard(row);
-          resolve(validatedCard);
-        } catch (validationError) {
-          reject(new DatabaseError('validating updated protocard', validationError as Error));
-        }
-      });
+      );
     });
   }
 
-  async deleteProtocord(id: ProtocardId): Promise<{ deleted: Protocard | null }> {
+  async deleteProtocord(
+    id: ProtocardId
+  ): Promise<{ deleted: Protocard | null }> {
     GenericValidation.validatePositiveInteger(id);
     return new Promise((resolve, reject) => {
       this.db.get(QUERIES.PROTOCARDS.DELETE, [id], (err, row: unknown) => {

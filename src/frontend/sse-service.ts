@@ -1,4 +1,5 @@
 import { SSEEvent } from '@/shared/types/sse';
+import { API_PATHS_FRONTEND } from '@/shared/routes';
 
 class SSEService {
   private eventSource: EventSource | null = null;
@@ -10,7 +11,7 @@ class SSEService {
     }
 
     console.log('[SSE] Connecting to server...');
-    this.eventSource = new EventSource('/api/events');
+    this.eventSource = new EventSource(API_PATHS_FRONTEND.sse());
 
     this.eventSource.onopen = () => {
       console.log('[SSE] Connected');

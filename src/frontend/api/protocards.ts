@@ -1,6 +1,7 @@
 // Protocard API service
 
 import { apiClient } from '@/frontend/api/client';
+import { API_PATHS_FRONTEND } from '@/shared/routes';
 import {
   GetAllProtocardsResponse,
   GetProtocardCountResponse,
@@ -13,19 +14,22 @@ import {
 import { ProtocardId } from '@/server/db/types';
 
 export class ProtocardApi {
-  
   /**
    * Get all protocards
    */
   async getAll(): Promise<GetAllProtocardsResponse> {
-    return apiClient.get<GetAllProtocardsResponse>('/protocards');
+    return apiClient.get<GetAllProtocardsResponse>(
+      API_PATHS_FRONTEND.protocards.getAll()
+    );
   }
 
   /**
    * Get protocard count
    */
   async getCount(): Promise<number> {
-    const response = await apiClient.get<GetProtocardCountResponse>('/protocards/count');
+    const response = await apiClient.get<GetProtocardCountResponse>(
+      API_PATHS_FRONTEND.protocards.getCount()
+    );
     return response.count;
   }
 
@@ -33,10 +37,10 @@ export class ProtocardApi {
    * Create a new protocard
    */
   async create(
-    request: CreateProtocardRequest, 
+    request: CreateProtocardRequest
   ): Promise<CreateProtocardResponse> {
     return apiClient.post<CreateProtocardResponse>(
-      '/protocards', 
+      API_PATHS_FRONTEND.protocards.create(),
       request
     );
   }
@@ -46,10 +50,10 @@ export class ProtocardApi {
    */
   async update(
     entityId: ProtocardId,
-    request: UpdateProtocardRequest,
+    request: UpdateProtocardRequest
   ): Promise<UpdateProtocardResponse> {
     return apiClient.put<UpdateProtocardResponse>(
-      `/protocards/${entityId}`,
+      API_PATHS_FRONTEND.protocards.update(entityId),
       request
     );
   }
@@ -57,11 +61,9 @@ export class ProtocardApi {
   /**
    * Delete a protocard
    */
-  async delete(
-    entityId: ProtocardId,
-  ): Promise<DeleteProtocardResponse> {
+  async delete(entityId: ProtocardId): Promise<DeleteProtocardResponse> {
     return apiClient.delete<DeleteProtocardResponse>(
-      `/protocards/${entityId}`
+      API_PATHS_FRONTEND.protocards.delete(entityId)
     );
   }
 }

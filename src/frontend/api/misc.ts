@@ -1,26 +1,26 @@
 // Misc API service
 
 import { apiClient } from '@/frontend/api/client';
-import {
-  PingResponse,
-  CountResponse,
-} from '@/shared/types/api';
+import { API_PATHS_FRONTEND } from '@/shared/routes';
+import { PingResponse, CountResponse } from '@/shared/types/api';
 
 export class MiscApi {
-  
   /**
    * Ping the backend
    */
-  async ping(delaySeconds?: number, correlationId?: string): Promise<void> {
-    const endpoint = delaySeconds ? `/ping?delay=${delaySeconds}` : '/ping';
-    await apiClient.get<PingResponse>(endpoint, correlationId);
+  async ping(delaySeconds?: number): Promise<void> {
+    const params = delaySeconds ? { delay: delaySeconds } : undefined;
+    await apiClient.get<PingResponse>(API_PATHS_FRONTEND.ping(), params);
   }
 
   /**
    * Get call count
    */
-  async getCallCount(correlationId?: string): Promise<number> {
-    const response = await apiClient.post<CountResponse>('/count', {}, correlationId);
+  async getCallCount(): Promise<number> {
+    const response = await apiClient.post<CountResponse>(
+      API_PATHS_FRONTEND.count(),
+      {}
+    );
     return response.total;
   }
 }

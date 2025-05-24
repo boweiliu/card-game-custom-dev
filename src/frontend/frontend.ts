@@ -3,8 +3,9 @@ import { Spinner } from '@/frontend/spinner';
 import { loadFullScreenContainer } from '@/frontend/container';
 import { cardTemplate } from '@/frontend/cards';
 import { $id, ADD_CARD, CARD, LOADING } from '@/frontend/div-ids';
-import { Protocard } from '@/server/db/types';
+import { Protocard, ProtocardId } from '@/server/db/types';
 import { miscApi } from '@/frontend/api/misc';
+import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
 
 interface Card {
@@ -37,7 +38,7 @@ class CardManager {
     try {
       console.log(`Pinging backend with ${delaySeconds}s delay...`);
       await miscApi.ping(delaySeconds > 0 ? delaySeconds : undefined);
-      
+
       this.$loadingIndicator.removeClass('textError').hide();
       console.log('Backend is up');
     } catch (error) {
@@ -48,7 +49,10 @@ class CardManager {
       } else {
         this.$loadingIndicator
           .addClass('textError')
-          .text('Not Connected: ' + (error instanceof Error ? error.message : 'Unknown error'));
+          .text(
+            'Not Connected: ' +
+              (error instanceof Error ? error.message : 'Unknown error')
+          );
         console.error('Backend is down:', error);
       }
     } finally {
@@ -85,12 +89,7 @@ class CardManager {
 
     const id = $card.data('id');
     try {
-      await $.ajax({
-        url: `/api/cards/${id}`,
-        method: 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify({ content }),
-      });
+      await protocardApi.update(id, { text_body: content });
       $card.find('.card-content').text(content);
     } catch (error) {
       console.error('Error editing card:', error);
@@ -101,10 +100,7 @@ class CardManager {
     if (!confirm('Are you sure you want to delete this card?')) return;
 
     try {
-      await $.ajax({
-        url: `/api/cards/${id}`,
-        method: 'DELETE',
-      });
+      await protocardApi.delete(id as ProtocardId);
       this.loadCards();
     } catch (error) {
       console.error('Error deleting card:', error);
@@ -113,11 +109,13 @@ class CardManager {
 
   private async loadCards() {
     try {
-      const response = await $.ajax({
-        url: '/api/cards',
-        method: 'GET',
-      });
-      this.cards = response;
+      const response = await protocardApi.getAll();
+      this.cards = response.map((p) => ({
+        id: p.entityId,
+        content: p.text_body,
+        x_position: 100,
+        y_position: 100,
+      }));
       this.renderCards();
     } catch (error) {
       console.error('Error loading cards:', error);
@@ -137,16 +135,7 @@ class CardManager {
     if (!content) return;
 
     try {
-      const response = await $.ajax({
-        url: '/api/cards',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          content,
-          x_position: 100,
-          y_position: 100,
-        }),
-      });
+      await protocardApi.create({ text_body: content });
       this.loadCards();
     } catch (error) {
       console.error('Error creating card:', error);

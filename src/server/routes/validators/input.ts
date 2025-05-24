@@ -50,17 +50,17 @@ export async function deleteProtocardValidator(
   return [{}, validatedParams];
 }
 
-function validateProtocardBody(inData: unknown): CreateProtocardRequest | UpdateProtocardRequest {
+function validateProtocardBody(
+  inData: unknown
+): CreateProtocardRequest | UpdateProtocardRequest {
   const data = GenericValidation.validateObject(inData, 'request body');
   const { text_body, id } = data;
-
 
   return {
     id: BrandedTypeValidation.validateOptionalMessageID(id, 'id'),
     text_body: GenericValidation.validateString(text_body, 'text_body'),
   };
 }
-  
 
 function validateProtocardParams(params: unknown): ProtocardParams {
   const data = GenericValidation.validateObject(params, 'request params');

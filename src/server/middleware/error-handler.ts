@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { HttpError } from '@/server/errors/http-errors';
 import { ErrorResponse, MessageID } from '@/shared/types/responses';
+import {
+  extractRequestId,
+  extractData,
+} from '@/server/middleware/async-handler';
 
 export function errorHandler(
   error: Error,
@@ -16,12 +20,13 @@ export function errorHandler(
 
   // Extract request ID if present
   const requestId: MessageID | undefined = (() => {
-    const { body, query } = req;
-    const hasBody = body && typeof body === 'object' && Object.keys(body).length > 0;
-    const rawData = hasBody ? body : query;
-    return (rawData && typeof rawData === 'object' && 'id' in rawData) 
-      ? (rawData as any).id as MessageID
-      : undefined;
+    try {
+      const rawData = extractData(req);
+      return extractRequestId(rawData);
+    } catch (error) {
+      console.error('Failed to extract request ID:', error);
+      return undefined;
+    }
   })();
 
   // Handle known HTTP errors
@@ -52,10 +57,10 @@ export function errorHandler(
     success: false,
     type: 'api.error',
     error: {
-      message: 'Internal server error',
-      code: 'INTERNAL_SERVER_ERROR',
+      message: error.message,
+      code: error.name,
       ...(process.env.NODE_ENV === 'development' && {
-        details: error.message,
+        details: error.stack,
       }),
     },
     meta: {

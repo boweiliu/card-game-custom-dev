@@ -3,16 +3,15 @@
 import { Protocard, ProtocardId } from '@/server/db/types';
 import { MessageID } from '@/shared/types/responses';
 
-
 // Parameter types for routes
 export interface ProtocardParams {
   entityId: ProtocardId;
 }
 
-export type ProtocardTransportType = "transport.protocard" & { __brand: never }
+export type ProtocardTransportType = 'transport.protocard' & { __brand: never };
 
 export type ProtocardTransport = {
-  id: ProtocardId;
+  entityId: ProtocardId;
   text_body: string;
   type: ProtocardTransportType;
 };
@@ -49,8 +48,7 @@ export interface PingRequest {
 }
 export type PingResponse = {};
 
-export interface CountRequest {
-}
+export interface CountRequest {}
 export type CountResponse = {
   total: number;
 };

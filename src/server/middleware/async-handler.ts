@@ -6,14 +6,19 @@ type AsyncRouteHandler<InT, OutT, ParamsT> = (
   params: ParamsT
 ) => Promise<OutT>;
 
-function extractRequestId(rawData: unknown): MessageID | undefined {
-  if (!rawData || typeof rawData !== 'object' || !('id' in rawData) || typeof rawData.id !== 'string') {
+export function extractRequestId(rawData: unknown): MessageID | undefined {
+  if (
+    !rawData ||
+    typeof rawData !== 'object' ||
+    !('id' in rawData) ||
+    typeof rawData.id !== 'string'
+  ) {
     return undefined;
   }
-  return (rawData as any).id as MessageID;
+  return rawData.id as MessageID;
 }
 
-function extractData(request: Request): unknown {
+export function extractData(request: Request): unknown {
   const { body, query } = request;
   const hasBody =
     body && typeof body === 'object' && Object.keys(body).length > 0;
@@ -22,7 +27,11 @@ function extractData(request: Request): unknown {
 
 // Wrapper to catch async errors and handle returned data
 export function asyncHandler<InT, OutT, ParamsT>(fns: {
-  validator: (inData: unknown, params: unknown, req: unknown) => Promise<[InT, ParamsT]>;
+  validator: (
+    inData: unknown,
+    params: unknown,
+    req: unknown
+  ) => Promise<[InT, ParamsT]>;
   routeFn: AsyncRouteHandler<InT, OutT, ParamsT>;
   responseType: string;
 }) {
@@ -45,7 +54,7 @@ export function asyncHandler<InT, OutT, ParamsT>(fns: {
         result: result,
         meta: {
           timestamp: new Date().toISOString(),
-          params: [ requestData, params ],
+          params: [requestData, params],
         },
       };
       res.json(response);

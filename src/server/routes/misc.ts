@@ -19,7 +19,10 @@ export function createMiscRoutes(repository: DatabaseRepository): Router {
       validator: async (inData: unknown, params: unknown, req: unknown) => {
         return [inData as PingRequest, {}];
       },
-      routeFn: async (props: PingRequest, params: {}): Promise<PingResponse> => {
+      routeFn: async (
+        props: PingRequest,
+        params: {}
+      ): Promise<PingResponse> => {
         const { delay = 0 } = props;
         console.log(`Ping endpoint called with ${delay}s delay`);
         await new Promise((resolve) =>

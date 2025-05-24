@@ -5,7 +5,10 @@ import { MessageID } from '@/shared/types/responses';
 
 // Base validation error types
 export class ValidationError extends Error {
-  constructor(message: string, public field?: string) {
+  constructor(
+    message: string,
+    public field?: string
+  ) {
     super(message);
     this.name = 'ValidationError';
   }
@@ -13,7 +16,6 @@ export class ValidationError extends Error {
 
 // Generic validation functions for primitive types
 export namespace GenericValidation {
-  
   // String validation
   export function validateString(value: unknown, fieldName = 'field'): string {
     if (typeof value !== 'string') {
@@ -22,7 +24,10 @@ export namespace GenericValidation {
     return value;
   }
 
-  export function validateNonEmptyString(value: unknown, fieldName = 'field'): string {
+  export function validateNonEmptyString(
+    value: unknown,
+    fieldName = 'field'
+  ): string {
     const str = validateString(value, fieldName);
     if (str.trim().length === 0) {
       throw new ValidationError(`${fieldName} cannot be empty`, fieldName);
@@ -30,10 +35,17 @@ export namespace GenericValidation {
     return str.trim();
   }
 
-  export function validateStringWithLength(value: unknown, maxLength: number, fieldName = 'field'): string {
+  export function validateStringWithLength(
+    value: unknown,
+    maxLength: number,
+    fieldName = 'field'
+  ): string {
     const str = validateNonEmptyString(value, fieldName);
     if (str.length > maxLength) {
-      throw new ValidationError(`${fieldName} cannot exceed ${maxLength} characters`, fieldName);
+      throw new ValidationError(
+        `${fieldName} cannot exceed ${maxLength} characters`,
+        fieldName
+      );
     }
     return str;
   }
@@ -41,15 +53,24 @@ export namespace GenericValidation {
   // Number validation
   export function validateNumber(value: unknown, fieldName = 'field'): number {
     if (typeof value !== 'number' || isNaN(value)) {
-      throw new ValidationError(`${fieldName} must be a valid number`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a valid number`,
+        fieldName
+      );
     }
     return value;
   }
 
-  export function validatePositiveNumber(value: unknown, fieldName = 'field'): number {
+  export function validatePositiveNumber(
+    value: unknown,
+    fieldName = 'field'
+  ): number {
     const num = validateNumber(value, fieldName);
     if (num <= 0) {
-      throw new ValidationError(`${fieldName} must be a positive number`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a positive number`,
+        fieldName
+      );
     }
     return num;
   }
@@ -62,49 +83,79 @@ export namespace GenericValidation {
     return num;
   }
 
-  export function validatePositiveInteger(value: unknown, fieldName = 'field'): number {
+  export function validatePositiveInteger(
+    value: unknown,
+    fieldName = 'field'
+  ): number {
     const num = validateInteger(value, fieldName);
     if (num <= 0) {
-      throw new ValidationError(`${fieldName} must be a positive integer`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a positive integer`,
+        fieldName
+      );
     }
     return num;
   }
 
   // Parse string to number
-  export function parseStringToNumber(value: unknown, fieldName = 'field'): number {
+  export function parseStringToNumber(
+    value: unknown,
+    fieldName = 'field'
+  ): number {
     if (typeof value === 'number') {
       return validateNumber(value, fieldName);
     }
     if (typeof value !== 'string') {
-      throw new ValidationError(`${fieldName} must be a string or number`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a string or number`,
+        fieldName
+      );
     }
     const parsed = parseInt(value, 10);
     if (isNaN(parsed)) {
-      throw new ValidationError(`${fieldName} must be a valid number`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a valid number`,
+        fieldName
+      );
     }
     return parsed;
   }
 
-  export function parseStringToPositiveInteger(value: unknown, fieldName = 'field'): number {
+  export function parseStringToPositiveInteger(
+    value: unknown,
+    fieldName = 'field'
+  ): number {
     const num = parseStringToNumber(value, fieldName);
     if (num <= 0) {
-      throw new ValidationError(`${fieldName} must be a positive number`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a positive number`,
+        fieldName
+      );
     }
     return num;
   }
 
   // Date validation
-  export function validateISODateString(value: unknown, fieldName = 'field'): string {
+  export function validateISODateString(
+    value: unknown,
+    fieldName = 'field'
+  ): string {
     const str = validateString(value, fieldName);
     const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
     if (!regex.test(str)) {
-      throw new ValidationError(`${fieldName} must be a valid ISO date string`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a valid ISO date string`,
+        fieldName
+      );
     }
     return str;
   }
 
   // Object validation
-  export function validateObject(value: unknown, fieldName = 'field'): Record<string, unknown> {
+  export function validateObject(
+    value: unknown,
+    fieldName = 'field'
+  ): Record<string, unknown> {
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
       throw new ValidationError(`${fieldName} must be an object`, fieldName);
     }
@@ -113,7 +164,7 @@ export namespace GenericValidation {
 
   // Optional validation
   export function validateOptional<T>(
-    value: unknown, 
+    value: unknown,
     validator: (val: unknown, field: string) => T,
     fieldName = 'field'
   ): T | undefined {
@@ -126,34 +177,55 @@ export namespace GenericValidation {
 
 // Branded type validators (using generic validators)
 export namespace BrandedTypeValidation {
-  
-  export function validateProtocardId(value: unknown, fieldName = 'id'): ProtocardId {
+  export function validateProtocardId(
+    value: unknown,
+    fieldName = 'id'
+  ): ProtocardId {
     let num: number;
-    
+
     if (typeof value === 'number') {
       num = GenericValidation.validatePositiveInteger(value, fieldName);
     } else if (typeof value === 'string') {
       num = GenericValidation.parseStringToPositiveInteger(value, fieldName);
     } else {
-      throw new ValidationError(`${fieldName} must be a number or string`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a number or string`,
+        fieldName
+      );
     }
-    
+
     return num as ProtocardId;
   }
 
-  export function validateDateString(value: unknown, fieldName = 'date'): DateString {
+  export function validateDateString(
+    value: unknown,
+    fieldName = 'date'
+  ): DateString {
     const str = GenericValidation.validateISODateString(value, fieldName);
     return str as DateString;
   }
 
-  export function validateMessageID(value: unknown, fieldName = 'id'): MessageID {
+  export function validateMessageID(
+    value: unknown,
+    fieldName = 'id'
+  ): MessageID {
     if (typeof value !== 'string' && typeof value !== 'number') {
-      throw new ValidationError(`${fieldName} must be a string or number`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a string or number`,
+        fieldName
+      );
     }
     return value as MessageID;
   }
 
-  export function validateOptionalMessageID(value: unknown, fieldName = 'id'): MessageID | undefined {
-    return GenericValidation.validateOptional(value, validateMessageID, fieldName);
+  export function validateOptionalMessageID(
+    value: unknown,
+    fieldName = 'id'
+  ): MessageID | undefined {
+    return GenericValidation.validateOptional(
+      value,
+      validateMessageID,
+      fieldName
+    );
   }
 }

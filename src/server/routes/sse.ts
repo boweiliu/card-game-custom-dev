@@ -27,9 +27,9 @@ export function createSSERoutes(): Router {
     const connectedResponse: SSEConnectedResponse = {
       id: undefined,
       success: true,
-      type: "sse.connected",
-      result: { message: "SSE connection established" },
-      meta: { timestamp: new Date().toISOString() }
+      type: 'sse.connected',
+      result: { message: 'SSE connection established' },
+      meta: { timestamp: new Date().toISOString() },
     };
     res.write(`data: ${JSON.stringify(connectedResponse)}\n\n`);
 
@@ -48,9 +48,9 @@ export function createSSERoutes(): Router {
       const heartbeatResponse: SSEHeartbeatResponse = {
         id: undefined,
         success: true,
-        type: "sse.heartbeat",
+        type: 'sse.heartbeat',
         result: { count: heartbeatCount },
-        meta: { timestamp: new Date().toISOString() }
+        meta: { timestamp: new Date().toISOString() },
       };
       const heartbeatData = `data: ${JSON.stringify(heartbeatResponse)}\n\n`;
 
