@@ -1,5 +1,5 @@
 import { Database } from 'sqlite3';
-import { QUERIES } from './queries';
+import { QUERIES } from '@/server/db/queries';
 import { Protocard } from '@/shared/types/db';
 
 export class DatabaseRepository {

@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import { createProtocardRoutes } from './routes/protocards';
-import { createSSERoutes } from './routes/sse';
-import { createMiscRoutes } from './routes/misc';
-import { initializeDatabase } from './db';
+import { createProtocardRoutes } from '@/server/routes/protocards';
+import { createSSERoutes } from '@/server/routes/sse';
+import { createMiscRoutes } from '@/server/routes/misc';
+import { initializeDatabase } from '@/server/db';
 
 const app = express();
 app.use(cors());

@@ -1,4 +1,4 @@
-import { CONTENT, ADD_CARD, CARD, LOADING } from '../div-ids';
+import { CONTENT, ADD_CARD, CARD, LOADING } from '@/frontend/div-ids';
 
 export function getStartScreenContent(): string {
   return `

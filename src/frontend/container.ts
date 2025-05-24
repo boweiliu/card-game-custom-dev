@@ -13,13 +13,13 @@ import {
   PROTOCARD_COUNT,
   SSE_STATUS,
   $id,
-} from './div-ids';
-import * as styles from './container.module.less';
+} from '@/frontend/div-ids';
+import * as styles from '@/frontend/container.module.less';
 import { ProtocardCountResponse } from '@/shared/types/api';
-import { sseService } from './sse-service';
-import { getStartScreenContent } from './screens/start-screen';
-import { getScreen1Content } from './screens/screen1';
-import { getScreen2Content } from './screens/screen2';
+import { sseService } from '@/frontend/sse-service';
+import { getStartScreenContent } from '@/frontend/screens/start-screen';
+import { getScreen1Content } from '@/frontend/screens/screen1';
+import { getScreen2Content } from '@/frontend/screens/screen2';
 
 const fullScreenContainerTemplate = () => `
   <div id="${FULLSCREEN_PARENT}" class="${styles.fullScreenContainerParent}">

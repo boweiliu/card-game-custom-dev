@@ -1,7 +1,7 @@
 import sqlite3, { Database } from 'sqlite3';
 import path from 'path';
-import { TABLE_SCHEMAS } from './schemas';
-import { DatabaseRepository } from './repository';
+import { TABLE_SCHEMAS } from '@/server/db/schemas';
+import { DatabaseRepository } from '@/server/db/repository';
 
 // Database initialization
 export function initializeDatabase(): {
@@ -22,4 +22,4 @@ export function initializeDatabase(): {
   return { db, repository };
 }
 
-export { DatabaseRepository } from './repository';
+export { DatabaseRepository } from '@/server/db/repository';
