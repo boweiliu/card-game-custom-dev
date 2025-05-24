@@ -1,11 +1,11 @@
 import { Spinner } from '@/frontend/components/spinner/spinner';
-import { cardTemplate } from '@/frontend/cards';
+import { cardTemplate } from '@/frontend/components/cards';
 import { $id, ADD_CARD, CARD, LOADING } from '@/frontend/utils/div-ids';
 import { ProtocardId } from '@/server/db/types';
 import { miscApi } from '@/frontend/api/misc';
 import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
-import { Card } from '@/shared/types/frontend';
+import { Card } from '@/frontend/types';
 
 export class CardManager {
   private cards: Card[] = [];
@@ -21,7 +21,7 @@ export class CardManager {
   }
 
   private async checkBackendStatus() {
-    await this.pingBackend(10);
+    await this.pingBackend(9);
   }
 
   // Public method to test ping with optional delay (for debugging spinner)

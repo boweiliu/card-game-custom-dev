@@ -1,35 +1,10 @@
-@import url('./utils/colors.less');
-
 /* 
 DEPRECATED: This file is deprecated. Do not add new styles here.
 Use CSS modules (*.module.less) for component-specific styles instead.
 Global styles should be applied through the app-root element or component-specific modules.
+
+All styles have been moved to their respective CSS modules:
+- h1 styles → container.module.less (.title)
+- #add-card → container.module.less (.addCard)  
+- .card → cards.module.less (.card)
 */
-
-h1 {
-  text-align: center;
-  color: @text-primary;
-}
-
-#add-card {
-  display: block;
-  margin: 20px auto;
-  padding: 10px 20px;
-  background-color: @primary-blue;
-  color: @text-white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.card {
-  background-color: @white;
-  border: 1px solid @button-default;
-  border-radius: 5px;
-  padding: 15px;
-  margin: 10px;
-  display: inline-block;
-  min-width: 200px;
-  box-shadow: 0 2px 4px @shadow-light;
-  cursor: pointer;
-}

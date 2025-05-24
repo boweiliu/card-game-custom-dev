@@ -15,7 +15,7 @@ export function getScreen2Content(protocardCount: number): string {
     : '🔴 Disconnected';
   return `
     <div>
-      <h1>Screen 2 - Protocards View</h1>
+      <h1 class="${styles.title}">Screen 2 - Protocards View</h1>
       <div id="${CONTENT}">
         <div class="${styles.infoBox}">
           <h3>Protocards Count</h3>
@@ -29,7 +29,7 @@ export function getScreen2Content(protocardCount: number): string {
             SSE Status: ${sseStatus}
           </div>
         </div>
-        <button id="${ADD_CARD}">Add Protocard</button>
+        <button id="${ADD_CARD}" class="${styles.addCard}">Add Protocard</button>
         <div id="${CARD}"></div>
       </div>
       <div id="${LOADING}"></div>
