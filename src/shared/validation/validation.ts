@@ -22,7 +22,7 @@ export namespace GenericValidation {
     fieldName = 'field'
   ): boolean {
     if (typeof value !== 'boolean') {
-      throw new ValidationError(`${fieldName} must be a boolean`, fieldName);
+      throw new ValidationError(`${fieldName} must be a boolean. Got: ${JSON.stringify(value)}`, fieldName);
     }
     return value;
   }
@@ -30,7 +30,7 @@ export namespace GenericValidation {
   // String validation
   export function validateString(value: unknown, fieldName = 'field'): string {
     if (typeof value !== 'string') {
-      throw new ValidationError(`${fieldName} must be a string`, fieldName);
+      throw new ValidationError(`${fieldName} must be a string. Got: ${JSON.stringify(value)}`, fieldName);
     }
     return value;
   }
@@ -41,7 +41,7 @@ export namespace GenericValidation {
   ): string {
     const str = validateString(value, fieldName);
     if (str.trim().length === 0) {
-      throw new ValidationError(`${fieldName} cannot be empty`, fieldName);
+      throw new ValidationError(`${fieldName} cannot be empty. Got: ${JSON.stringify(value)}`, fieldName);
     }
     return str.trim();
   }
@@ -54,7 +54,7 @@ export namespace GenericValidation {
     const str = validateNonEmptyString(value, fieldName);
     if (str.length > maxLength) {
       throw new ValidationError(
-        `${fieldName} cannot exceed ${maxLength} characters`,
+        `${fieldName} cannot exceed ${maxLength} characters. Got: ${JSON.stringify(value)} (length: ${str.length})`,
         fieldName
       );
     }
@@ -65,7 +65,7 @@ export namespace GenericValidation {
   export function validateNumber(value: unknown, fieldName = 'field'): number {
     if (typeof value !== 'number' || isNaN(value)) {
       throw new ValidationError(
-        `${fieldName} must be a valid number`,
+        `${fieldName} must be a valid number. Got: ${JSON.stringify(value)}`,
         fieldName
       );
     }
@@ -79,7 +79,7 @@ export namespace GenericValidation {
     const num = validateNumber(value, fieldName);
     if (num <= 0) {
       throw new ValidationError(
-        `${fieldName} must be a positive number`,
+        `${fieldName} must be a positive number. Got: ${JSON.stringify(value)}`,
         fieldName
       );
     }
@@ -89,7 +89,7 @@ export namespace GenericValidation {
   export function validateInteger(value: unknown, fieldName = 'field'): number {
     const num = validateNumber(value, fieldName);
     if (!Number.isInteger(num)) {
-      throw new ValidationError(`${fieldName} must be an integer`, fieldName);
+      throw new ValidationError(`${fieldName} must be an integer. Got: ${JSON.stringify(value)}`, fieldName);
     }
     return num;
   }
@@ -101,7 +101,7 @@ export namespace GenericValidation {
     const num = validateInteger(value, fieldName);
     if (num <= 0) {
       throw new ValidationError(
-        `${fieldName} must be a positive integer`,
+        `${fieldName} must be a positive integer. Got: ${JSON.stringify(value)}`,
         fieldName
       );
     }
@@ -118,14 +118,14 @@ export namespace GenericValidation {
     }
     if (typeof value !== 'string') {
       throw new ValidationError(
-        `${fieldName} must be a string or number`,
+        `${fieldName} must be a string or number. Got: ${JSON.stringify(value)}`,
         fieldName
       );
     }
     const parsed = parseInt(value, 10);
     if (isNaN(parsed)) {
       throw new ValidationError(
-        `${fieldName} must be a valid number`,
+        `${fieldName} must be a valid number. Got: ${JSON.stringify(value)}`,
         fieldName
       );
     }
@@ -139,7 +139,7 @@ export namespace GenericValidation {
     const num = parseStringToNumber(value, fieldName);
     if (num <= 0) {
       throw new ValidationError(
-        `${fieldName} must be a positive number`,
+        `${fieldName} must be a positive number. Got: ${JSON.stringify(value)}`,
         fieldName
       );
     }
@@ -155,7 +155,7 @@ export namespace GenericValidation {
     const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
     if (!regex.test(str)) {
       throw new ValidationError(
-        `${fieldName} must be a valid ISO date string`,
+        `${fieldName} must be a valid ISO date string. Got: "${str}"`,
         fieldName
       );
     }
@@ -168,7 +168,7 @@ export namespace GenericValidation {
     fieldName = 'field'
   ): Record<string, unknown> {
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
-      throw new ValidationError(`${fieldName} must be an object`, fieldName);
+      throw new ValidationError(`${fieldName} must be an object. Got: ${JSON.stringify(value)}`, fieldName);
     }
     return value as Record<string, unknown>;
   }
@@ -200,7 +200,7 @@ export namespace BrandedTypeValidation {
       num = GenericValidation.parseStringToPositiveInteger(value, fieldName);
     } else {
       throw new ValidationError(
-        `${fieldName} must be a number or string`,
+        `${fieldName} must be a number or string. Got: ${JSON.stringify(value)}`,
         fieldName
       );
     }
@@ -222,7 +222,7 @@ export namespace BrandedTypeValidation {
   ): MessageID {
     if (typeof value !== 'string' && typeof value !== 'number') {
       throw new ValidationError(
-        `${fieldName} must be a string or number`,
+        `${fieldName} must be a string or number. Got: ${JSON.stringify(value)}`,
         fieldName
       );
     }

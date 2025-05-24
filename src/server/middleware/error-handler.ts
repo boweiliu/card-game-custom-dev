@@ -6,17 +6,32 @@ import {
   extractData,
 } from '@/server/middleware/async-handler';
 
+function logErrorChain(error: Error, depth = 0): void {
+  const prefix = `[${depth}]`;
+  console.error(`${prefix} [Error Handler] ${error.name}: ${error.message}`);
+  
+  if (error.stack) {
+    console.error(`${prefix} Stack trace:`);
+    console.error(error.stack);
+  }
+  
+  const cause = (error as any).cause;
+  if (cause && cause instanceof Error) {
+    console.error(`${prefix} Caused by:`);
+    logErrorChain(cause, depth + 1);
+  } else if (cause) {
+    console.error(`${prefix} Caused by non-Error:`, cause);
+  }
+}
+
 export function errorHandler(
   error: Error,
   req: Request,
   res: Response,
   next: NextFunction
 ): void {
-  // Log the full error for debugging
-  console.error(`[Error Handler] ${error.name}: ${error.message}`);
-  if (error.stack) {
-    console.error(error.stack);
-  }
+  // Log the full error chain for debugging
+  logErrorChain(error);
 
   // Extract request ID if present
   const requestId: MessageID | undefined = (() => {
@@ -39,7 +54,7 @@ export function errorHandler(
         message: error.userMessage,
         code: error.name,
         ...(process.env.NODE_ENV === 'development' && {
-          details: error.details,
+          cause: error.cause,
         }),
       },
       meta: {

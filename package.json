@@ -17,6 +17,7 @@
     "proxy": "caddy run --config Caddyfile",
     "test": "jest",
     "test:watch": "jest --watch",
+    "migrate": "npm run build:be && node dist/server/server.js --migrate-only",
     "lint": "npm run format",
     "format": "npm run format:fix && npm run lint:eslint && npm run lint:css",
     "format:fix": "prettier --write . --log-level error",
