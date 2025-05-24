@@ -1,4 +1,4 @@
-import { SSEEvent } from '@/shared/types';
+import { SSEEvent } from '@/shared/types/sse';
 
 class SSEService {
   private eventSource: EventSource | null = null;

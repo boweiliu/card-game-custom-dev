@@ -15,7 +15,7 @@ import {
   $id,
 } from './div-ids';
 import * as styles from './container.module.less';
-import { ProtocardCountResponse } from '@/shared/types';
+import { ProtocardCountResponse } from '@/shared/types/api';
 import { sseService } from './sse-service';
 import { getStartScreenContent } from './screens/start-screen';
 import { getScreen1Content } from './screens/screen1';

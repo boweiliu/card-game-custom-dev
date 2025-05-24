@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { Database } from 'sqlite3';
-import { CreateProtocardRequest, UpdateProtocardRequest, Protocard, ProtocardCountResponse } from '@/shared/types';
+import { CreateProtocardRequest, UpdateProtocardRequest, ProtocardCountResponse } from '@/shared/types/api';
+import { Protocard } from '@/shared/types/db';
 
 export function createProtocardRoutes(db: Database): Router {
   const router = Router();
