@@ -6,9 +6,11 @@
 4. [DONE] Start menu can be used to swap between 3-4 user screens and 3-4 dev/debug screens (TBD). So first build a pair of buttons in start menu to swap between 2 sample screens (with some filler text + colors for now).
 5. [DONE] Make a db model for "protocards" - they just have an id and a text body, for now. Eventually they'll have multiple text box data fields. This is disinct from "physcards" which refer to a protocard id, but can carry some ingame state.
 6. [DONE] Add route from frontend screen 2 that gets the # of protocards on first load, and displays that count
-7. Set up SSE server side events to get push info from backend.
-8. Set up tracking for frontend state -- frontend wants to hold the same state as backend when user makes changes, so we need to track "pending" and "synced" state of all changes.
-8. Add routes from frontend screen 2 that 1) fetch all protocards, and 2) allows user to creates a new protocard with empty text body. Since (2) is a write, the behavior should be to update the frontend data model first into the "pending" state then sync it up to the backend and confirm the frontend model when we receive the confirmation from backend.
+7. [DONE] Set up SSE server side events to get push info from backend.
+8. Clean up code and module structure - separate out screens into their own components, separate individual groups of backedn routes too
+9. Add ability for backend to listen to changes from the database [realistically -- since DB is held in the same sqlite process -- this just looks like backend being able to notify other client SSE streams of changes]
+10. Set up tracking for frontend state for full list of protocards -- frontend wants to hold the same state as backend when user makes changes, so we need to track "pending" and "synced" state of all changes. Start by fetching the full protocard list on first load.
+11. Add routes from frontend screen 2 that 1) fetch all protocards, and 2) allows user to creates a new protocard with empty text body. Since (2) is a write, the behavior should be to update the frontend data model first into the "pending" state then sync it up to the backend and confirm the frontend model when we receive the confirmation from backend.
 
 
 LATER 

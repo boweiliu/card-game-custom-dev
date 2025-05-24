@@ -1,0 +1,31 @@
+{
+	# Disable automatic HTTPS and admin API
+	auto_https off
+	admin off
+}
+
+http://localhost:4888 {
+	# Handle webpack HMR WebSocket connections
+	@websocket {
+		header Connection *Upgrade*
+		header Upgrade websocket
+	}
+	reverse_proxy @websocket localhost:4321
+
+	# Handle SSE and other API routes to backend
+	@api {
+		path /api/*
+	}
+	reverse_proxy @api localhost:43210 {
+		# SSE-specific configuration
+		flush_interval -1
+		header_up Connection {http.request.header.Connection}
+		header_up Cache-Control {http.request.header.Cache-Control}
+		header_up Accept {http.request.header.Accept}
+		# Preserve SSE headers
+		header_down -Server
+	}
+
+	# All other routes go to webpack dev server (frontend)
+	reverse_proxy localhost:4321
+}

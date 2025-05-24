@@ -10,10 +10,13 @@ import {
   START_SCREEN_BTN,
   SCREEN_1_BTN,
   SCREEN_2_BTN,
+  PROTOCARD_COUNT,
+  SSE_STATUS,
   $id,
 } from './div-ids';
 import * as styles from './container.module.less';
 import { ProtocardCountResponse } from '@/shared/types';
+import { sseService } from './sse-service';
 
 const fullScreenContainerTemplate = () => `
   <div id="${FULLSCREEN_PARENT}" class="${styles.fullScreenContainerParent}">
@@ -50,6 +53,9 @@ class ScreenManager {
     this.setupEventListeners();
     this.loadProtocardCount();
     this.showScreen(0);
+    
+    // Connect to SSE
+    sseService.connect();
   }
 
   private async loadProtocardCount() {
@@ -140,20 +146,27 @@ class ScreenManager {
   }
 
   private getScreen2Content(): string {
+    const sseStatus = sseService.isSSEConnected() ? '🟢 Connected' : '🔴 Disconnected';
     return `
       <div>
         <h1>Screen 2 - Protocards View</h1>
-        <p>Sample screen with light pink background.</p>
-        <div style="margin: 20px 0; padding: 20px; background-color: rgba(255,255,255,0.7); border-radius: 8px;">
-          <h3>Protocards Count</h3>
-          <p style="font-size: 24px; font-weight: bold; color: #333;">
-            Total: ${this.protocardCount}
-          </p>
+        <div id="${CONTENT}">
+          <div class="${styles.infoBox}">
+            <h3>Protocards Count</h3>
+            <div id="${PROTOCARD_COUNT}" class="${styles.countDisplay}">
+              Total: ${this.protocardCount}
+            </div>
+          </div>
+          <div class="${styles.infoBox}">
+            <h3>Server Connection</h3>
+            <div id="${SSE_STATUS}" class="${styles.statusDisplay}">
+              SSE Status: ${sseStatus}
+            </div>
+          </div>
+          <button id="${ADD_CARD}">Add Protocard</button>
+          <div id="${CARD}"></div>
         </div>
-        <div style="margin: 20px 0;">
-          <button style="margin: 5px; padding: 10px;">Sample Button A</button>
-          <button style="margin: 5px; padding: 10px;">Sample Button B</button>
-        </div>
+        <div id="${LOADING}"></div>
       </div>
     `;
   }

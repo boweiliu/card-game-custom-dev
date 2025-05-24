@@ -12,6 +12,8 @@ export const START_BAR = 'start-bar';
 export const START_SCREEN_BTN = 'start-screen-btn';
 export const SCREEN_1_BTN = 'screen-1-btn';
 export const SCREEN_2_BTN = 'screen-2-btn';
+export const PROTOCARD_COUNT = 'protocard-count';
+export const SSE_STATUS = 'sse-status';
 
 // Helper function to get jQuery selector string by ID
 export const getJQuerySelector = (id: string): string => `#${id}`;
