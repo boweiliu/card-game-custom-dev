@@ -1,5 +1,5 @@
-import * as styles from '@/frontend/spinner.module.less';
-import { SPINNER, $id, APP_ROOT } from '@/frontend/div-ids';
+import * as styles from '@/frontend/components/spinner/spinner.module.less';
+import { SPINNER, $id, APP_ROOT } from '@/frontend/utils/div-ids';
 
 function createSpinnerElement(): JQuery<HTMLElement> {
   return $(`<div id="${SPINNER}" class="${styles.spinner}"></div>`);

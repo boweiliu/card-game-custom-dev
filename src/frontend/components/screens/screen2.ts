@@ -5,9 +5,9 @@ import {
   LOADING,
   PROTOCARD_COUNT,
   SSE_STATUS,
-} from '@/frontend/div-ids';
-import * as styles from '@/frontend/container.module.less';
-import { sseService } from '@/frontend/sse-service';
+} from '@/frontend/utils/div-ids';
+import * as styles from '@/frontend/components/container/container.module.less';
+import { sseService } from '@/frontend/services/sse-service';
 
 export function getScreen2Content(protocardCount: number): string {
   const sseStatus = sseService.isSSEConnected()

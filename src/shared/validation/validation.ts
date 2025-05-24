@@ -1,6 +1,6 @@
 // Generic validation utilities for primitive types
 
-import { ProtocardId, DateString } from '@/server/db/types';
+import { ProtocardId, DateString } from '@/shared/types/db';
 import { MessageID } from '@/shared/types/responses';
 
 // Base validation error types

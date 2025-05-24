@@ -1,6 +1,6 @@
 // API request/response types
 
-import { Protocard, ProtocardId } from '@/server/db/types';
+import { ProtocardId } from '@/shared/types/db';
 import { MessageID } from '@/shared/types/responses';
 
 // Parameter types for routes

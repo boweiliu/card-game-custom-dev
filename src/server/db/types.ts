@@ -1,5 +1,5 @@
-// Database entity types
-import { GenericValidation } from '@/shared/validation/validation';
+// Server-side database entity types
+import { ProtocardId, DateString } from '@/shared/types/db';
 
 export interface Protocard {
   id: ProtocardId;
@@ -8,8 +8,5 @@ export interface Protocard {
   updated_at: DateString;
 }
 
-// Distinguished type for datestring
-export type DateString = string & { __date_string: true };
-
-// Use a distinguished type so we cant mistake it for a number
-export type ProtocardId = number & { __protocard_id: true };
+// Re-export shared types for convenience
+export { ProtocardId, DateString } from '@/shared/types/db';

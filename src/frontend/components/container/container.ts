@@ -13,12 +13,12 @@ import {
   PROTOCARD_COUNT,
   SSE_STATUS,
   $id,
-} from '@/frontend/div-ids';
-import * as styles from '@/frontend/container.module.less';
-import { sseService } from '@/frontend/sse-service';
-import { getStartScreenContent } from '@/frontend/screens/start-screen';
-import { getScreen1Content } from '@/frontend/screens/screen1';
-import { getScreen2Content } from '@/frontend/screens/screen2';
+} from '@/frontend/utils/div-ids';
+import * as styles from '@/frontend/components/container/container.module.less';
+import { sseService } from '@/frontend/services/sse-service';
+import { getStartScreenContent } from '@/frontend/components/screens/start-screen';
+import { getScreen1Content } from '@/frontend/components/screens/screen1';
+import { getScreen2Content } from '@/frontend/components/screens/screen2';
 import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
 
