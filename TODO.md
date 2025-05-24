@@ -12,6 +12,27 @@
 10. [DONE] Add ability for backend to listen to changes from the database [realistically -- since DB is held in the same sqlite process -- this just looks like backend being able to notify other client SSE streams of changes. use a pub sub interface but just back it by shared backend state for now.]
 11. [DONE] Set up tracking for frontend state for full list of protocards -- frontend wants to hold the same state as backend when user makes changes, so we need to track "pending" and "synced" state of all changes. Start by fetching the full protocard list on first load.
 12. Make a new screen #3 and make a placeholder horizontal row that fetches all protocards, only once for now (on init), and renders 7x12 dimension cards into the row and allows horizontal scrolling.
+  a. [OK] no Screen 3 title
+  b. [OK] grid container should take up almost the entire placeholder container
+  c. [OK] cards should have quite low paddings to separate from other cards
+  d. [OK] use black and white cards, no gray, also no drop shadow or animations. flat style
+  e. [OK] no ID # on the cards
+  f. [OK] Use quite a large font size for the body text. also the body text should be v & h centered
+  g. [OK] Leave a button row below the grid container - put some placeholders for now
+  h. [OK] sort the cards by id by default - this may change later
+  i. [OK] Grid container should support 2 rows of cards (the second row stays unused for now). This probably means cards should be much bigger too - let's size the cards based on their row size so they scsale up. (KEEP 7x12 scale)
+  j. [OK] Adding the button row has caused some vertical scrolling - let's use flex to ensure the button row size is consistent and the remainder is taken up by grid containere
+  k. [OK] Grid container should occupy a lot of horizontal space -- it's currently not because there's a mysterious extra div in between placeholderContainer and contentContainer. lets either get rid of it, or size it properly and add id + css class
+  l. [OK] bring back the rounded corners on the cards
+  m. [OK] buttons should look like the other screen selector buttons, some styling there is good. We want separate designs for the UI of the interface itself, and the in-game cards
+  n. [OK] cardContent padding is exploding outside of its protocard container. Maybe use margin instead?
+  o. [OK] Can we put a border around gridContainer
+  p. [OK] Can we avoid the pattern of "width/height: 100% or 100% - 16px" and padding 8px inside flex containers? Let's use extra divs if needed to avoid calc'ing heights like that
+  q. [OK] Let's always show a horizontal scrollbar on gridContainer
+  r. [OK] Let's not hardcode px values, let's use variables and reuse code
+  s. [OK] Make border-box propagated everywhere (its currently in global body style in container.module.less)
+  t. [OK] padding on gridContainer and protocard-grid are breaking other layouts, lets remove them for now
+  u. [OK] Apply a different background color to the grid container and to the screen 3 container to visually distinguish them
 13. Add the ability to select specific cards in screen #3 and create an edit button which brings up a bigger modal view of the card. Edit modal should have save and cancel buttons. dont write anything to backend yet, just do the frontend logic.
 14. Add a routes from frontend screen 2 that 1) fetch all protocards, and 2) allows user to creates a new protocard with empty text body. Since (2) is a write, the behavior should be to update the frontend data model first into the "pending" state then sync it up to the backend and confirm the frontend model when we receive the confirmation from backend.
 15. Add stacktrace tracking to the pub sub, so that we aren't completely blindsided when a sub change is triggered but we cant tell from where

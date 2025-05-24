@@ -10,6 +10,7 @@ import {
   START_SCREEN_BTN,
   SCREEN_1_BTN,
   SCREEN_2_BTN,
+  SCREEN_3_BTN,
   PROTOCARD_COUNT,
   SSE_STATUS,
   $id,
@@ -19,6 +20,7 @@ import { sseService } from '@/frontend/services/sse-service';
 import { getStartScreenContent } from '@/frontend/components/screens/start-screen';
 import { getScreen1Content } from '@/frontend/components/screens/screen1';
 import { getScreen2Content } from '@/frontend/components/screens/screen2';
+import { getScreen3Content, Screen3Manager } from '@/frontend/components/screens/screen3';
 import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
 
@@ -40,6 +42,7 @@ const fullScreenContainerTemplate = () => `
           <button id="${START_SCREEN_BTN}" class="${styles.screenButton}">Start Screen</button>
           <button id="${SCREEN_1_BTN}" class="${styles.screenButton}">Screen 1</button>
           <button id="${SCREEN_2_BTN}" class="${styles.screenButton}">Screen 2</button>
+          <button id="${SCREEN_3_BTN}" class="${styles.screenButton}">Screen 3</button>
         </div>
       </div>
     </div>
@@ -49,6 +52,7 @@ const fullScreenContainerTemplate = () => `
 class ScreenManager {
   private $placeholderContainer: JQuery;
   private protocardCount: number = 0;
+  private screen3Manager: Screen3Manager | null = null;
 
   constructor() {
     this.$placeholderContainer = $id(FULLSCREEN).find(
@@ -82,23 +86,27 @@ class ScreenManager {
     $id(START_SCREEN_BTN).on('click', () => this.showScreen(0));
     $id(SCREEN_1_BTN).on('click', () => this.showScreen(1));
     $id(SCREEN_2_BTN).on('click', () => this.showScreen(2));
+    $id(SCREEN_3_BTN).on('click', () => this.showScreen(3));
   }
 
-  private showScreen(screenNumber: number) {
+  private async showScreen(screenNumber: number) {
     // Update button states
     $id(START_SCREEN_BTN).toggleClass(styles.active, screenNumber === 0);
     $id(SCREEN_1_BTN).toggleClass(styles.active, screenNumber === 1);
     $id(SCREEN_2_BTN).toggleClass(styles.active, screenNumber === 2);
+    $id(SCREEN_3_BTN).toggleClass(styles.active, screenNumber === 3);
 
     // Update container background
     this.$placeholderContainer
-      .removeClass(`${styles.screen1} ${styles.screen2}`)
+      .removeClass(`${styles.screen1} ${styles.screen2} ${styles.screen3}`)
       .addClass(
         screenNumber === 1
           ? styles.screen1
           : screenNumber === 2
             ? styles.screen2
-            : ''
+            : screenNumber === 3
+              ? styles.screen3
+              : ''
       );
 
     // Update content
@@ -113,10 +121,21 @@ class ScreenManager {
       case 2:
         content = getScreen2Content(this.protocardCount);
         break;
+      case 3:
+        content = getScreen3Content();
+        break;
       default:
         content = getStartScreenContent();
     }
     this.$placeholderContainer.html(content);
+
+    // Initialize screen-specific managers
+    if (screenNumber === 3) {
+      if (!this.screen3Manager) {
+        this.screen3Manager = new Screen3Manager();
+      }
+      await this.screen3Manager.initialize();
+    }
   }
 }
 

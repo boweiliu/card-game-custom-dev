@@ -1,0 +1,146 @@
+@import '@/frontend/utils/colors.less';
+
+// Card dimensions and spacing variables
+@card-scale: 24px; // Base scale unit
+@card-width: @card-scale * 7; // 7 units wide
+@card-height: @card-scale * 12; // 12 units tall
+@card-gap: 4px;
+@card-padding: 8px;
+@container-padding: 10px;
+@button-padding-v: 8px;
+@button-padding-h: 16px;
+@button-gap: 10px;
+@button-row-padding: 15px;
+@border-radius: 4px;
+@card-border-radius: 8px;
+
+.screenContainer {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: @bg-screen-container;
+}
+
+.contentLayout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Important for flex children with overflow */
+  justify-content: center;
+  align-items: center;
+}
+
+.gridContainer {
+  flex: 1;
+  width: 90%;
+  overflow-x: scroll; /* Always show horizontal scrollbar */
+  overflow-y: hidden;
+  background: @bg-grid-container;
+  border: 1px solid @border-primary;
+  min-height: 0; /* Important for flex children with overflow */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.horizontalGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @card-gap;
+  width: calc(100% - @card-gap * 8);
+  height: calc(100% - @card-gap * 8);
+  align-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.protocard {
+  flex: 0 0 auto;
+  width: @card-width;
+  height: @card-height;
+  border: 1px solid @black;
+  border-radius: @card-border-radius;
+  background: @white;
+  cursor: pointer;
+  
+  &:hover {
+    background: @gray-lightest;
+  }
+}
+
+.cardBorder {
+  height: 100%;
+  width: 100%;
+  padding: @card-padding;
+}
+
+.cardContent {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardBody {
+  color: @black;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+  word-wrap: break-word;
+}
+
+.buttonRow {
+  flex: 0 0 auto; /* Fixed size, don't grow or shrink */
+  display: flex;
+  gap: @button-gap;
+  padding: @button-row-padding @container-padding;
+  justify-content: center;
+  flex-wrap: wrap;
+  background: @bg-screen-container;
+}
+
+.actionButton {
+  padding: @button-padding-v @button-padding-h;
+  background-color: @button-default;
+  border: 1px solid @button-default-border;
+  border-radius: @border-radius;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: @button-default-hover;
+    border-color: @button-default-border-hover;
+  }
+  
+  &:active {
+    background-color: @primary-blue;
+    color: @text-white;
+    border-color: @primary-blue-dark;
+  }
+}
+
+/* Scrollbar styling */
+.gridContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.gridContainer::-webkit-scrollbar-track {
+  background: @bg-primary;
+}
+
+.gridContainer::-webkit-scrollbar-thumb {
+  background: @border-primary;
+  border-radius: 4px;
+}
+
+.gridContainer::-webkit-scrollbar-thumb:hover {
+  background: @text-secondary;
+}
