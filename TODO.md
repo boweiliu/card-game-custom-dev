@@ -11,7 +11,7 @@
 9. [DONE] Figure out if we need to manually write to the DB file
 10. [DONE] Add ability for backend to listen to changes from the database [realistically -- since DB is held in the same sqlite process -- this just looks like backend being able to notify other client SSE streams of changes. use a pub sub interface but just back it by shared backend state for now.]
 11. [DONE] Set up tracking for frontend state for full list of protocards -- frontend wants to hold the same state as backend when user makes changes, so we need to track "pending" and "synced" state of all changes. Start by fetching the full protocard list on first load.
-12. Make a new screen #3 and make a placeholder horizontal row that fetches all protocards, only once for now (on init), and renders 7x12 dimension cards into the row and allows horizontal scrolling.
+12. [DONE] Make a new screen #3 and make a placeholder horizontal row that fetches all protocards, only once for now (on init), and renders 7x12 dimension cards into the row and allows horizontal scrolling.
   a. [OK] no Screen 3 title
   b. [OK] grid container should take up almost the entire placeholder container
   c. [OK] cards should have quite low paddings to separate from other cards

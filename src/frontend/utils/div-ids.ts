@@ -17,6 +17,11 @@ export const PROTOCARD_COUNT = 'protocard-count';
 export const SSE_STATUS = 'sse-status';
 export const PROTOCARD_GRID = 'protocard-grid';
 export const BUTTON_ROW = 'button-row';
+export const EDIT_MODAL = 'edit-modal';
+export const MODAL_OVERLAY = 'modal-overlay';
+export const MODAL_TEXT_INPUT = 'modal-text-input';
+export const MODAL_SAVE_BTN = 'modal-save-btn';
+export const MODAL_CANCEL_BTN = 'modal-cancel-btn';
 
 // Helper function to get jQuery selector string by ID
 export const getJQuerySelector = (id: string): string => `#${id}`;

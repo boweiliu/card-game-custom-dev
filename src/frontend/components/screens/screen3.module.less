@@ -144,3 +144,87 @@
 .gridContainer::-webkit-scrollbar-thumb:hover {
   background: @text-secondary;
 }
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.editModal {
+  background: @white;
+  border-radius: @border-radius;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  
+  h3 {
+    margin: 0 0 15px 0;
+    color: @text-primary;
+    text-align: center;
+  }
+}
+
+.modalTextInput {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  border: 2px solid @border-primary;
+  border-radius: @border-radius;
+  font-size: 16px;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 20px;
+  
+  &:focus {
+    outline: none;
+    border-color: @primary-blue;
+  }
+}
+
+.modalButtons {
+  display: flex;
+  gap: @button-gap;
+  justify-content: center;
+}
+
+.modalButton {
+  padding: @button-padding-v @button-padding-h;
+  border: 1px solid @button-default-border;
+  border-radius: @border-radius;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.saveButton {
+  background: @primary-blue;
+  color: @text-white;
+  border-color: @primary-blue-dark;
+  
+  &:hover {
+    background: @primary-blue-light;
+    border-color: @primary-blue-darker;
+  }
+}
+
+.cancelButton {
+  background: @button-default;
+  color: @text-primary;
+  border-color: @button-default-border;
+  
+  &:hover {
+    background: @button-default-hover;
+    border-color: @button-default-border-hover;
+  }
+}

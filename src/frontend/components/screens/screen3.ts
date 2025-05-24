@@ -3,6 +3,11 @@ import {
   LOADING,
   PROTOCARD_GRID,
   BUTTON_ROW,
+  EDIT_MODAL,
+  MODAL_OVERLAY,
+  MODAL_TEXT_INPUT,
+  MODAL_SAVE_BTN,
+  MODAL_CANCEL_BTN,
 } from '@/frontend/utils/div-ids';
 import * as styles from '@/frontend/components/container/container.module.less';
 import * as cardStyles from './screen3.module.less';
@@ -28,6 +33,18 @@ export function getScreen3Content(): string {
         </div>
       </div>
       <div id="${LOADING}"></div>
+      
+      <!-- Edit Modal -->
+      <div id="${MODAL_OVERLAY}" class="${cardStyles.modalOverlay}">
+        <div id="${EDIT_MODAL}" class="${cardStyles.editModal}">
+          <h3>Edit Protocard</h3>
+          <textarea id="${MODAL_TEXT_INPUT}" class="${cardStyles.modalTextInput}" placeholder="Enter card text..."></textarea>
+          <div class="${cardStyles.modalButtons}">
+            <button id="${MODAL_SAVE_BTN}" class="${cardStyles.modalButton} ${cardStyles.saveButton}">Save</button>
+            <button id="${MODAL_CANCEL_BTN}" class="${cardStyles.modalButton} ${cardStyles.cancelButton}">Cancel</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -35,9 +52,14 @@ export function getScreen3Content(): string {
 export class Screen3Manager {
   private protocards: ProtocardTransport[] = [];
   private $gridContainer: JQuery | null = null;
+  private selectedProtocardId: number | null = null;
+  private $modalOverlay: JQuery | null = null;
+  private $modalTextInput: JQuery | null = null;
 
   async initialize() {
     this.$gridContainer = $(`#${PROTOCARD_GRID}`);
+    this.$modalOverlay = $(`#${MODAL_OVERLAY}`);
+    this.$modalTextInput = $(`#${MODAL_TEXT_INPUT}`);
     
     if (this.$gridContainer.length === 0) {
       console.error('Protocard grid container not found');
@@ -46,6 +68,7 @@ export class Screen3Manager {
 
     await this.loadProtocards();
     this.renderProtocards();
+    this.setupEventListeners();
   }
 
   private async loadProtocards() {
@@ -87,5 +110,78 @@ export class Screen3Manager {
     }).join('');
 
     this.$gridContainer.html(cardElements);
+  }
+
+  private setupEventListeners() {
+    // Card click handlers
+    if (this.$gridContainer) {
+      this.$gridContainer.on('click', `.${cardStyles.protocard}`, (event) => {
+        const cardElement = $(event.currentTarget);
+        const protocardId = parseInt(cardElement.data('id'), 10);
+        this.selectCard(protocardId);
+      });
+    }
+
+    // Modal button handlers
+    $(`#${MODAL_SAVE_BTN}`).on('click', () => this.saveCard());
+    $(`#${MODAL_CANCEL_BTN}`).on('click', () => this.hideModal());
+    
+    // Close modal on overlay click
+    if (this.$modalOverlay) {
+      this.$modalOverlay.on('click', (event) => {
+        if (this.$modalOverlay && event.target === this.$modalOverlay[0]) {
+          this.hideModal();
+        }
+      });
+    }
+
+    // Close modal on Escape key
+    $(document).on('keydown', (event) => {
+      if (event.key === 'Escape' && this.$modalOverlay && this.$modalOverlay.is(':visible')) {
+        this.hideModal();
+      }
+    });
+  }
+
+  private selectCard(protocardId: number) {
+    const protocard = this.protocards.find(p => p.entityId === protocardId);
+    if (!protocard) {
+      console.error('Protocard not found:', protocardId);
+      return;
+    }
+
+    this.selectedProtocardId = protocardId;
+    this.showModal(protocard);
+  }
+
+  private showModal(protocard: ProtocardTransport) {
+    if (!this.$modalOverlay || !this.$modalTextInput) return;
+
+    this.$modalTextInput.val(protocard.text_body);
+    this.$modalOverlay.show();
+    this.$modalTextInput.focus();
+  }
+
+  private hideModal() {
+    if (!this.$modalOverlay) return;
+
+    this.$modalOverlay.hide();
+    this.selectedProtocardId = null;
+  }
+
+  private saveCard() {
+    if (!this.selectedProtocardId || !this.$modalTextInput) return;
+
+    const newText = this.$modalTextInput.val() as string;
+    console.log('Save card:', this.selectedProtocardId, 'with text:', newText);
+    
+    // Update the card in the local state (frontend only for now)
+    const protocardIndex = this.protocards.findIndex(p => p.entityId === this.selectedProtocardId);
+    if (protocardIndex !== -1) {
+      this.protocards[protocardIndex].text_body = newText;
+      this.renderProtocards();
+    }
+
+    this.hideModal();
   }
 }
