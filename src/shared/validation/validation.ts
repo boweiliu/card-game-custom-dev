@@ -16,6 +16,15 @@ export class ValidationError extends Error {
 
 // Generic validation functions for primitive types
 export namespace GenericValidation {
+
+  // boolean
+  export function validateBoolean(value: unknown, fieldName = 'field'): boolean {
+    if (typeof value !== 'boolean') {
+      throw new ValidationError(`${fieldName} must be a boolean`, fieldName);
+    }
+    return value;
+  }
+
   // String validation
   export function validateString(value: unknown, fieldName = 'field'): string {
     if (typeof value !== 'string') {

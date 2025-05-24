@@ -1,5 +1,6 @@
-import { SSEEvent } from '@/shared/types/sse';
+import { ApiResponse } from '@/shared/types/responses';
 import { API_PATHS_FRONTEND } from '@/shared/routes';
+import { validateSSEResponse } from '@/frontend/validation/api';
 
 class SSEService {
   private eventSource: EventSource | null = null;
@@ -20,7 +21,8 @@ class SSEService {
 
     this.eventSource.onmessage = (event) => {
       try {
-        const data: SSEEvent = JSON.parse(event.data);
+        const rawResponse: unknown = JSON.parse(event.data);
+        const data: ApiResponse<unknown> = validateSSEResponse(rawResponse);
         this.handleEvent(data);
       } catch (error) {
         console.error('[SSE] Error parsing event:', error);
@@ -45,12 +47,12 @@ class SSEService {
     return this.isConnected;
   }
 
-  private handleEvent(event: SSEEvent): void {
+  private handleEvent(event: ApiResponse<unknown>): void {
     switch (event.type) {
-      case 'connected':
+      case 'sse.connected':
         console.log('[SSE] Server connection confirmed');
         break;
-      case 'heartbeat':
+      case 'sse.heartbeat':
         // Heartbeats are silent - no logging needed
         break;
       default:

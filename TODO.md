@@ -12,14 +12,16 @@
 10. Add ability for backend to listen to changes from the database [realistically -- since DB is held in the same sqlite process -- this just looks like backend being able to notify other client SSE streams of changes. use a pub sub interface but just back it by shared backend state for now.]
 11. Set up tracking for frontend state for full list of protocards -- frontend wants to hold the same state as backend when user makes changes, so we need to track "pending" and "synced" state of all changes. Start by fetching the full protocard list on first load.
 12. Add routes from frontend screen 2 that 1) fetch all protocards, and 2) allows user to creates a new protocard with empty text body. Since (2) is a write, the behavior should be to update the frontend data model first into the "pending" state then sync it up to the backend and confirm the frontend model when we receive the confirmation from backend.
+13. Add stacktrace tracking to the pub sub, so that we aren't completely blindsided when a sub change is triggered but we cant tell from where
+14. Remember to put back in the ability for SSE subscribers to only listen for events they care about, rather than broadcast to all
 
 LATER
 
-1. Make a "dev" screen and make it the default. On the dev screen, we can edit the text on the cards and add new cards.
+1. On the dev screen (Screen #2), user should be able to edit the text on the cards and add new cards.
 2. Make spinner into a standalone reusable component that can elide what else is being loaded
 3. 2 large card rows - one at top and one at bottom. Fill them with placeholder cards for now (7x12, tarot dimensions)
 4. Special areas at the left or right of the card rows, e.g. for the deck
-5. Card interaction - when one is selected it takes up the ENTIRE screen, then actions are available like highlight it, move it somewhere
+5. Card interaction - when one is selected it takes up the ENTIRE screen (keep the card dimensions but use a modal), then actions are available like highlight it, move it somewhere
 6. Interact with the deck to: view it unsorted, sorted, or bubble shuffle it
 7. Store the entire player-side game state into a base64 in the url: refer to cards by their protoids and specify their positions.
 
@@ -29,10 +31,7 @@ LATER
 
 1. Add error boundaries and global error handling for the frontend
 2. Implement database migrations system for schema changes
-3. Add API versioning (e.g., /api/v1/) for future compatibility
-4. Create a centralized API client service for frontend-backend communication
-5. Add database connection pooling and proper connection management
-6. Implement request/response logging middleware for debugging
+3. Implement request/response logging middleware for debugging
 
 ## User Experience & Interface
 
@@ -46,26 +45,18 @@ LATER
 ## Developer Experience
 
 13. Add Jest unit tests for shared types and utility functions
-14. Create Storybook or similar component documentation
-15. Add pre-commit hooks for formatting and linting
-16. Implement hot module replacement for faster development
-17. Add TypeScript strict mode and resolve any type issues
-18. Create development seed data for consistent testing
+14. Add TypeScript strict mode and resolve any type issues
+15. Create development seed data for consistent testing
 
 ## Performance & Optimization
 
 19. Implement virtual scrolling for large lists of protocards
-20. Add caching layer (Redis) for frequently accessed data
-21. Optimize bundle size with code splitting and lazy loading
-22. Add service worker for offline functionality
-23. Implement debounced search and filtering
-24. Add compression middleware for API responses
+20. Optimize bundle size with code splitting and lazy loading
+21. Add service worker for offline functionality
+22. Implement debounced search and filtering
+23. Add compression middleware for API responses
 
 ## Security & Reliability
 
-25. Add input validation and sanitization on both frontend and backend
-26. Implement rate limiting for API endpoints
-27. Add CSRF protection for state-changing operations
-28. Create backup and restore functionality for the database
 29. Add health check endpoints for monitoring
 30. Implement proper error codes and consistent error responses
