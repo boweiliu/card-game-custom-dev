@@ -4,7 +4,7 @@
 @card-scale: 24px; // Base scale unit
 @card-width: @card-scale * 7; // 7 units wide
 @card-height: @card-scale * 12; // 12 units tall
-@card-gap: 4px;
+@card-gap: 12px;
 @card-padding: 8px;
 @container-padding: 10px;
 @button-padding-v: 8px;
@@ -37,7 +37,7 @@
   overflow-x: scroll; /* Always show horizontal scrollbar */
   overflow-y: hidden;
   background: @bg-grid-container;
-  border: 1px solid @border-primary;
+  border: 2px solid @border-primary;
   min-height: 0; /* Important for flex children with overflow */
   display: flex;
   justify-content: center;
@@ -48,8 +48,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: @card-gap;
-  width: calc(100% - @card-gap * 8);
-  height: calc(100% - @card-gap * 8);
+  width: calc(100% - @card-gap * 2);
+  height: calc(100% - @card-gap * 2);
   align-content: flex-start;
   overflow-x: auto;
   overflow-y: hidden;
@@ -59,7 +59,7 @@
   flex: 0 0 auto;
   width: @card-width;
   height: @card-height;
-  border: 1px solid @black;
+  border: 2px solid @gray-darker;
   border-radius: @card-border-radius;
   background: @white;
   cursor: pointer;
