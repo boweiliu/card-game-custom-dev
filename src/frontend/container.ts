@@ -66,7 +66,8 @@ class ScreenManager {
     try {
       const response = await fetch('/api/protocards/count');
       if (response.ok) {
-        const data: ApiResponse<GetProtocardCountResponse> = await response.json();
+        const data: ApiResponse<GetProtocardCountResponse> =
+          await response.json();
         if (!data.success) {
           console.error('Failed to fetch protocard count:', data.error.message);
           return;

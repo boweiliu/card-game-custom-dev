@@ -1,3 +1,5 @@
+@import url('./colors.less');
+
 .fullScreenContainerParent {
   width: 100vw;
   height: 100vh;
@@ -15,7 +17,7 @@
 .verticalLayout {
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: @white;
   height: 100%;
 }
 
@@ -25,13 +27,13 @@
   align-items: center;
   flex: 1;
   overflow-y: auto;
-  background-color: #fffacd;
+  background-color: @bg-cream;
 }
 
 .startBar {
   height: 60px;
-  background-color: #f0f0f0;
-  border-top: 1px solid #ccc;
+  background-color: @gray-light;
+  border-top: 1px solid @gray;
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -41,8 +43,8 @@
 
 .screenButton {
   padding: 8px 16px;
-  background-color: #ddd;
-  border: 1px solid #aaa;
+  background-color: @button-default;
+  border: 1px solid @button-default-border;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -50,46 +52,46 @@
 }
 
 .screenButton:hover {
-  background-color: #ccc;
-  border-color: #888;
+  background-color: @button-default-hover;
+  border-color: @button-default-border-hover;
 }
 
 .active {
-  background-color: #007acc;
-  color: white;
-  border-color: #005a9e;
-  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
+  background-color: @primary-blue;
+  color: @text-white;
+  border-color: @primary-blue-dark;
+  box-shadow: 0 2px 4px @shadow-medium;
 }
 
 .active:hover {
-  background-color: #06a;
-  border-color: #048;
+  background-color: @primary-blue-light;
+  border-color: @primary-blue-darker;
 }
 
 .screen1 {
-  background-color: #e8f4f8;
+  background-color: @bg-blue-light;
 }
 
 .screen2 {
-  background-color: #f8e8f4;
+  background-color: @bg-pink-light;
 }
 
 .infoBox {
   margin: 20px 0;
   padding: 20px;
-  background-color: rgb(255 255 255 / 70%);
+  background-color: @bg-white-transparent;
   border-radius: 8px;
 }
 
 .countDisplay {
   font-size: 24px;
   font-weight: bold;
-  color: #333;
+  color: @text-primary;
 }
 
 .statusDisplay {
   font-size: 16px;
-  color: #333;
+  color: @text-primary;
 }
 
 .globalBodyStyle {

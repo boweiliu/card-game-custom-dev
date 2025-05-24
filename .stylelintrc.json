@@ -5,7 +5,8 @@
     "color-function-notation": "modern",
     "alpha-value-notation": "percentage",
     "at-rule-no-unknown": null,
-    "color-no-invalid-hex": true
+    "color-no-invalid-hex": true,
+    "declaration-property-value-no-unknown": null
   },
   "ignoreFiles": ["dist/**"]
 }

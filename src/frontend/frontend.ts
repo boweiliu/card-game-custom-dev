@@ -4,6 +4,7 @@ import { loadFullScreenContainer } from '@/frontend/container';
 import { cardTemplate } from '@/frontend/cards';
 import { $id, ADD_CARD, CARD, LOADING } from '@/frontend/div-ids';
 import { Protocard } from '@/shared/types/db';
+import { colors } from '@/frontend/colors';
 
 interface Card {
   id: number;
@@ -33,13 +34,12 @@ class CardManager {
   public async pingBackend(delaySeconds: number = 0) {
     this.spinner.show();
     try {
-      const url = delaySeconds > 0 
-        ? `/api/ping?delay=${delaySeconds}` 
-        : '/api/ping';
-      
+      const url =
+        delaySeconds > 0 ? `/api/ping?delay=${delaySeconds}` : '/api/ping';
+
       console.log(`Pinging backend with ${delaySeconds}s delay...`);
       const response = await fetch(url);
-      
+
       if (response.ok) {
         this.$loadingIndicator.hide();
         console.log('Backend is up:', response);
@@ -47,7 +47,7 @@ class CardManager {
         console.log('Backend response:', data);
       } else {
         const text = `Not Connected to ${response.url} - server ${response.status}`;
-        this.$loadingIndicator.css('color', 'red');
+        this.$loadingIndicator.css('color', colors.textError);
         this.$loadingIndicator.text(text);
         console.log(text);
       }
@@ -162,7 +162,7 @@ jQuery(async () => {
   await loadFullScreenContainer();
   const cardManager = new CardManager();
   cardManager.setupEventListeners();
-  
+
   // Expose for debugging in console
   (window as any).cardManager = cardManager;
   console.log('CardManager available globally as window.cardManager');
