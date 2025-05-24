@@ -4,7 +4,7 @@ import {
   UpdateProtocardRequest,
   ProtocardCountResponse,
 } from '@/shared/types/api';
-import { DatabaseRepository } from '@/server/db';
+import { DatabaseRepository } from '@/server/db/repository';
 
 export function createProtocardRoutes(repository: DatabaseRepository): Router {
   const router = Router();

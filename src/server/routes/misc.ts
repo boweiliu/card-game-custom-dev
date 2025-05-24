@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { DatabaseRepository } from '@/server/db';
+import { DatabaseRepository } from '@/server/db/repository';
 
 export function createMiscRoutes(repository: DatabaseRepository): Router {
   const router = Router();

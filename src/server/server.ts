@@ -3,7 +3,7 @@ import cors from 'cors';
 import { createProtocardRoutes } from '@/server/routes/protocards';
 import { createSSERoutes } from '@/server/routes/sse';
 import { createMiscRoutes } from '@/server/routes/misc';
-import { initializeDatabase } from '@/server/db';
+import { initializeDatabase } from '@/server/db/db';
 
 const app = express();
 app.use(cors());
@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.static('../public')); // Serve static files from public directory
 
 // Initialize database
-const { db, repository } = initializeDatabase();
+const { db, repository } = initializeDatabase(__dirname);
 
 // Mount route modules
 app.use('/api', createMiscRoutes(repository));
