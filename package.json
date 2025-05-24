@@ -19,7 +19,7 @@
     "test:watch": "jest --watch",
     "lint": "npm run format",
     "format": "npm run format:fix && npm run lint:eslint && npm run lint:css",
-    "format:fix": "prettier --write .",
+    "format:fix": "prettier --write . --log-level error",
     "format:check": "prettier --check .",
     "lint:eslint": "eslint . --ext .js,.ts,.tsx",
     "lint:css": "stylelint '**/*.less' '**/*.css' --fix"

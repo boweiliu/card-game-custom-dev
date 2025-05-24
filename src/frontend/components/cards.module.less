@@ -10,4 +10,31 @@
   min-width: 200px;
   box-shadow: 0 2px 4px @shadow-light;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card.cardPending {
+  border-color: var(--warning);
+  background-color: rgb(255 193 7 / 10%);
+  animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.card.cardError {
+  border-color: var(--danger);
+  background-color: rgb(220 53 69 / 10%);
+}
+
+.card.cardSynced {
+  border-color: @button-default;
+  background-color: @white;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 70%;
+  }
+
+  to {
+    opacity: 100%;
+  }
 }

@@ -55,9 +55,42 @@ class SSEService {
       case 'sse.heartbeat':
         // Heartbeats are silent - no logging needed
         break;
+      case 'sse.protocard.created':
+        this.handleProtocardCreated(event as any);
+        break;
+      case 'sse.protocard.updated':
+        this.handleProtocardUpdated(event as any);
+        break;
+      case 'sse.protocard.deleted':
+        this.handleProtocardDeleted(event as any);
+        break;
       default:
         console.log('[SSE] Unknown event type:', event.type);
     }
+  }
+
+  private handleProtocardCreated(event: any): void {
+    console.log('[SSE] Protocard created:', event.result?.protocard);
+    // Emit custom event that the state manager can listen to
+    this.emitProtocardEvent('protocard.created', event.result?.protocard);
+  }
+
+  private handleProtocardUpdated(event: any): void {
+    console.log('[SSE] Protocard updated:', event.result?.protocard);
+    this.emitProtocardEvent('protocard.updated', event.result?.protocard);
+  }
+
+  private handleProtocardDeleted(event: any): void {
+    console.log('[SSE] Protocard deleted:', event.result?.id);
+    this.emitProtocardEvent('protocard.deleted', { id: event.result?.id });
+  }
+
+  private emitProtocardEvent(type: string, data: any): void {
+    // Emit a custom DOM event that the state manager can listen to
+    const customEvent = new CustomEvent('sse-protocard-event', {
+      detail: { type, data },
+    });
+    window.dispatchEvent(customEvent);
   }
 }
 

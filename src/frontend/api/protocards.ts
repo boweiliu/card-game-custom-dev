@@ -11,7 +11,7 @@ import {
   UpdateProtocardResponse,
   DeleteProtocardResponse,
 } from '@/shared/types/api';
-import { ProtocardId } from '@/server/db/types';
+import { ProtocardId } from '@/shared/types/db';
 
 export class ProtocardApi {
   /**

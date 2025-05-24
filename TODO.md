@@ -9,11 +9,16 @@
 7. [DONE] Set up SSE server side events to get push info from backend.
 8. [DONE] Clean up code and module structure - separate out screens into their own components, separate individual groups of backedn routes too
 9. [DONE] Figure out if we need to manually write to the DB file
-10. Add ability for backend to listen to changes from the database [realistically -- since DB is held in the same sqlite process -- this just looks like backend being able to notify other client SSE streams of changes. use a pub sub interface but just back it by shared backend state for now.]
+10. [DONE] Add ability for backend to listen to changes from the database [realistically -- since DB is held in the same sqlite process -- this just looks like backend being able to notify other client SSE streams of changes. use a pub sub interface but just back it by shared backend state for now.]
 11. Set up tracking for frontend state for full list of protocards -- frontend wants to hold the same state as backend when user makes changes, so we need to track "pending" and "synced" state of all changes. Start by fetching the full protocard list on first load.
 12. Add routes from frontend screen 2 that 1) fetch all protocards, and 2) allows user to creates a new protocard with empty text body. Since (2) is a write, the behavior should be to update the frontend data model first into the "pending" state then sync it up to the backend and confirm the frontend model when we receive the confirmation from backend.
 13. Add stacktrace tracking to the pub sub, so that we aren't completely blindsided when a sub change is triggered but we cant tell from where
 14. Remember to put back in the ability for SSE subscribers to only listen for events they care about, rather than broadcast to all
+15. Split up the docker build into 3 steps -- FE only (delete BE code), BE only (delete FE code), and then port the artifacts over and actually run stuff. This compresses the image and also ensures no BE <> FE dependency.
+16. Make sure DB_PATH is working properly both on dev and prod (just set the env variable manually), and ideally also use a fly volume to make sure it persists in prod.
+17. Version the protocards, i.e. make the db immutable and append-only and when we want to fetch stuff just fetch thel atest versions
+18. Add a model for game history playouts -- these will be write-only (since FE will manage all the state edits) but we just want a record of the actions and game states passed through. Each game history snapshot should have like a list of all the physcards (which refer to protocards), and their positions (deck/hand/score), and separately we also need a record of all game actions in the tree structure - user actions, triggered actions, down to even deck shuffle operations; and each action should point to the game history snapshot it was created from (or vice versa)
+19. all ids (message/correlation, entity) should have a prefix so we can easily tell where they come from. For DB ids -- either start managing id creation in backend, or have backend DB prepend the string prefix. For other ids, have a centralized place the branded id strings are created, and also make sure validation checks for the correct prefix on transport.
 
 LATER
 
