@@ -1,4 +1,3 @@
-import { Protocard, ProtocardId } from '@/server/db/types';
 import {
   ProtocardEvents,
   TypedEventEmitter,
@@ -23,13 +22,13 @@ export class PubSubService {
 
   public publish<K extends keyof ProtocardEvents>(
     event: K,
-    data: ProtocardEvents[K]
+    data: Omit<ProtocardEvents[K], 'type' | 'timestamp'>
   ): void {
     this.protocards.typedEmit(event, {
       ...data,
       type: event,
       timestamp: new Date().toISOString(),
-    });
+    } as ProtocardEvents[K]);
   }
 
   public on<K extends keyof ProtocardEvents>(

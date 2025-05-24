@@ -84,8 +84,6 @@ export class DatabaseRepository {
             const validatedCard = validateProtocard(row);
             pubSubService.publish('protocard.created', {
               protocard: validatedCard,
-              type: 'protocard.created',
-              timestamp: new Date().toISOString(),
             });
             resolve(validatedCard);
           } catch (validationError) {
@@ -121,9 +119,7 @@ export class DatabaseRepository {
           try {
             const validatedCard = validateProtocard(row);
             pubSubService.publish('protocard.updated', {
-              type: 'protocard.updated',
               protocard: validatedCard,
-              timestamp: new Date().toISOString(),
             });
             resolve(validatedCard);
           } catch (validationError) {
@@ -156,9 +152,7 @@ export class DatabaseRepository {
         }
         const deletedCard = validateProtocard(row);
         pubSubService.publish('protocard.deleted', {
-          type: 'protocard.deleted',
           id: deletedCard.id,
-          timestamp: new Date().toISOString(),
         });
         resolve({ deleted: deletedCard });
       });
