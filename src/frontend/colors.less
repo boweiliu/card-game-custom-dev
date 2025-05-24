@@ -1,66 +1,146 @@
-// Centralized color system for the frontend
-// Import this file in all .module.less files to access these variables
+/* Centralized color system using CSS Custom Properties */
 
-// Primary Brand Colors
-@primary-blue: #007acc;
-@primary-blue-dark: #005a9e;
+/* Define CSS variables in :root and use them everywhere */
 
-@primary-blue-darker: #048;
+:root {
+  /* Primary Brand Colors */
+  --primary-blue: #007acc;
+  --primary-blue-dark: #005a9e;
+  --primary-blue-darker: #048;
+  --primary-blue-light: #06a;
 
-@primary-blue-light: #06a;
+  /* Neutral Colors */
+  --white: #fff;
+  --gray-lightest: #f8f9fa;
+  --gray-lighter: #f3f3f3;
+  --gray-light: #f0f0f0;
+  --gray: #ccc;
+  --gray-medium: #aaa;
+  --gray-dark: #888;
+  --gray-darker: #333;
+  --black: #000;
 
-// Neutral Colors
-@white: #ffffff;
-@gray-lightest: #f8f9fa;
+  /* Semantic Colors */
+  --success: #28a745;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --info: #17a2b8;
 
-@gray-lighter: #f3f3f3;
+  /* Background Colors */
+  --bg-cream: #fffacd;
+  --bg-blue-light: #e8f4f8;
+  --bg-pink-light: #f8e8f4;
+  --bg-white-transparent: rgb(255 255 255 / 70%);
 
-@gray-light: #f0f0f0;
+  /* Button Colors */
+  --button-default: #ddd;
+  --button-default-hover: #ccc;
+  --button-default-border: #aaa;
+  --button-default-border-hover: #888;
 
-@gray: #ccc;
+  /* Spinner Colors */
+  --spinner-track: #f3f3f3;
+  --spinner-active: #3498db;
 
-@gray-medium: #aaa;
+  /* Shadow Colors */
+  --shadow-light: rgb(0 0 0 / 10%);
+  --shadow-medium: rgb(0 0 0 / 20%);
 
-@gray-dark: #888;
+  /* Text Colors */
+  --text-primary: #333;
+  --text-white: #fff;
+  --text-error: #dc3545;
+}
 
-@gray-darker: #333;
+/* Utility classes for common color usage */
+.textError {
+  color: var(--text-error);
+}
 
-@black: #000000;
+.textPrimary {
+  color: var(--text-primary);
+}
 
-// Semantic Colors
-@success: #28a745;
-@warning: #ffc107;
+.textWhite {
+  color: var(--text-white);
+}
 
-@danger: #dc3545;
+.bgPrimary {
+  background-color: var(--primary-blue);
+}
 
-@info: #17a2b8;
+.bgSuccess {
+  background-color: var(--success);
+}
 
-// Background Colors
-@bg-cream: #fffacd;
-@bg-blue-light: #e8f4f8;
+.bgDanger {
+  background-color: var(--danger);
+}
 
-@bg-pink-light: #f8e8f4;
+.bgWarning {
+  background-color: var(--warning);
+}
 
-@bg-white-transparent: rgba(255, 255, 255, 0.7);
+// LESS variables that reference CSS custom properties for convenience
+@primary-blue: var(--primary-blue);
+@primary-blue-dark: var(--primary-blue-dark);
 
-// Button Colors
-@button-default: #ddd;
-@button-default-hover: #ccc;
+@primary-blue-darker: var(--primary-blue-darker);
 
-@button-default-border: #aaa;
+@primary-blue-light: var(--primary-blue-light);
 
-@button-default-border-hover: #888;
+@white: var(--white);
 
-// Spinner Colors
-@spinner-track: #f3f3f3;
-@spinner-active: #3498db;
+@gray-lightest: var(--gray-lightest);
 
-// Shadow Colors
-@shadow-light: rgba(0, 0, 0, 0.1);
-@shadow-medium: rgba(0, 0, 0, 0.2);
+@gray-lighter: var(--gray-lighter);
 
-// Text Colors
-@text-primary: #333;
-@text-white: #ffffff;
+@gray-light: var(--gray-light);
 
-@text-error: #dc3545;
+@gray: var(--gray);
+
+@gray-medium: var(--gray-medium);
+
+@gray-dark: var(--gray-dark);
+
+@gray-darker: var(--gray-darker);
+
+@black: var(--black);
+
+@success: var(--success);
+
+@warning: var(--warning);
+
+@danger: var(--danger);
+
+@info: var(--info);
+
+@bg-cream: var(--bg-cream);
+
+@bg-blue-light: var(--bg-blue-light);
+
+@bg-pink-light: var(--bg-pink-light);
+
+@bg-white-transparent: var(--bg-white-transparent);
+
+@button-default: var(--button-default);
+
+@button-default-hover: var(--button-default-hover);
+
+@button-default-border: var(--button-default-border);
+
+@button-default-border-hover: var(--button-default-border-hover);
+
+@spinner-track: var(--spinner-track);
+
+@spinner-active: var(--spinner-active);
+
+@shadow-light: var(--shadow-light);
+
+@shadow-medium: var(--shadow-medium);
+
+@text-primary: var(--text-primary);
+
+@text-white: var(--text-white);
+
+@text-error: var(--text-error);

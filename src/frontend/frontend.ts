@@ -4,7 +4,6 @@ import { loadFullScreenContainer } from '@/frontend/container';
 import { cardTemplate } from '@/frontend/cards';
 import { $id, ADD_CARD, CARD, LOADING } from '@/frontend/div-ids';
 import { Protocard } from '@/shared/types/db';
-import { colors } from '@/frontend/colors';
 
 interface Card {
   id: number;
@@ -41,19 +40,20 @@ class CardManager {
       const response = await fetch(url);
 
       if (response.ok) {
-        this.$loadingIndicator.hide();
+        this.$loadingIndicator.removeClass('textError').hide();
         console.log('Backend is up:', response);
         const data = await response.json();
         console.log('Backend response:', data);
       } else {
         const text = `Not Connected to ${response.url} - server ${response.status}`;
-        this.$loadingIndicator.css('color', colors.textError);
-        this.$loadingIndicator.text(text);
+        this.$loadingIndicator.addClass('textError').text(text);
         console.log(text);
       }
     } catch (error) {
       console.error('Backend is down:', error);
-      this.$loadingIndicator.text('Not Connected ' + error);
+      this.$loadingIndicator
+        .addClass('textError')
+        .text('Not Connected ' + error);
     } finally {
       this.spinner.hide();
     }

@@ -96,9 +96,12 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 - **Use CSS Modules**: All new component styles should go in `.module.less` files
 - **Global Styles**: Apply global styles through the app-root element or component-specific modules
 - **Scoped Styling**: Use CSS modules' `:global()` syntax only when absolutely necessary for global resets
-- **Centralized Colors**: Use the centralized color system:
-  - **LESS files**: Import `@/frontend/colors.less` and use LESS variables like `@primary-blue`, `@text-primary`
-  - **TypeScript files**: Import `{ colors }` from `@/frontend/colors` and use like `colors.primaryBlue`, `colors.textError`
+- **Centralized Colors**: Use the CSS custom properties color system:
+  - **Single source of truth**: Colors are defined as CSS custom properties in `colors.less` (`:root { --primary-blue: #007acc; }`)
+  - **LESS files**: Import `./colors.less` and use LESS variables like `@primary-blue`, `@text-primary` (which reference CSS vars)
+  - **TypeScript files**: Use CSS classes like `.textError`, `.textPrimary`, `.bgPrimary` instead of inline styles
+  - **No duplication**: Colors are defined once in CSS custom properties, with utility classes available everywhere
+  - **Avoid inline styles**: Always use CSS classes instead of `element.css('color', 'red')` or similar
   - **Never use hardcoded colors** - always reference the centralized color system
 - **Separation of Concerns**: Split CSS classes by purpose:
   - **Positioning classes**: Handle `position`, `inset`, `z-index` (how element fits in its parent)

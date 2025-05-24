@@ -1,55 +1,22 @@
-// TypeScript color constants that match colors.less
-// Use these in TypeScript files instead of hardcoded color values
+// Color utilities for TypeScript
+// Colors are defined in colors.less as CSS custom properties and utility classes
+// Use CSS classes (.textError, .bgPrimary, etc.) instead of these utilities
 
-export const colors = {
-  // Primary Brand Colors
-  primaryBlue: '#007acc',
-  primaryBlueDark: '#005a9e',
-  primaryBlueDarker: '#048',
-  primaryBlueLight: '#06a',
+// If you need direct access to CSS custom property values in rare cases:
+export function getCSSVar(varName: string): string {
+  if (typeof document === 'undefined') {
+    // Fallback for SSR or Node.js environments
+    return '';
+  }
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(varName)
+    .trim();
+}
 
-  // Neutral Colors
-  white: '#ffffff',
-  grayLightest: '#f8f9fa',
-  grayLighter: '#f3f3f3',
-  grayLight: '#f0f0f0',
-  gray: '#ccc',
-  grayMedium: '#aaa',
-  grayDark: '#888',
-  grayDarker: '#333',
-  black: '#000000',
-
-  // Semantic Colors
-  success: '#28a745',
-  warning: '#ffc107',
-  danger: '#dc3545',
-  info: '#17a2b8',
-
-  // Background Colors
-  bgCream: '#fffacd',
-  bgBlueLight: '#e8f4f8',
-  bgPinkLight: '#f8e8f4',
-  bgWhiteTransparent: 'rgba(255, 255, 255, 0.7)',
-
-  // Button Colors
-  buttonDefault: '#ddd',
-  buttonDefaultHover: '#ccc',
-  buttonDefaultBorder: '#aaa',
-  buttonDefaultBorderHover: '#888',
-
-  // Spinner Colors
-  spinnerTrack: '#f3f3f3',
-  spinnerActive: '#3498db',
-
-  // Shadow Colors
-  shadowLight: 'rgba(0, 0, 0, 0.1)',
-  shadowMedium: 'rgba(0, 0, 0, 0.2)',
-
-  // Text Colors
-  textPrimary: '#333',
-  textWhite: '#ffffff',
-  textError: '#dc3545',
+// CSS custom property names (for rare cases where you need the variable name)
+export const cssVars = {
+  primaryBlue: '--primary-blue',
+  textError: '--text-error',
+  textPrimary: '--text-primary',
+  // Add more as needed
 } as const;
-
-// Type for color keys
-export type ColorKey = keyof typeof colors;
