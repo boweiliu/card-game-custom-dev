@@ -1,6 +1,5 @@
 import sqlite3, { Database } from 'sqlite3';
-import path from 'path';
-import { TABLE_SCHEMAS } from '@/server/db/schemas';
+import { TABLE_SCHEMAS } from '@/server/db/sql/schemas';
 import { DatabaseRepository } from '@/server/db/repository';
 
 // Database initialization

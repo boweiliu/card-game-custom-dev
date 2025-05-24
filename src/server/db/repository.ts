@@ -1,7 +1,9 @@
 import { Database } from 'sqlite3';
-import { QUERIES } from '@/server/db/queries';
-import { Protocard, ProtocardId, validateProtocard } from '@/shared/types/db';
+import { QUERIES } from '@/server/db/sql/queries';
+import { Protocard, ProtocardId } from '@/server/db/types';
 import { DatabaseError, NotFoundError } from '@/server/errors/http-errors';
+import { validateProtocard, validateRowCount } from '@/server/db/validators/input';
+import { GenericValidation } from '@/shared/validation/validation';
 
 export class DatabaseRepository {
   constructor(private db: Database) {}
@@ -18,16 +20,13 @@ export class DatabaseRepository {
 
         const insertId = this.lastID;
         // Get total count
-        db.get(QUERIES.COUNT_CALLS.GET_TOTAL, (err, row: unknown) => {
+        db.get(QUERIES.COUNT_CALLS.GET_COUNT, (err, row: unknown) => {
           if (err) {
             reject(new DatabaseError('getting count total', err));
             return;
           }
-          if (!row || typeof row !== 'object' || !('total' in row) || typeof row.total !== 'number') {
-            reject(new DatabaseError('getting count total', new Error('Invalid row')));
-            return;
-          }
-          resolve({ id: insertId, total: row.total });
+          const result = validateRowCount(row);
+          resolve({ id: insertId, total: result.count });
         });
       });
     });
@@ -53,21 +52,19 @@ export class DatabaseRepository {
 
   async getProtocardCount(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this.db.get(QUERIES.PROTOCARDS.SELECT_COUNT, (err, row: unknown) => {
+      this.db.get(QUERIES.PROTOCARDS.GET_COUNT, (err, row: unknown) => {
         if (err) {
           reject(new DatabaseError('counting protocards', err));
           return;
         }
-        if (!row || typeof row !== 'object' || !('count' in row) || typeof row.count !== 'number') {
-          reject(new DatabaseError('counting protocards', new Error('Invalid row')));
-          return;
-        }
-        resolve(row.count);
+        const result = validateRowCount(row);
+        resolve(result.count);
       });
     });
   }
 
   async createProtocord(textBody: string): Promise<Protocard> {
+    GenericValidation.validateString(textBody);
     return new Promise((resolve, reject) => {
       this.db.get(QUERIES.PROTOCARDS.INSERT, [textBody], (err, row: unknown) => {
         if (err) {
@@ -85,6 +82,9 @@ export class DatabaseRepository {
   }
 
   async updateProtocord(id: ProtocardId, textBody: string): Promise<Protocard> {
+    GenericValidation.validatePositiveInteger(id);
+    GenericValidation.validateString(textBody);
+
     return new Promise((resolve, reject) => {
       this.db.get(QUERIES.PROTOCARDS.UPDATE, [textBody, id], (err, row: unknown) => {
         if (err) {
@@ -105,18 +105,20 @@ export class DatabaseRepository {
     });
   }
 
-  async deleteProtocord(id: ProtocardId): Promise<{ deleted: boolean }> {
+  async deleteProtocord(id: ProtocardId): Promise<{ deleted: Protocard | null }> {
+    GenericValidation.validatePositiveInteger(id);
     return new Promise((resolve, reject) => {
-      this.db.run(QUERIES.PROTOCARDS.DELETE, [id], function (err) {
+      this.db.get(QUERIES.PROTOCARDS.DELETE, [id], (err, row: unknown) => {
         if (err) {
           reject(new DatabaseError('deleting protocard', err));
           return;
         }
-        if (this.changes === 0) {
-          reject(new NotFoundError('Protocard'));
+        if (!row) {
+          // already deleted, noop
+          resolve({ deleted: null });
           return;
         }
-        resolve({ deleted: true });
+        resolve({ deleted: validateProtocard(row) });
       });
     });
   }

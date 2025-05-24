@@ -3,10 +3,10 @@ import { DatabaseRepository } from '@/server/db/repository';
 import { asyncHandler } from '@/server/middleware/async-handler';
 import { 
   noBodyValidator, 
-  protocardValidator,
-  protocardWithParamsValidator,
+  createProtocardValidator,
+  updateProtocardValidator,
   deleteProtocardValidator
-} from '@/server/validators/validators';
+} from '@/server/routes/validators/input';
 import {
   GetAllProtocardsRequest,
   GetAllProtocardsResponse,
@@ -20,6 +20,7 @@ import {
   DeleteProtocardResponse,
   ProtocardParams,
 } from '@/shared/types/api';
+import { transformProtocard } from '@/server/routes/validators/transport';
 
 export function createProtocardRoutes(repository: DatabaseRepository): Router {
   const router = Router();
@@ -35,7 +36,7 @@ export function createProtocardRoutes(repository: DatabaseRepository): Router {
         params: {}
       ): Promise<GetAllProtocardsResponse> => {
         const protocards = await repository.getAllProtocards();
-        return protocards;
+        return protocards.map(transformProtocard);
       },
     })
   );
@@ -60,7 +61,7 @@ export function createProtocardRoutes(repository: DatabaseRepository): Router {
   router.post(
     '/',
     asyncHandler({
-      validator: protocardValidator,
+      validator: createProtocardValidator,
       responseType: 'api.protocards.create',
       routeFn: async (
         validatedData: CreateProtocardRequest,
@@ -68,7 +69,7 @@ export function createProtocardRoutes(repository: DatabaseRepository): Router {
       ): Promise<CreateProtocardResponse> => {
         const { text_body } = validatedData;
         const result = await repository.createProtocord(text_body);
-        return result;
+        return transformProtocard(result);
       },
     })
   );
@@ -77,7 +78,7 @@ export function createProtocardRoutes(repository: DatabaseRepository): Router {
   router.put(
     '/:entityId',
     asyncHandler({
-      validator: protocardWithParamsValidator,
+      validator: updateProtocardValidator,
       responseType: 'api.protocards.update',
       routeFn: async (
         validatedData: UpdateProtocardRequest,
@@ -89,7 +90,7 @@ export function createProtocardRoutes(repository: DatabaseRepository): Router {
           entityId,
           text_body
         );
-        return result;
+        return transformProtocard(result);
       },
     })
   );
@@ -105,10 +106,8 @@ export function createProtocardRoutes(repository: DatabaseRepository): Router {
         params: ProtocardParams
       ): Promise<DeleteProtocardResponse> => {
         const { entityId } = params;
-        await repository.deleteProtocord(entityId);
-        return {
-          entityId: entityId,
-        };
+        const result = await repository.deleteProtocord(entityId);
+        return result.deleted ? transformProtocard(result.deleted) : null;
       },
     })
   );

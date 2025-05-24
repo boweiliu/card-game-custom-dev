@@ -3,7 +3,7 @@ import { Spinner } from '@/frontend/spinner';
 import { loadFullScreenContainer } from '@/frontend/container';
 import { cardTemplate } from '@/frontend/cards';
 import { $id, ADD_CARD, CARD, LOADING } from '@/frontend/div-ids';
-import { Protocard } from '@/shared/types/db';
+import { Protocard } from '@/server/db/types';
 
 interface Card {
   id: number;

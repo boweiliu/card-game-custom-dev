@@ -6,6 +6,20 @@ type AsyncRouteHandler<InT, OutT, ParamsT> = (
   params: ParamsT
 ) => Promise<OutT>;
 
+function extractRequestId(rawData: unknown): MessageID | undefined {
+  if (!rawData || typeof rawData !== 'object' || !('id' in rawData) || typeof rawData.id !== 'string') {
+    return undefined;
+  }
+  return (rawData as any).id as MessageID;
+}
+
+function extractData(request: Request): unknown {
+  const { body, query } = request;
+  const hasBody =
+    body && typeof body === 'object' && Object.keys(body).length > 0;
+  return hasBody ? body : query;
+}
+
 // Wrapper to catch async errors and handle returned data
 export function asyncHandler<InT, OutT, ParamsT>(fns: {
   validator: (inData: unknown, params: unknown, req: unknown) => Promise<[InT, ParamsT]>;
@@ -16,22 +30,16 @@ export function asyncHandler<InT, OutT, ParamsT>(fns: {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       // prefer using body over query
-      const { body, query } = req;
-      const hasBody =
-        body && typeof body === 'object' && Object.keys(body).length > 0;
-      const rawData = hasBody ? body : query;
+      const rawData = extractData(req);
       const rawParams = req.params;
+      const rawRequestId: MessageID | undefined = extractRequestId(rawData);
+
       const [requestData, params] = await validator(rawData, rawParams, req);
       const result = await routeFn(requestData, params);
 
-      // Extract request ID if present
-      const requestId: MessageID | undefined = (requestData && typeof requestData === 'object' && 'id' in requestData && typeof requestData.id === 'string') 
-        ? (requestData as any).id as MessageID
-        : undefined;
-
       // wrap result in transport
       const response: SuccessResponse<OutT> = {
-        id: requestId,
+        id: rawRequestId,
         success: true,
         type: responseType,
         result: result,

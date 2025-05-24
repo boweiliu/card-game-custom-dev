@@ -1,6 +1,6 @@
 // API request/response types
 
-import { Protocard, ProtocardId } from '@/shared/types/db';
+import { Protocard, ProtocardId } from '@/server/db/types';
 import { MessageID } from '@/shared/types/responses';
 
 
@@ -9,9 +9,17 @@ export interface ProtocardParams {
   entityId: ProtocardId;
 }
 
+export type ProtocardTransportType = "transport.protocard" & { __brand: never }
+
+export type ProtocardTransport = {
+  id: ProtocardId;
+  text_body: string;
+  type: ProtocardTransportType;
+};
+
 // Protocard route types
 export interface GetAllProtocardsRequest {}
-export type GetAllProtocardsResponse = Array<Protocard>;
+export type GetAllProtocardsResponse = Array<ProtocardTransport>;
 
 export interface GetProtocardCountRequest {}
 export type GetProtocardCountResponse = { count: number };
@@ -21,21 +29,19 @@ export interface CreateProtocardRequest {
   id?: MessageID;
   text_body: string;
 }
-export type CreateProtocardResponse = Protocard;
+export type CreateProtocardResponse = ProtocardTransport;
 
 export interface UpdateProtocardRequest {
   // an idempotency id, not the entity id, which is auto-generated
   id?: MessageID;
   text_body: string;
 }
-export type UpdateProtocardResponse = Protocard;
+export type UpdateProtocardResponse = ProtocardTransport;
 
 export interface DeleteProtocardRequest {
   id?: MessageID;
 }
-export type DeleteProtocardResponse = {
-  entityId: ProtocardId;
-};
+export type DeleteProtocardResponse = ProtocardTransport | null;
 
 // Misc route types
 export interface PingRequest {

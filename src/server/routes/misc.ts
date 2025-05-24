@@ -7,7 +7,7 @@ import {
   CountRequest,
   CountResponse,
 } from '@/shared/types/api';
-import { noBodyValidator } from '@/server/validators/validators';
+import { noBodyValidator } from '@/server/routes/validators/input';
 
 export function createMiscRoutes(repository: DatabaseRepository): Router {
   const router = Router();
