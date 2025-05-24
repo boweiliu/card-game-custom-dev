@@ -10,9 +10,9 @@ export const QUERIES = {
   PROTOCARDS: {
     SELECT_ALL: 'SELECT * FROM protocards ORDER BY created_at DESC',
     SELECT_COUNT: 'SELECT COUNT(*) as count FROM protocards',
-    INSERT: 'INSERT INTO protocards (text_body) VALUES (?)',
+    INSERT: 'INSERT INTO protocards (text_body) VALUES (?) RETURNING *',
     UPDATE:
-      'UPDATE protocards SET text_body = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    DELETE: 'DELETE FROM protocards WHERE id = ?',
+      'UPDATE protocards SET text_body = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *',
+    DELETE: 'DELETE FROM protocards WHERE id = ? RETURNING *',
   },
 };

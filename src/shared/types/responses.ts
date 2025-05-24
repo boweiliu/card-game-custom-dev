@@ -1,8 +1,12 @@
-// Response wrapper types for consistent API responses
+// JSON-RPC 2.0 inspired response types for consistent API and SSE responses
 
-export interface Response<T> {
+export type MessageID = (string | number | null | undefined) & { __message_id: true };
+
+export interface SuccessResponse<T = unknown> {
+  id?: MessageID;
   success: true;
-  data: T;
+  type: string;
+  result: T;
   meta: {
     timestamp: string;
     pagination?: {
@@ -11,22 +15,24 @@ export interface Response<T> {
       total: number;
       totalPages: number;
     };
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
 export interface ErrorResponse {
+  id?: MessageID;
   success: false;
+  type: string;
   error: {
     message: string;
     code?: string;
-    details?: any;
+    data?: unknown;
   };
   meta: {
     timestamp: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
 // Union type for all possible API responses
-export type ApiResponse<T = any> = Response<T> | ErrorResponse;
+export type ApiResponse<T = unknown> = SuccessResponse<T> | ErrorResponse;

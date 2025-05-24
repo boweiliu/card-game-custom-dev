@@ -1,4 +1,4 @@
-import { Response as ApiResponse } from '@/shared/types/responses';
+import { SuccessResponse, MessageID } from '@/shared/types/responses';
 import { Request, Response, NextFunction } from 'express';
 
 type AsyncRouteHandler<InT, OutT, ParamsT> = (
@@ -8,10 +8,11 @@ type AsyncRouteHandler<InT, OutT, ParamsT> = (
 
 // Wrapper to catch async errors and handle returned data
 export function asyncHandler<InT, OutT, ParamsT>(fns: {
-  validator: (inData: unknown, req: unknown) => Promise<InT>;
+  validator: (inData: unknown, params: unknown, req: unknown) => Promise<[InT, ParamsT]>;
   routeFn: AsyncRouteHandler<InT, OutT, ParamsT>;
+  responseType: string;
 }) {
-  const { validator, routeFn } = fns;
+  const { validator, routeFn, responseType } = fns;
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       // prefer using body over query
@@ -19,15 +20,24 @@ export function asyncHandler<InT, OutT, ParamsT>(fns: {
       const hasBody =
         body && typeof body === 'object' && Object.keys(body).length > 0;
       const rawData = hasBody ? body : query;
-      const requestData = await validator(rawData, req);
-      const result = await routeFn(requestData, req.params as ParamsT);
+      const rawParams = req.params;
+      const [requestData, params] = await validator(rawData, rawParams, req);
+      const result = await routeFn(requestData, params);
+
+      // Extract request ID if present
+      const requestId: MessageID | undefined = (requestData && typeof requestData === 'object' && 'id' in requestData && typeof requestData.id === 'string') 
+        ? (requestData as any).id as MessageID
+        : undefined;
 
       // wrap result in transport
-      const response: ApiResponse<OutT> = {
+      const response: SuccessResponse<OutT> = {
+        id: requestId,
         success: true,
-        data: result,
+        type: responseType,
+        result: result,
         meta: {
           timestamp: new Date().toISOString(),
+          params: [ requestData, params ],
         },
       };
       res.json(response);

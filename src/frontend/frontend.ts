@@ -164,7 +164,7 @@ jQuery(async () => {
   cardManager.setupEventListeners();
 
   // Expose for debugging in console
-  (window as any).cardManager = cardManager;
+  (window as unknown as { cardManager: CardManager }).cardManager = cardManager;
   console.log('CardManager available globally as window.cardManager');
   console.log('Try: cardManager.pingBackend(5) for 5-second delay test');
 });

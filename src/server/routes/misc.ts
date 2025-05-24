@@ -16,10 +16,10 @@ export function createMiscRoutes(repository: DatabaseRepository): Router {
   router.get(
     '/ping',
     asyncHandler({
-      validator: async (inData: unknown) => {
-        return inData as PingRequest;
+      validator: async (inData: unknown, params: unknown, req: unknown) => {
+        return [inData as PingRequest, {}];
       },
-      routeFn: async (props: PingRequest): Promise<PingResponse> => {
+      routeFn: async (props: PingRequest, params: {}): Promise<PingResponse> => {
         const { delay = 0 } = props;
         console.log(`Ping endpoint called with ${delay}s delay`);
         await new Promise((resolve) =>
@@ -27,6 +27,7 @@ export function createMiscRoutes(repository: DatabaseRepository): Router {
         );
         return {};
       },
+      responseType: 'api.ping',
     })
   );
 
@@ -42,11 +43,10 @@ export function createMiscRoutes(repository: DatabaseRepository): Router {
         const result = await repository.insertCountCall();
         console.log(`Count endpoint called. Total calls: ${result.total}`);
         return {
-          message: 'Count recorded',
           total: result.total,
-          id: result.id,
         };
       },
+      responseType: 'api.count',
     })
   );
 

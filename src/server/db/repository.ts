@@ -1,6 +1,6 @@
 import { Database } from 'sqlite3';
 import { QUERIES } from '@/server/db/queries';
-import { Protocard } from '@/shared/types/db';
+import { Protocard, ProtocardId, validateProtocard } from '@/shared/types/db';
 import { DatabaseError, NotFoundError } from '@/server/errors/http-errors';
 
 export class DatabaseRepository {
@@ -18,9 +18,13 @@ export class DatabaseRepository {
 
         const insertId = this.lastID;
         // Get total count
-        db.get(QUERIES.COUNT_CALLS.GET_TOTAL, (err, row: any) => {
+        db.get(QUERIES.COUNT_CALLS.GET_TOTAL, (err, row: unknown) => {
           if (err) {
             reject(new DatabaseError('getting count total', err));
+            return;
+          }
+          if (!row || typeof row !== 'object' || !('total' in row) || typeof row.total !== 'number') {
+            reject(new DatabaseError('getting count total', new Error('Invalid row')));
             return;
           }
           resolve({ id: insertId, total: row.total });
@@ -32,21 +36,30 @@ export class DatabaseRepository {
   // Protocard operations
   async getAllProtocards(): Promise<Protocard[]> {
     return new Promise((resolve, reject) => {
-      this.db.all(QUERIES.PROTOCARDS.SELECT_ALL, (err, rows: Protocard[]) => {
+      this.db.all(QUERIES.PROTOCARDS.SELECT_ALL, (err, rows: unknown[]) => {
         if (err) {
           reject(new DatabaseError('fetching all protocards', err));
           return;
         }
-        resolve(rows);
+        try {
+          const validatedCards = rows.map(row => validateProtocard(row));
+          resolve(validatedCards);
+        } catch (validationError) {
+          reject(new DatabaseError('validating protocards', validationError as Error));
+        }
       });
     });
   }
 
   async getProtocardCount(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this.db.get(QUERIES.PROTOCARDS.SELECT_COUNT, (err, row: any) => {
+      this.db.get(QUERIES.PROTOCARDS.SELECT_COUNT, (err, row: unknown) => {
         if (err) {
           reject(new DatabaseError('counting protocards', err));
+          return;
+        }
+        if (!row || typeof row !== 'object' || !('count' in row) || typeof row.count !== 'number') {
+          reject(new DatabaseError('counting protocards', new Error('Invalid row')));
           return;
         }
         resolve(row.count);
@@ -54,44 +67,45 @@ export class DatabaseRepository {
     });
   }
 
-  async createProtocord(
-    textBody: string
-  ): Promise<{ id: number; text_body: string }> {
+  async createProtocord(textBody: string): Promise<Protocard> {
     return new Promise((resolve, reject) => {
-      this.db.run(QUERIES.PROTOCARDS.INSERT, [textBody], function (err) {
+      this.db.get(QUERIES.PROTOCARDS.INSERT, [textBody], (err, row: unknown) => {
         if (err) {
           reject(new DatabaseError('creating protocard', err));
           return;
         }
-        resolve({ id: this.lastID, text_body: textBody });
+        try {
+          const validatedCard = validateProtocard(row);
+          resolve(validatedCard);
+        } catch (validationError) {
+          reject(new DatabaseError('validating created protocard', validationError as Error));
+        }
       });
     });
   }
 
-  async updateProtocord(
-    id: number,
-    textBody: string
-  ): Promise<{ updated: boolean; id: number; text_body: string }> {
+  async updateProtocord(id: ProtocardId, textBody: string): Promise<Protocard> {
     return new Promise((resolve, reject) => {
-      this.db.run(QUERIES.PROTOCARDS.UPDATE, [textBody, id], function (err) {
+      this.db.get(QUERIES.PROTOCARDS.UPDATE, [textBody, id], (err, row: unknown) => {
         if (err) {
           reject(new DatabaseError('updating protocard', err));
           return;
         }
-        if (this.changes === 0) {
+        if (!row) {
           reject(new NotFoundError('Protocard'));
           return;
         }
-        resolve({
-          updated: true,
-          id: id,
-          text_body: textBody,
-        });
+        try {
+          const validatedCard = validateProtocard(row);
+          resolve(validatedCard);
+        } catch (validationError) {
+          reject(new DatabaseError('validating updated protocard', validationError as Error));
+        }
       });
     });
   }
 
-  async deleteProtocord(id: number): Promise<{ deleted: boolean }> {
+  async deleteProtocord(id: ProtocardId): Promise<{ deleted: boolean }> {
     return new Promise((resolve, reject) => {
       this.db.run(QUERIES.PROTOCARDS.DELETE, [id], function (err) {
         if (err) {

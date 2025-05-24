@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { SSEConnectedResponse, SSEHeartbeatResponse } from '@/shared/types/sse';
 
 export function createSSERoutes(): Router {
   const router = Router();
@@ -23,9 +24,14 @@ export function createSSERoutes(): Router {
     });
 
     // Send initial connection event
-    res.write(
-      'data: {"type": "connected", "message": "SSE connection established"}\n\n'
-    );
+    const connectedResponse: SSEConnectedResponse = {
+      id: undefined,
+      success: true,
+      type: "sse.connected",
+      result: { message: "SSE connection established" },
+      meta: { timestamp: new Date().toISOString() }
+    };
+    res.write(`data: ${JSON.stringify(connectedResponse)}\n\n`);
 
     // Keep connection alive with periodic heartbeat
     let heartbeatCount = 0;
@@ -39,7 +45,14 @@ export function createSSERoutes(): Router {
       }
 
       heartbeatCount++;
-      const heartbeatData = `data: {"type": "heartbeat", "timestamp": "${new Date().toISOString()}", "count": ${heartbeatCount}}\n\n`;
+      const heartbeatResponse: SSEHeartbeatResponse = {
+        id: undefined,
+        success: true,
+        type: "sse.heartbeat",
+        result: { count: heartbeatCount },
+        meta: { timestamp: new Date().toISOString() }
+      };
+      const heartbeatData = `data: ${JSON.stringify(heartbeatResponse)}\n\n`;
 
       try {
         res.write(heartbeatData);

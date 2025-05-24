@@ -6,7 +6,7 @@ export abstract class HttpError extends Error {
 
   constructor(
     message: string,
-    public readonly details?: any
+    public readonly details?: unknown
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -17,7 +17,7 @@ export class BadRequestError extends HttpError {
   readonly statusCode = 400;
   readonly userMessage: string;
 
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super(message, details);
     this.userMessage = message;
   }
@@ -27,7 +27,7 @@ export class NotFoundError extends HttpError {
   readonly statusCode = 404;
   readonly userMessage: string;
 
-  constructor(resource: string, details?: any) {
+  constructor(resource: string, details?: unknown) {
     const message = `${resource} not found`;
     super(message, details);
     this.userMessage = message;
@@ -38,7 +38,7 @@ export class InternalServerError extends HttpError {
   readonly statusCode = 500;
   readonly userMessage = 'Internal server error';
 
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super(message, details);
   }
 }
@@ -46,5 +46,17 @@ export class InternalServerError extends HttpError {
 export class DatabaseError extends InternalServerError {
   constructor(operation: string, originalError?: Error) {
     super(`Database error during ${operation}`, originalError);
+  }
+}
+
+export class ValidationError extends BadRequestError {
+  constructor(message: string, details?: unknown) {
+    super(message, details);
+  }
+}
+
+export class InternalValidationError extends InternalServerError {
+  constructor(message: string, details?: unknown) {
+    super(message, details);
   }
 }

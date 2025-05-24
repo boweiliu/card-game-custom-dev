@@ -72,7 +72,7 @@ class ScreenManager {
           console.error('Failed to fetch protocard count:', data.error.message);
           return;
         }
-        this.protocardCount = data.data.count;
+        this.protocardCount = data.result.count;
         // Update screen 2 if it's currently showing
         if (this.$placeholderContainer.hasClass(styles.screen2)) {
           this.showScreen(2);

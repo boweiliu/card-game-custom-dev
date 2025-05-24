@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { HttpError } from '@/server/errors/http-errors';
-import { ErrorResponse } from '@/shared/types/responses';
+import { ErrorResponse, MessageID } from '@/shared/types/responses';
 
 export function errorHandler(
   error: Error,
@@ -14,10 +14,22 @@ export function errorHandler(
     console.error(error.stack);
   }
 
+  // Extract request ID if present
+  const requestId: MessageID | undefined = (() => {
+    const { body, query } = req;
+    const hasBody = body && typeof body === 'object' && Object.keys(body).length > 0;
+    const rawData = hasBody ? body : query;
+    return (rawData && typeof rawData === 'object' && 'id' in rawData) 
+      ? (rawData as any).id as MessageID
+      : undefined;
+  })();
+
   // Handle known HTTP errors
   if (error instanceof HttpError) {
     const response: ErrorResponse = {
+      id: requestId,
       success: false,
+      type: 'api.error',
       error: {
         message: error.userMessage,
         code: error.name,
@@ -36,7 +48,9 @@ export function errorHandler(
 
   // Handle unknown errors
   const response: ErrorResponse = {
+    id: requestId,
     success: false,
+    type: 'api.error',
     error: {
       message: 'Internal server error',
       code: 'INTERNAL_SERVER_ERROR',
