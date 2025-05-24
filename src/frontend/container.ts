@@ -15,12 +15,12 @@ import {
   $id,
 } from '@/frontend/div-ids';
 import * as styles from '@/frontend/container.module.less';
-import { GetProtocardCountResponse } from '@/shared/types/api';
 import { sseService } from '@/frontend/sse-service';
 import { getStartScreenContent } from '@/frontend/screens/start-screen';
 import { getScreen1Content } from '@/frontend/screens/screen1';
 import { getScreen2Content } from '@/frontend/screens/screen2';
-import { ApiResponse } from '@/shared/types/responses';
+import { protocardApi } from '@/frontend/api/protocards';
+import { ApiError } from '@/frontend/api/client';
 
 const fullScreenContainerTemplate = () => `
   <div id="${FULLSCREEN_PARENT}" class="${styles.fullScreenContainerParent}">
@@ -64,24 +64,17 @@ class ScreenManager {
 
   private async loadProtocardCount() {
     try {
-      const response = await fetch('/api/protocards/count');
-      if (response.ok) {
-        const data: ApiResponse<GetProtocardCountResponse> =
-          await response.json();
-        if (!data.success) {
-          console.error('Failed to fetch protocard count:', data.error.message);
-          return;
-        }
-        this.protocardCount = data.result.count;
-        // Update screen 2 if it's currently showing
-        if (this.$placeholderContainer.hasClass(styles.screen2)) {
-          this.showScreen(2);
-        }
-      } else {
-        console.error('Failed to fetch protocard count:', response.status);
+      this.protocardCount = await protocardApi.getCount();
+      // Update screen 2 if it's currently showing
+      if (this.$placeholderContainer.hasClass(styles.screen2)) {
+        this.showScreen(2);
       }
     } catch (error) {
-      console.error('Error fetching protocard count:', error);
+      if (error instanceof ApiError) {
+        console.error('Failed to fetch protocard count:', error.message);
+      } else {
+        console.error('Unexpected error fetching protocard count:', error);
+      }
     }
   }
 

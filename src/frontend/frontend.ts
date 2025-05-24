@@ -4,6 +4,8 @@ import { loadFullScreenContainer } from '@/frontend/container';
 import { cardTemplate } from '@/frontend/cards';
 import { $id, ADD_CARD, CARD, LOADING } from '@/frontend/div-ids';
 import { Protocard } from '@/server/db/types';
+import { miscApi } from '@/frontend/api/misc';
+import { ApiError } from '@/frontend/api/client';
 
 interface Card {
   id: number;
@@ -33,27 +35,22 @@ class CardManager {
   public async pingBackend(delaySeconds: number = 0) {
     this.spinner.show();
     try {
-      const url =
-        delaySeconds > 0 ? `/api/ping?delay=${delaySeconds}` : '/api/ping';
-
       console.log(`Pinging backend with ${delaySeconds}s delay...`);
-      const response = await fetch(url);
-
-      if (response.ok) {
-        this.$loadingIndicator.removeClass('textError').hide();
-        console.log('Backend is up:', response);
-        const data = await response.json();
-        console.log('Backend response:', data);
-      } else {
-        const text = `Not Connected to ${response.url} - server ${response.status}`;
-        this.$loadingIndicator.addClass('textError').text(text);
-        console.log(text);
-      }
+      await miscApi.ping(delaySeconds > 0 ? delaySeconds : undefined);
+      
+      this.$loadingIndicator.removeClass('textError').hide();
+      console.log('Backend is up');
     } catch (error) {
-      console.error('Backend is down:', error);
-      this.$loadingIndicator
-        .addClass('textError')
-        .text('Not Connected ' + error);
+      if (error instanceof ApiError) {
+        const text = `Not Connected - server error ${error.status}: ${error.message}`;
+        this.$loadingIndicator.addClass('textError').text(text);
+        console.error('Backend API error:', error.message);
+      } else {
+        this.$loadingIndicator
+          .addClass('textError')
+          .text('Not Connected: ' + (error instanceof Error ? error.message : 'Unknown error'));
+        console.error('Backend is down:', error);
+      }
     } finally {
       this.spinner.hide();
     }
