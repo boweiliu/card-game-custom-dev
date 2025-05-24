@@ -1,112 +1,109 @@
 import { Router } from 'express';
-import { Database } from 'sqlite3';
-import { CreateProtocardRequest, UpdateProtocardRequest, ProtocardCountResponse } from '@/shared/types/api';
-import { Protocard } from '@/shared/types/db';
+import {
+  CreateProtocardRequest,
+  UpdateProtocardRequest,
+  ProtocardCountResponse,
+} from '@/shared/types/api';
+import { DatabaseRepository } from '../db';
 
-export function createProtocardRoutes(db: Database): Router {
+export function createProtocardRoutes(repository: DatabaseRepository): Router {
   const router = Router();
 
   // Get all protocards
-  router.get('/', (req, res) => {
-    db.all('SELECT * FROM protocards ORDER BY created_at DESC', (err, rows: Protocard[]) => {
-      if (err) {
-        console.error('Error fetching protocards:', err);
-        res.status(500).json({ error: 'Database error' });
-        return;
-      }
-      res.json(rows);
-    });
+  router.get('/', async (req, res) => {
+    try {
+      const protocards = await repository.getAllProtocards();
+      res.json(protocards);
+    } catch (error) {
+      console.error('Error fetching protocards:', error);
+      res.status(500).json({ error: 'Database error' });
+    }
   });
 
   // Get protocards count
-  router.get('/count', (req, res) => {
-    db.get('SELECT COUNT(*) as count FROM protocards', (err, row: any) => {
-      if (err) {
-        console.error('Error counting protocards:', err);
-        res.status(500).json({ error: 'Database error' });
-        return;
-      }
-      const response: ProtocardCountResponse = { count: row.count };
+  router.get('/count', async (req, res) => {
+    try {
+      const count = await repository.getProtocardCount();
+      const response: ProtocardCountResponse = { count };
       res.json(response);
-    });
+    } catch (error) {
+      console.error('Error counting protocards:', error);
+      res.status(500).json({ error: 'Database error' });
+    }
   });
 
   // Create new protocard
-  router.post('/', (req, res) => {
+  router.post('/', async (req, res) => {
     const { text_body }: CreateProtocardRequest = req.body;
-    
+
     if (!text_body || typeof text_body !== 'string') {
-      res.status(400).json({ error: 'text_body is required and must be a string' });
+      res
+        .status(400)
+        .json({ error: 'text_body is required and must be a string' });
       return;
     }
-    
-    db.run('INSERT INTO protocards (text_body) VALUES (?)', [text_body], function(err) {
-      if (err) {
-        console.error('Error creating protocard:', err);
-        res.status(500).json({ error: 'Database error' });
-        return;
-      }
-      
-      res.status(201).json({ 
-        id: this.lastID,
-        text_body,
-        message: 'Protocard created successfully'
+
+    try {
+      const result = await repository.createProtocord(text_body);
+      res.status(201).json({
+        id: result.id,
+        text_body: result.text_body,
+        message: 'Protocard created successfully',
       });
-    });
+    } catch (error) {
+      console.error('Error creating protocard:', error);
+      res.status(500).json({ error: 'Database error' });
+    }
   });
 
   // Update protocard
-  router.put('/:id', (req, res) => {
+  router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { text_body }: UpdateProtocardRequest = req.body;
-    
+
     if (!text_body || typeof text_body !== 'string') {
-      res.status(400).json({ error: 'text_body is required and must be a string' });
+      res
+        .status(400)
+        .json({ error: 'text_body is required and must be a string' });
       return;
     }
-    
-    db.run(
-      'UPDATE protocards SET text_body = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [text_body, id],
-      function(err) {
-        if (err) {
-          console.error('Error updating protocard:', err);
-          res.status(500).json({ error: 'Database error' });
-          return;
-        }
-        
-        if (this.changes === 0) {
-          res.status(404).json({ error: 'Protocard not found' });
-          return;
-        }
-        
-        res.json({ 
-          id: parseInt(id),
-          text_body,
-          message: 'Protocard updated successfully'
-        });
-      }
-    );
-  });
 
-  // Delete protocard
-  router.delete('/:id', (req, res) => {
-    const { id } = req.params;
-    
-    db.run('DELETE FROM protocards WHERE id = ?', [id], function(err) {
-      if (err) {
-        console.error('Error deleting protocard:', err);
-        res.status(500).json({ error: 'Database error' });
-        return;
-      }
-      
-      if (this.changes === 0) {
+    try {
+      const result = await repository.updateProtocord(parseInt(id), text_body);
+
+      if (!result.updated) {
         res.status(404).json({ error: 'Protocard not found' });
         return;
       }
-      
+
+      res.json({
+        id: result.id,
+        text_body: result.text_body,
+        message: 'Protocard updated successfully',
+      });
+    } catch (error) {
+      console.error('Error updating protocard:', error);
+      res.status(500).json({ error: 'Database error' });
+    }
+  });
+
+  // Delete protocard
+  router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const result = await repository.deleteProtocord(parseInt(id));
+
+      if (!result.deleted) {
+        res.status(404).json({ error: 'Protocard not found' });
+        return;
+      }
+
       res.json({ message: 'Protocard deleted successfully' });
-    });
+    } catch (error) {
+      console.error('Error deleting protocard:', error);
+      res.status(500).json({ error: 'Database error' });
+    }
   });
 
   return router;

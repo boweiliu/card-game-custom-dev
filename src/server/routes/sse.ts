@@ -5,40 +5,49 @@ export function createSSERoutes(): Router {
 
   // Server-Sent Events endpoint
   router.get('/', (req, res) => {
-    const clientIP = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 'unknown';
-    
+    const clientIP =
+      req.ip ||
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress ||
+      'unknown';
+
     console.log(`[SSE] Connection from IP: ${clientIP}`);
 
     // Set headers for SSE
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Cache-Control',
     });
 
     // Send initial connection event
-    res.write('data: {"type": "connected", "message": "SSE connection established"}\n\n');
+    res.write(
+      'data: {"type": "connected", "message": "SSE connection established"}\n\n'
+    );
 
     // Keep connection alive with periodic heartbeat
     let heartbeatCount = 0;
     let connectionClosed = false;
-    
+
     const heartbeat = setInterval(() => {
       // Check if connection is still alive
       if (connectionClosed || res.destroyed || !res.writable) {
         clearInterval(heartbeat);
         return;
       }
-      
+
       heartbeatCount++;
       const heartbeatData = `data: {"type": "heartbeat", "timestamp": "${new Date().toISOString()}", "count": ${heartbeatCount}}\n\n`;
-      
+
       try {
         res.write(heartbeatData);
       } catch (error) {
-        console.error(`[SSE] Error writing heartbeat to IP: ${clientIP}:`, error);
+        console.error(
+          `[SSE] Error writing heartbeat to IP: ${clientIP}:`,
+          error
+        );
         connectionClosed = true;
         clearInterval(heartbeat);
       }

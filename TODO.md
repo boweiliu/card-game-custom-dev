@@ -12,8 +12,8 @@
 10. Set up tracking for frontend state for full list of protocards -- frontend wants to hold the same state as backend when user makes changes, so we need to track "pending" and "synced" state of all changes. Start by fetching the full protocard list on first load.
 11. Add routes from frontend screen 2 that 1) fetch all protocards, and 2) allows user to creates a new protocard with empty text body. Since (2) is a write, the behavior should be to update the frontend data model first into the "pending" state then sync it up to the backend and confirm the frontend model when we receive the confirmation from backend.
 
+LATER
 
-LATER 
 1. Make a "dev" screen and make it the default. On the dev screen, we can edit the text on the cards and add new cards.
 2. Make spinner into a standalone reusable component that can elide what else is being loaded
 3. 2 large card rows - one at top and one at bottom. Fill them with placeholder cards for now (7x12, tarot dimensions)
@@ -25,6 +25,7 @@ LATER
 # LLM-suggested TODOs (DONT DO THESE RIGHT NOW, most of them are bad)
 
 ## Architecture & Infrastructure
+
 1. Add error boundaries and global error handling for the frontend
 2. Implement database migrations system for schema changes
 3. Add API versioning (e.g., /api/v1/) for future compatibility
@@ -33,6 +34,7 @@ LATER
 6. Implement request/response logging middleware for debugging
 
 ## User Experience & Interface
+
 7. Add loading states and skeleton screens for better perceived performance
 8. Implement keyboard shortcuts for common actions (ESC to close modals, etc.)
 9. Add confirmation dialogs for destructive actions (delete protocards, etc.)
@@ -41,6 +43,7 @@ LATER
 12. Implement undo/redo functionality for user actions
 
 ## Developer Experience
+
 13. Add Jest unit tests for shared types and utility functions
 14. Create Storybook or similar component documentation
 15. Add pre-commit hooks for formatting and linting
@@ -49,6 +52,7 @@ LATER
 18. Create development seed data for consistent testing
 
 ## Performance & Optimization
+
 19. Implement virtual scrolling for large lists of protocards
 20. Add caching layer (Redis) for frequently accessed data
 21. Optimize bundle size with code splitting and lazy loading
@@ -57,6 +61,7 @@ LATER
 24. Add compression middleware for API responses
 
 ## Security & Reliability
+
 25. Add input validation and sanitization on both frontend and backend
 26. Implement rate limiting for API endpoints
 27. Add CSRF protection for state-changing operations

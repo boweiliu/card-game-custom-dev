@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { Database } from 'sqlite3';
+import { DatabaseRepository } from '../db';
 
-export function createMiscRoutes(db: Database): Router {
+export function createMiscRoutes(repository: DatabaseRepository): Router {
   const router = Router();
 
   // Ping endpoint
@@ -22,30 +22,20 @@ export function createMiscRoutes(db: Database): Router {
   });
 
   // Count endpoint - records each call in SQLite
-  router.post('/count', (req, res) => {
-    db.run('INSERT INTO count_calls DEFAULT VALUES', function(err) {
-      if (err) {
-        console.error('Error inserting count record:', err);
-        res.status(500).json({ error: 'Database error' });
-        return;
-      }
-      
-      // Get total count
-      db.get('SELECT COUNT(*) as total FROM count_calls', (err, row: any) => {
-        if (err) {
-          console.error('Error getting count:', err);
-          res.status(500).json({ error: 'Database error' });
-          return;
-        }
-        
-        console.log(`Count endpoint called. Total calls: ${row.total}`);
-        res.json({ 
-          message: 'Count recorded',
-          total: row.total,
-          id: this.lastID 
-        });
+  router.post('/count', async (req, res) => {
+    try {
+      const result = await repository.insertCountCall();
+
+      console.log(`Count endpoint called. Total calls: ${result.total}`);
+      res.json({
+        message: 'Count recorded',
+        total: result.total,
+        id: result.id,
       });
-    });
+    } catch (error) {
+      console.error('Error inserting count record:', error);
+      res.status(500).json({ error: 'Database error' });
+    }
   });
 
   return router;

@@ -1,9 +1,18 @@
-import { CONTENT, ADD_CARD, CARD, LOADING, PROTOCARD_COUNT, SSE_STATUS } from '../div-ids';
+import {
+  CONTENT,
+  ADD_CARD,
+  CARD,
+  LOADING,
+  PROTOCARD_COUNT,
+  SSE_STATUS,
+} from '../div-ids';
 import * as styles from '../container.module.less';
 import { sseService } from '../sse-service';
 
 export function getScreen2Content(protocardCount: number): string {
-  const sseStatus = sseService.isSSEConnected() ? '🟢 Connected' : '🔴 Disconnected';
+  const sseStatus = sseService.isSSEConnected()
+    ? '🟢 Connected'
+    : '🔴 Disconnected';
   return `
     <div>
       <h1>Screen 2 - Protocards View</h1>

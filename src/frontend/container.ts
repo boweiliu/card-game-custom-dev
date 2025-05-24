@@ -56,7 +56,7 @@ class ScreenManager {
     this.setupEventListeners();
     this.loadProtocardCount();
     this.showScreen(0);
-    
+
     // Connect to SSE
     sseService.connect();
   }
@@ -86,7 +86,6 @@ class ScreenManager {
   }
 
   private showScreen(screenNumber: number) {
-
     // Update button states
     $id(START_SCREEN_BTN).toggleClass(styles.active, screenNumber === 0);
     $id(SCREEN_1_BTN).toggleClass(styles.active, screenNumber === 1);
@@ -99,8 +98,8 @@ class ScreenManager {
         screenNumber === 1
           ? styles.screen1
           : screenNumber === 2
-          ? styles.screen2
-          : ''
+            ? styles.screen2
+            : ''
       );
 
     // Update content
@@ -120,7 +119,6 @@ class ScreenManager {
     }
     this.$placeholderContainer.html(content);
   }
-
 }
 
 export async function loadFullScreenContainer() {
