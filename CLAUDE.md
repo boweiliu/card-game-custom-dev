@@ -110,6 +110,7 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 - **CSS Modules Class Names**: Always use `styles.className` instead of string literals like `'className'`
   - Use `styles.active` not `'active'`, `styles.hidden` not `'hidden'`, etc.
   - This ensures proper CSS module scoping and prevents class name conflicts
+  - **IMPORTANT**: Do not use plain classes, use styles to refer to CSS module classes
 
 ### TODO Workflow
 
