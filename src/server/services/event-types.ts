@@ -7,10 +7,6 @@ export class StackTraceCapture extends Error {
   constructor(message = 'Stack trace capture') {
     super(message);
     this.name = 'StackTraceCapture';
-    // Remove this constructor from the stack trace
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, StackTraceCapture);
-    }
   }
 }
 
