@@ -33,7 +33,7 @@
   s. [OK] Make border-box propagated everywhere (its currently in global body style in container.module.less)
   t. [OK] padding on gridContainer and protocard-grid are breaking other layouts, lets remove them for now
   u. [OK] Apply a different background color to the grid container and to the screen 3 container to visually distinguish them
-13. Add the ability to select specific cards in screen #3 and create an edit button which brings up a bigger modal view of the card and an editable text box. Edit modal should have save and cancel buttons. dont write anything to backend yet, just do the frontend logic.
+13. [OK] Add the ability to select specific cards in screen #3 and create an edit button which brings up a bigger modal view of the card and an editable text box. Edit modal should have save and cancel buttons. dont write anything to backend yet, just do the frontend logic.
 14. Add a routes from frontend screen 2 that 1) fetch all protocards, and 2) allows user to creates a new protocard with empty text body. Since (2) is a write, the behavior should be to update the frontend data model first into the "pending" state then sync it up to the backend and confirm the frontend model when we receive the confirmation from backend.
 15. Add stacktrace tracking to the pub sub, so that we aren't completely blindsided when a sub change is triggered but we cant tell from where
 16. Remember to put back in the ability for SSE subscribers to only listen for events they care about, rather than broadcast to all
