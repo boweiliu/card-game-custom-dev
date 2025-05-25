@@ -52,3 +52,44 @@ export interface CountRequest {}
 export type CountResponse = {
   total: number;
 };
+
+// Game history route types
+import { GameSnapshotId, GameActionId, PhysCardId } from '@/shared/types/db';
+
+export interface CreateGameSnapshotRequest {
+  physCards: Array<{
+    id: PhysCardId;
+    protocardId: ProtocardId;
+    position: 'deck' | 'hand' | 'score' | 'discard';
+    positionIndex: number;
+  }>;
+}
+
+export interface CreateGameActionRequest {
+  parentActionId?: GameActionId;
+  snapshotId: GameSnapshotId;
+  actionType: 'user' | 'triggered' | 'system';
+  actionName: 'draw_card' | 'play_card' | 'shuffle_deck' | 'move_card' | 'create_card';
+  actionData: object;
+}
+
+export type GameSnapshotResponse = {
+  id: GameSnapshotId;
+  physCards: Array<{
+    id: PhysCardId;
+    protocardId: ProtocardId;
+    position: 'deck' | 'hand' | 'score' | 'discard';
+    positionIndex: number;
+  }>;
+  createdAt: string;
+};
+
+export type GameActionResponse = {
+  id: GameActionId;
+  parentActionId: GameActionId | null;
+  snapshotId: GameSnapshotId;
+  actionType: 'user' | 'triggered' | 'system';
+  actionName: 'draw_card' | 'play_card' | 'shuffle_deck' | 'move_card' | 'create_card';
+  actionData: object;
+  createdAt: string;
+};

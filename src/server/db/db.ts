@@ -16,7 +16,9 @@ async function validateSchemas(db: Database): Promise<boolean> {
       const actualSchemas = new Map(rows.map(row => [row.name, row.sql]));
       const tableNameMap: Record<string, string> = {
         'COUNT_CALLS': 'count_calls',
-        'PROTOCARDS': 'protocards'
+        'PROTOCARDS': 'protocards',
+        'GAME_SNAPSHOTS': 'game_snapshots',
+        'GAME_ACTIONS': 'game_actions'
       };
       
       console.log('🔍 Validating database schemas...');
@@ -81,6 +83,8 @@ export async function initializeDatabase(dbPath: string): Promise<{
     db.serialize(async () => {
       db.run(TABLE_SCHEMAS.COUNT_CALLS);
       db.run(TABLE_SCHEMAS.PROTOCARDS);
+      db.run(TABLE_SCHEMAS.GAME_SNAPSHOTS);
+      db.run(TABLE_SCHEMAS.GAME_ACTIONS);
       
       try {
         // Run migrations if requested

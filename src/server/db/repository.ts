@@ -1,6 +1,6 @@
 import { Database } from 'sqlite3';
 import { QUERIES } from '@/server/db/sql/queries';
-import { Protocard, ProtocardId } from '@/server/db/types';
+import { Protocard, ProtocardId, GameSnapshot, GameAction, GameSnapshotId, GameActionId, PhysCard, ActionType, ActionName } from '@/server/db/types';
 import { DatabaseError, NotFoundError } from '@/server/errors/http-errors';
 import {
   validateProtocard,
@@ -156,6 +156,148 @@ export class DatabaseRepository {
         });
         resolve({ deleted: deletedCard });
       });
+    });
+  }
+
+  // Game history operations
+  async createGameSnapshot(physCards: PhysCard[]): Promise<GameSnapshot> {
+    return new Promise((resolve, reject) => {
+      const serializedCards = JSON.stringify(physCards);
+      
+      this.db.run(
+        QUERIES.GAME_SNAPSHOTS.INSERT,
+        [serializedCards],
+        function (err) {
+          if (err) {
+            reject(new DatabaseError('creating game snapshot', err));
+            return;
+          }
+
+          const snapshotId = this.lastID as GameSnapshotId;
+          resolve({
+            id: snapshotId,
+            phys_cards: physCards,
+            created_at: new Date().toISOString() as any,
+          });
+        }
+      );
+    });
+  }
+
+  async createGameAction(
+    parentActionId: GameActionId | null,
+    snapshotId: GameSnapshotId,
+    actionType: ActionType,
+    actionName: ActionName,
+    actionData: object
+  ): Promise<GameAction> {
+    return new Promise((resolve, reject) => {
+      const serializedData = JSON.stringify(actionData);
+      
+      this.db.run(
+        QUERIES.GAME_ACTIONS.INSERT,
+        [parentActionId, snapshotId, actionType, actionName, serializedData],
+        function (err) {
+          if (err) {
+            reject(new DatabaseError('creating game action', err));
+            return;
+          }
+
+          const actionId = this.lastID as GameActionId;
+          resolve({
+            id: actionId,
+            parent_action_id: parentActionId,
+            snapshot_id: snapshotId,
+            action_type: actionType,
+            action_name: actionName,
+            action_data: actionData,
+            created_at: new Date().toISOString() as any,
+          });
+        }
+      );
+    });
+  }
+
+  async getGameSnapshot(id: GameSnapshotId): Promise<GameSnapshot | null> {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        QUERIES.GAME_SNAPSHOTS.GET_BY_ID,
+        [id],
+        (err, row: any) => {
+          if (err) {
+            reject(new DatabaseError('getting game snapshot', err));
+            return;
+          }
+
+          if (!row) {
+            resolve(null);
+            return;
+          }
+
+          resolve({
+            id: row.id as GameSnapshotId,
+            phys_cards: JSON.parse(row.phys_cards),
+            created_at: row.created_at,
+          });
+        }
+      );
+    });
+  }
+
+  async getGameAction(id: GameActionId): Promise<GameAction | null> {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        QUERIES.GAME_ACTIONS.GET_BY_ID,
+        [id],
+        (err, row: any) => {
+          if (err) {
+            reject(new DatabaseError('getting game action', err));
+            return;
+          }
+
+          if (!row) {
+            resolve(null);
+            return;
+          }
+
+          resolve({
+            id: row.id as GameActionId,
+            parent_action_id: row.parent_action_id as GameActionId | null,
+            snapshot_id: row.snapshot_id as GameSnapshotId,
+            action_type: row.action_type as ActionType,
+            action_name: row.action_name as ActionName,
+            action_data: JSON.parse(row.action_data),
+            created_at: row.created_at,
+          });
+        }
+      );
+    });
+  }
+
+  async getGameActionsBySnapshot(snapshotId: GameSnapshotId): Promise<GameAction[]> {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        QUERIES.GAME_ACTIONS.GET_BY_SNAPSHOT,
+        [snapshotId],
+        (err, rows: any[]) => {
+          if (err) {
+            reject(new DatabaseError('getting game actions by snapshot', err));
+            return;
+          }
+
+          const actions = rows.map(row => ({
+            id: row.id as GameActionId,
+            parent_action_id: row.parent_action_id as GameActionId | null,
+            snapshot_id: row.snapshot_id as GameSnapshotId,
+            action_type: row.action_type as ActionType,
+            action_name: row.action_name as ActionName,
+            action_data: JSON.parse(row.action_data),
+            created_at: row.created_at,
+          }));
+
+          resolve(actions);
+        }
+      );
     });
   }
 }
