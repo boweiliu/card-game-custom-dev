@@ -35,7 +35,7 @@
   u. [OK] Apply a different background color to the grid container and to the screen 3 container to visually distinguish them
 13. Add the ability to select specific cards in screen #3 and create an edit button which brings up a bigger modal view of the card and an editable text box. Edit modal should have save and cancel buttons. dont write anything to backend yet, just do the frontend logic.
 14. Add a routes from frontend screen 2 that 1) fetch all protocards, and 2) allows user to creates a new protocard with empty text body. Since (2) is a write, the behavior should be to update the frontend data model first into the "pending" state then sync it up to the backend and confirm the frontend model when we receive the confirmation from backend.
-15. Add stacktrace tracking to the pub sub, so that we aren't completely blindsided when a sub change is triggered but we cant tell from where
+15. [OK] Add stacktrace tracking to the pub sub, so that we aren't completely blindsided when a sub change is triggered but we cant tell from where
 16. Remember to put back in the ability for SSE subscribers to only listen for events they care about, rather than broadcast to all
 17. Split up the docker build into 3 steps -- FE only (delete BE code), BE only (delete FE code), and then port the artifacts over and actually run stuff. This compresses the image and also ensures no BE <> FE dependency.
 18. Make sure DB_PATH is working properly both on dev and prod (just set the env variable manually), and ideally also use a fly volume to make sure it persists in prod.
