@@ -41,7 +41,7 @@
 18. Make sure DB_PATH is working properly both on dev and prod (just set the env variable manually), and ideally also use a fly volume to make sure it persists in prod.
 19. Version the protocards, i.e. make the db immutable and append-only and when we want to fetch stuff just fetch thel atest versions
 20. Add a model for game history playouts -- these will be write-only (since FE will manage all the state edits) but we just want a record of the actions and game states passed through. Each game history snapshot should have like a list of all the physcards (which refer to protocards), and their positions (deck/hand/score), and separately we also need a record of all game actions in the tree structure - user actions, triggered actions, down to even deck shuffle operations; and each action should point to the game history snapshot it was created from (or vice versa)
-19. all ids (message/correlation, entity) should have a prefix so we can easily tell where they come from. For DB ids -- either start managing id creation in backend, or have backend DB prepend the string prefix. For other ids, have a centralized place the branded id strings are created, and also make sure validation checks for the correct prefix on transport.
+19. [OK] all ids (message/correlation, entity) should have a prefix so we can easily tell where they come from. For DB ids -- either start managing id creation in backend, or have backend DB prepend the string prefix. For other ids, have a centralized place the branded id strings are created, and also make sure validation checks for the correct prefix on transport.
 
 LATER
 
