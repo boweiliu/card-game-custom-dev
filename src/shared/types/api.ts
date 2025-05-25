@@ -1,6 +1,7 @@
 // API request/response types
 
 import { ProtocardId } from '@/shared/types/db';
+import { PrefixedProtocardId } from '@/shared/types/id-prefixes';
 import { MessageID } from '@/shared/types/responses';
 
 // Parameter types for routes
@@ -11,7 +12,7 @@ export interface ProtocardParams {
 export type ProtocardTransportType = 'transport.protocard' & { __brand: never };
 
 export type ProtocardTransport = {
-  entityId: ProtocardId;
+  entityId: PrefixedProtocardId;
   text_body: string;
   type: ProtocardTransportType;
 };
