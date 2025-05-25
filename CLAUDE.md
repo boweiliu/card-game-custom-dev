@@ -127,3 +127,11 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 
 - **Docker**: Uses `deploy.sh` for local Docker builds and runs
 - **Fly.io**: Deployed to https://card-game-custom-dev.fly.dev/ via git push to main
+
+### Commit Guidelines
+
+- Use brief commit messages, this is a toy project
+
+### Execution Guidance
+
+- When executing sudo commands, write into a script for human since you do not have sudo
