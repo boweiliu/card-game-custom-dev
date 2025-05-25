@@ -137,7 +137,7 @@ export class Screen3Manager {
 
     // Close modal on Escape key
     $(document).on('keydown', (event) => {
-      if (event.key === 'Escape' && this.$modalOverlay && this.$modalOverlay.is(':visible')) {
+      if (event.key === 'Escape' && this.$modalOverlay && this.$modalOverlay.hasClass(cardStyles.show)) {
         this.hideModal();
       }
     });
@@ -158,14 +158,14 @@ export class Screen3Manager {
     if (!this.$modalOverlay || !this.$modalTextInput) return;
 
     this.$modalTextInput.val(protocard.text_body);
-    this.$modalOverlay.show();
+    this.$modalOverlay.addClass(cardStyles.show).show();
     this.$modalTextInput.focus();
   }
 
   private hideModal() {
     if (!this.$modalOverlay) return;
 
-    this.$modalOverlay.hide();
+    this.$modalOverlay.removeClass(cardStyles.show).hide();
     this.selectedProtocardId = null;
   }
 

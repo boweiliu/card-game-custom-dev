@@ -135,3 +135,7 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 ### Execution Guidance
 
 - When executing sudo commands, write into a script for human since you do not have sudo
+
+## Development Branch Guidance
+
+- Work off of dev branch, not main, which is production
