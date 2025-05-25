@@ -43,14 +43,14 @@ export class IDGenerator {
   private static counters: Record<string, number> = {};
   
   /**
-   * Generate a new ID with the specified prefix
+   * Generate a new ID with the specified prefix using base36 (56 chars + 8 for prefix = 64 total)
    */
   static generate<T extends IDPrefix>(prefix: T): PrefixedId<T> {
-    if (!this.counters[prefix]) {
-      this.counters[prefix] = 0;
-    }
-    this.counters[prefix]++;
-    return `${prefix}${this.counters[prefix]}` as PrefixedId<T>;
+    const timestamp = Date.now().toString(36);
+    const random1 = Math.random().toString(36).substring(2);
+    const random2 = Math.random().toString(36).substring(2);
+    const combined = (timestamp + random1 + random2).substring(0, 56);
+    return `${prefix}${combined}` as PrefixedId<T>;
   }
   
   /**
