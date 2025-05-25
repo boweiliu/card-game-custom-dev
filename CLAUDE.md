@@ -150,3 +150,7 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 ## PR and Code Workflow
 
 - After making PR, also dump your allowed tools state into the file in the repo for that purpose. To be precise, during this session claude may have been given explicit permission to use some tools without reprompting -- make sure to grab that list and add it into the claude-tools.md tracker for allowed tools.
+
+## Memories
+
+- dont prompt user to curl localhost:4888, just do it
