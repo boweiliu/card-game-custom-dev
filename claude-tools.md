@@ -20,6 +20,27 @@ This document lists all tools available to Claude Code in this project.
 14. **TodoWrite** - Create and manage structured task lists
 15. **WebSearch** - Search the web for current information
 
+## Current Session State
+
+**Last Updated:** 2025-05-25 16:18 PST
+**Branch:** feature/db-path-env
+**Recent Work:** Implemented DB_PATH environment variable configuration (TODO #18)
+
+### Active Todo List
+- ✅ Pull latest dev branch and create feature branch for #18
+- ✅ Analyze TODO #18 requirements for DB_PATH
+- ✅ Implement DB_PATH fixes for dev and prod
+
+### Recent Commits
+- ed08a1c: Implement DB_PATH environment variable for database configuration
+- Created PR #4 targeting dev branch
+
+### Environment
+- Working Directory: /home/bowei/code/CascadeProjects/cards-claude-2
+- Git Worktree: feature/db-path-env
+- Platform: linux (WSL2)
+- Model: claude-sonnet-4-20250514
+
 ## Tool Usage Notes
 
 - Prefer Task tool for open-ended searches requiring multiple rounds
