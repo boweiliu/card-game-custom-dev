@@ -17,7 +17,7 @@ app.use(express.json());
 
 // Initialize database
 const dbPath =
-  process.env.DATABASE_PATH || path.join(process.cwd(), 'db/app.db');
+  process.env.DB_PATH || path.join(process.cwd(), 'db/app.db');
 
 async function startServer() {
   try {

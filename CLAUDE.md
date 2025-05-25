@@ -118,11 +118,14 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 - Only humans should mark items as "[DONE]"
 - This ensures proper testing and validation of implemented features
 
-### Port Configuration
+### Environment Configuration
 
 - Frontend dev: `PORT` environment variable (default 4321)
 - Backend dev: `BE_PORT` environment variable (default 43210)
 - Production backend: `PORT` environment variable (default 3001)
+- Database path: `DB_PATH` environment variable (default `process.cwd()/db/app.db`)
+  - Development: Uses local `db/app.db` file in project root
+  - Production: Uses `/data/app.db` with persistent volume mount
 
 ## Deployment
 
@@ -140,3 +143,7 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 ## Development Branch Guidance
 
 - Work off of dev branch, not main, which is production
+
+## PR and Code Workflow
+
+- After making PR, also dump your allowed tools state into the file in the repo for that purpose. To be precise, during this session claude may have been given explicit permission to use some tools without reprompting -- make sure to grab that list and add it into the claude-tools.md tracker for allowed tools.
