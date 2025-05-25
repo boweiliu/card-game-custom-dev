@@ -2,23 +2,34 @@ import { Protocard } from '@/server/db/types';
 import { ProtocardId } from '@/shared/types/db';
 import { EventEmitter } from 'events';
 
+// Non-Error error subclass for capturing stacktraces
+export class StackTraceCapture extends Error {
+  constructor(message = 'Stack trace capture') {
+    super(message);
+    this.name = 'StackTraceCapture';
+  }
+}
+
 // Define event payloads for each specific event type
 export interface ProtocardCreatedEvent {
   type: 'protocard.created';
   protocard: Protocard;
   timestamp: string;
+  stacktrace: StackTraceCapture;
 }
 
 export interface ProtocardUpdatedEvent {
   type: 'protocard.updated';
   protocard: Protocard;
   timestamp: string;
+  stacktrace: StackTraceCapture;
 }
 
 export interface ProtocardDeletedEvent {
   type: 'protocard.deleted';
   id: ProtocardId;
   timestamp: string;
+  stacktrace: StackTraceCapture;
 }
 
 // Typed EventEmitter wrapper for specific event types

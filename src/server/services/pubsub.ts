@@ -1,6 +1,7 @@
 import {
   ProtocardEvents,
   TypedEventEmitter,
+  StackTraceCapture,
 } from '@/server/services/event-types';
 
 export class PubSubService {
@@ -22,12 +23,13 @@ export class PubSubService {
 
   public publish<K extends keyof ProtocardEvents>(
     event: K,
-    data: Omit<ProtocardEvents[K], 'type' | 'timestamp'>
+    data: Omit<ProtocardEvents[K], 'type' | 'timestamp' | 'stacktrace'>
   ): void {
     this.protocards.typedEmit(event, {
       ...data,
       type: event,
       timestamp: new Date().toISOString(),
+      stacktrace: new StackTraceCapture(),
     } as ProtocardEvents[K]);
   }
 
