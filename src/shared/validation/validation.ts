@@ -1,7 +1,14 @@
 // Generic validation utilities for primitive types
 
-import { ProtocardId, DateString } from '@/shared/types/db';
+import { DateString, ProtocardId } from '@/shared/types/db';
 import { MessageID } from '@/shared/types/responses';
+import { 
+  IDGenerator, 
+  ID_PREFIXES, 
+  PrefixedId,
+  type IDPrefix,
+  type PrefixedProtocardId
+} from '@/shared/types/id-prefixes';
 
 // Base validation error types
 export class ValidationError extends Error {
@@ -227,6 +234,36 @@ export namespace BrandedTypeValidation {
       );
     }
     return value as MessageID;
+  }
+  
+  /**
+   * Validate a prefixed ID with specific prefix requirement
+   */
+  export function validatePrefixedId<T extends IDPrefix>(
+    value: unknown,
+    expectedPrefix: T,
+    fieldName = 'id'
+  ): PrefixedId<T> {
+    const str = GenericValidation.validateString(value, fieldName);
+    
+    if (!IDGenerator.validatePrefix(str, expectedPrefix)) {
+      throw new ValidationError(
+        `${fieldName} must start with prefix "${expectedPrefix}". Got: "${str}"`,
+        fieldName
+      );
+    }
+    
+    return str as PrefixedId<T>;
+  }
+  
+  /**
+   * Validate a protocard ID with correct prefix (new prefixed version)
+   */
+  export function validatePrefixedProtocardId(
+    value: unknown,
+    fieldName = 'protocardId'
+  ): PrefixedProtocardId {
+    return validatePrefixedId(value, ID_PREFIXES.PROTOCARD, fieldName);
   }
 
   export function validateOptionalMessageID(

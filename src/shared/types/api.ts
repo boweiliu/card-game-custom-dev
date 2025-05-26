@@ -1,6 +1,7 @@
 // API request/response types
 
 import { ProtocardId } from '@/shared/types/db';
+import { PrefixedProtocardId } from '@/shared/types/id-prefixes';
 import { MessageID } from '@/shared/types/responses';
 
 // Parameter types for routes
@@ -11,7 +12,7 @@ export interface ProtocardParams {
 export type ProtocardTransportType = 'transport.protocard' & { __brand: never };
 
 export type ProtocardTransport = {
-  entityId: ProtocardId;
+  entityId: PrefixedProtocardId;
   text_body: string;
   type: ProtocardTransportType;
 };
@@ -54,15 +55,42 @@ export type CountResponse = {
 };
 
 // Game history route types
-import { GameSnapshotId, GameActionId, PhysCardId } from '@/shared/types/db';
+import { GameSnapshotId, GameActionId, PhysCardId, CardPosition } from '@/shared/types/db';
+
+export type PhysCardTransportType = 'transport.physcard' & { __brand: never };
+
+export type PhysCardTransport = {
+  id: PhysCardId;
+  protocardId: ProtocardId;
+  position: CardPosition;
+  positionIndex: number;
+  type: PhysCardTransportType;
+};
+
+export type GameSnapshotTransportType = 'transport.gamesnapshot' & { __brand: never };
+
+export type GameSnapshotTransport = {
+  id: GameSnapshotId;
+  physCards: PhysCardTransport[];
+  createdAt: string;
+  type: GameSnapshotTransportType;
+};
+
+export type GameActionTransportType = 'transport.gameaction' & { __brand: never };
+
+export type GameActionTransport = {
+  id: GameActionId;
+  parentActionId: GameActionId | null;
+  snapshotId: GameSnapshotId;
+  actionType: 'user' | 'triggered' | 'system';
+  actionName: 'draw_card' | 'play_card' | 'shuffle_deck' | 'move_card' | 'create_card';
+  actionData: object;
+  createdAt: string;
+  type: GameActionTransportType;
+};
 
 export interface CreateGameSnapshotRequest {
-  physCards: Array<{
-    id: PhysCardId;
-    protocardId: ProtocardId;
-    position: 'deck' | 'hand' | 'score' | 'discard';
-    positionIndex: number;
-  }>;
+  physCards: PhysCardTransport[];
 }
 
 export interface CreateGameActionRequest {
@@ -73,23 +101,5 @@ export interface CreateGameActionRequest {
   actionData: object;
 }
 
-export type GameSnapshotResponse = {
-  id: GameSnapshotId;
-  physCards: Array<{
-    id: PhysCardId;
-    protocardId: ProtocardId;
-    position: 'deck' | 'hand' | 'score' | 'discard';
-    positionIndex: number;
-  }>;
-  createdAt: string;
-};
-
-export type GameActionResponse = {
-  id: GameActionId;
-  parentActionId: GameActionId | null;
-  snapshotId: GameSnapshotId;
-  actionType: 'user' | 'triggered' | 'system';
-  actionName: 'draw_card' | 'play_card' | 'shuffle_deck' | 'move_card' | 'create_card';
-  actionData: object;
-  createdAt: string;
-};
+export type CreateGameSnapshotResponse = GameSnapshotTransport;
+export type CreateGameActionResponse = GameActionTransport;

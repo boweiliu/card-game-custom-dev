@@ -1,5 +1,5 @@
 // Server-side database entity types
-import { ProtocardId, DateString, GameSnapshotId, GameActionId, PhysCardId } from '@/shared/types/db';
+import { ProtocardId, DateString, GameSnapshotId, GameActionId, PhysCardId, CardPosition } from '@/shared/types/db';
 
 export interface Protocard {
   id: ProtocardId;
@@ -7,9 +7,6 @@ export interface Protocard {
   created_at: DateString;
   updated_at: DateString;
 }
-
-// Game history types
-export type CardPosition = 'deck' | 'hand' | 'score' | 'discard';
 
 export interface PhysCard {
   id: PhysCardId;
