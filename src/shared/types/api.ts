@@ -55,7 +55,7 @@ export type CountResponse = {
 };
 
 // Game history route types
-import { GameSnapshotId, GameActionId, PhysCardId, CardPosition } from '@/shared/types/db';
+import { GameSnapshotId, PhysCardId, CardPosition } from '@/shared/types/db';
 
 export type PhysCardTransportType = 'transport.physcard' & { __brand: never };
 
@@ -71,35 +71,15 @@ export type GameSnapshotTransportType = 'transport.gamesnapshot' & { __brand: ne
 
 export type GameSnapshotTransport = {
   id: GameSnapshotId;
+  priorSnapshotId: GameSnapshotId | null;
   physCards: PhysCardTransport[];
   createdAt: string;
   type: GameSnapshotTransportType;
 };
 
-export type GameActionTransportType = 'transport.gameaction' & { __brand: never };
-
-export type GameActionTransport = {
-  id: GameActionId;
-  parentActionId: GameActionId | null;
-  snapshotId: GameSnapshotId;
-  actionType: 'user' | 'triggered' | 'system';
-  actionName: 'draw_card' | 'play_card' | 'shuffle_deck' | 'move_card' | 'create_card';
-  actionData: object;
-  createdAt: string;
-  type: GameActionTransportType;
-};
-
 export interface CreateGameSnapshotRequest {
+  priorSnapshotId?: GameSnapshotId;
   physCards: PhysCardTransport[];
 }
 
-export interface CreateGameActionRequest {
-  parentActionId?: GameActionId;
-  snapshotId: GameSnapshotId;
-  actionType: 'user' | 'triggered' | 'system';
-  actionName: 'draw_card' | 'play_card' | 'shuffle_deck' | 'move_card' | 'create_card';
-  actionData: object;
-}
-
 export type CreateGameSnapshotResponse = GameSnapshotTransport;
-export type CreateGameActionResponse = GameActionTransport;

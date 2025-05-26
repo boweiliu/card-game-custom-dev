@@ -17,8 +17,7 @@ async function validateSchemas(db: Database): Promise<boolean> {
       const tableNameMap: Record<string, string> = {
         'COUNT_CALLS': 'count_calls',
         'PROTOCARDS': 'protocards',
-        'GAME_SNAPSHOTS': 'game_snapshots',
-        'GAME_ACTIONS': 'game_actions'
+        'GAME_SNAPSHOTS': 'game_snapshots'
       };
       
       console.log('🔍 Validating database schemas...');
@@ -84,7 +83,6 @@ export async function initializeDatabase(dbPath: string): Promise<{
       db.run(TABLE_SCHEMAS.COUNT_CALLS);
       db.run(TABLE_SCHEMAS.PROTOCARDS);
       db.run(TABLE_SCHEMAS.GAME_SNAPSHOTS);
-      db.run(TABLE_SCHEMAS.GAME_ACTIONS);
       
       try {
         // Run migrations if requested

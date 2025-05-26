@@ -1,6 +1,6 @@
 // Server-side database entity types
 import { ProtocardId } from '@/shared/types/id-prefixes';
-import { DateString, GameSnapshotId, GameActionId, PhysCardId, CardPosition } from '@/shared/types/db';
+import { DateString, GameSnapshotId, PhysCardId, CardPosition } from '@/shared/types/db';
 
 export interface Protocard {
   id: ProtocardId;
@@ -18,20 +18,8 @@ export interface PhysCard {
 
 export interface GameSnapshot {
   id: GameSnapshotId;
+  prior_snapshot_id: GameSnapshotId | null; // reference to previous snapshot
   phys_cards: PhysCard[]; // JSON serialized array
-  created_at: DateString;
-}
-
-export type ActionType = 'user' | 'triggered' | 'system';
-export type ActionName = 'draw_card' | 'play_card' | 'shuffle_deck' | 'move_card' | 'create_card';
-
-export interface GameAction {
-  id: GameActionId;
-  parent_action_id: GameActionId | null; // for tree structure
-  snapshot_id: GameSnapshotId; // snapshot this action was created from
-  action_type: ActionType;
-  action_name: ActionName;
-  action_data: object; // JSON serialized action-specific data
   created_at: DateString;
 }
 
