@@ -12,8 +12,11 @@ export {
 export type DateString = string & { __date_string: true };
 
 // Game history related IDs - using prefixed system
-export type GameSnapshotId = string & { __game_snapshot_id: true };
-export type GameActionId = string & { __game_action_id: true };
+export { 
+  type PrefixedGameSnapshotId as GameSnapshotId,
+  type PrefixedGameActionId as GameActionId
+} from '@/shared/types/id-prefixes';
+
 export type PhysCardId = string & { __phys_card_id: true };
 
 // Card position for game history

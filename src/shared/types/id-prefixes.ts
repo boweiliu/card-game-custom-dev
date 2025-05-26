@@ -6,6 +6,8 @@ export const ID_PREFIXES = {
   PROTOCARD: 'pc_',
   GAME_CARD: 'gc_',
   GAME_HISTORY: 'gh_',
+  GAME_SNAPSHOT: 'gs_',
+  GAME_ACTION: 'ga_',
   
   // Message correlation ID prefixes
   MESSAGE: 'msg_',
@@ -28,6 +30,8 @@ export type PrefixedId<T extends string> = string & {
 export type PrefixedProtocardId = PrefixedId<typeof ID_PREFIXES.PROTOCARD>;
 export type GameCardId = PrefixedId<typeof ID_PREFIXES.GAME_CARD>;
 export type GameHistoryId = PrefixedId<typeof ID_PREFIXES.GAME_HISTORY>;
+export type PrefixedGameSnapshotId = PrefixedId<typeof ID_PREFIXES.GAME_SNAPSHOT>;
+export type PrefixedGameActionId = PrefixedId<typeof ID_PREFIXES.GAME_ACTION>;
 export type PrefixedMessageID = PrefixedId<typeof ID_PREFIXES.MESSAGE>;
 export type PrefixedPendingMessageID = PrefixedId<typeof ID_PREFIXES.PENDING_MESSAGE>;
 export type PrefixedPendingEntityId = PrefixedId<typeof ID_PREFIXES.TEMPORARY_ENTITY>;

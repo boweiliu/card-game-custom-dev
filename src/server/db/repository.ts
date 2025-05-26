@@ -2,6 +2,7 @@ import { Database } from 'sqlite3';
 import { QUERIES } from '@/server/db/sql/queries';
 import { Protocard, ProtocardId, GameSnapshot, GameAction, GameSnapshotId, GameActionId, PhysCard, ActionType, ActionName } from '@/server/db/types';
 import { DatabaseError, NotFoundError } from '@/server/errors/http-errors';
+import { IDGenerator, ID_PREFIXES } from '@/shared/types/id-prefixes';
 import {
   validateProtocard,
   validateRowCount,
@@ -162,18 +163,18 @@ export class DatabaseRepository {
   // Game history operations
   async createGameSnapshot(physCards: PhysCard[]): Promise<GameSnapshot> {
     return new Promise((resolve, reject) => {
+      const snapshotId = IDGenerator.generate(ID_PREFIXES.GAME_SNAPSHOT) as GameSnapshotId;
       const serializedCards = JSON.stringify(physCards);
       
       this.db.run(
-        QUERIES.GAME_SNAPSHOTS.INSERT,
-        [serializedCards],
+        QUERIES.GAME_SNAPSHOTS.INSERT_WITH_ID,
+        [snapshotId, serializedCards],
         function (err) {
           if (err) {
             reject(new DatabaseError('creating game snapshot', err));
             return;
           }
 
-          const snapshotId = this.lastID as GameSnapshotId;
           resolve({
             id: snapshotId,
             phys_cards: physCards,
@@ -192,18 +193,18 @@ export class DatabaseRepository {
     actionData: object
   ): Promise<GameAction> {
     return new Promise((resolve, reject) => {
+      const actionId = IDGenerator.generate(ID_PREFIXES.GAME_ACTION) as GameActionId;
       const serializedData = JSON.stringify(actionData);
       
       this.db.run(
-        QUERIES.GAME_ACTIONS.INSERT,
-        [parentActionId, snapshotId, actionType, actionName, serializedData],
+        QUERIES.GAME_ACTIONS.INSERT_WITH_ID,
+        [actionId, parentActionId, snapshotId, actionType, actionName, serializedData],
         function (err) {
           if (err) {
             reject(new DatabaseError('creating game action', err));
             return;
           }
 
-          const actionId = this.lastID as GameActionId;
           resolve({
             id: actionId,
             parent_action_id: parentActionId,
