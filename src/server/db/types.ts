@@ -1,5 +1,6 @@
 // Server-side database entity types
-import { ProtocardId, DateString, GameSnapshotId, GameActionId, PhysCardId, CardPosition } from '@/shared/types/db';
+import { ProtocardId } from '@/shared/types/id-prefixes';
+import { DateString, GameSnapshotId, GameActionId, PhysCardId, CardPosition } from '@/shared/types/db';
 
 export interface Protocard {
   id: ProtocardId;
@@ -34,5 +35,3 @@ export interface GameAction {
   created_at: DateString;
 }
 
-// Re-export shared types for convenience
-export { ProtocardId, DateString, GameSnapshotId, GameActionId, PhysCardId } from '@/shared/types/db';

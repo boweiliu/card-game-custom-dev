@@ -1,6 +1,8 @@
 import { Database } from 'sqlite3';
 import { QUERIES } from '@/server/db/sql/queries';
-import { Protocard, ProtocardId, GameSnapshot, GameAction, GameSnapshotId, GameActionId, PhysCard, ActionType, ActionName } from '@/server/db/types';
+import { Protocard, GameSnapshot, GameAction, PhysCard, ActionType, ActionName } from '@/server/db/types';
+import { ProtocardId } from '@/shared/types/id-prefixes';
+import { GameSnapshotId, GameActionId } from '@/shared/types/db';
 import { DatabaseError, NotFoundError } from '@/server/errors/http-errors';
 import { IDGenerator, ID_PREFIXES } from '@/shared/types/id-prefixes';
 import {
