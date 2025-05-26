@@ -1,6 +1,7 @@
 // Generic validation utilities for primitive types
 
-import { DateString, ProtocardId } from '@/shared/types/db';
+import { DateString } from '@/shared/types/db';
+import { ProtocardId } from '@/shared/types/id-prefixes';
 import { MessageID } from '@/shared/types/responses';
 import { 
   IDGenerator, 

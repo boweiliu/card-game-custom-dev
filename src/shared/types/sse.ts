@@ -1,7 +1,7 @@
 // Server-Sent Events types using JSON-RPC 2.0 inspired format
 import { SuccessResponse, ErrorResponse } from '@/shared/types/responses';
 import { ProtocardTransport } from '@/shared/types/api';
-import { ProtocardId } from '@/shared/types/db';
+import { ProtocardId } from '@/shared/types/id-prefixes';
 
 export interface SSEConnectedData {
   message: string;

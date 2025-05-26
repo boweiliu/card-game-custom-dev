@@ -1,5 +1,5 @@
 import { Protocard } from '@/server/db/types';
-import { ProtocardId } from '@/shared/types/db';
+import { ProtocardId } from '@/shared/types/id-prefixes';
 import { EventEmitter } from 'events';
 
 // Non-Error error subclass for capturing stacktraces

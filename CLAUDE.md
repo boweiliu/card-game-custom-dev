@@ -154,3 +154,4 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 ## Memories
 
 - dont prompt user to curl localhost:4888, just do it
+- avoid re-exports in shared types - import directly from source files instead

@@ -1,5 +1,6 @@
 // Server-side database entity types
-import { ProtocardId, DateString } from '@/shared/types/db';
+import { ProtocardId } from '@/shared/types/id-prefixes';
+import { DateString, GameSnapshotId, PhysCardId, CardPosition } from '@/shared/types/db';
 
 export interface Protocard {
   id: ProtocardId;
@@ -8,5 +9,17 @@ export interface Protocard {
   updated_at: DateString;
 }
 
-// Re-export shared types for convenience
-export { ProtocardId, DateString } from '@/shared/types/db';
+export interface PhysCard {
+  id: PhysCardId;
+  protocard_id: ProtocardId;
+  position: CardPosition;
+  position_index: number; // order within position
+}
+
+export interface GameSnapshot {
+  id: GameSnapshotId;
+  prior_snapshot_id: GameSnapshotId | null; // reference to previous snapshot
+  phys_cards: PhysCard[]; // JSON serialized array
+  created_at: DateString;
+}
+

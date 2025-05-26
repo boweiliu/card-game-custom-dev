@@ -1,7 +1,10 @@
 import { Database } from 'sqlite3';
 import { QUERIES } from '@/server/db/sql/queries';
-import { Protocard, ProtocardId } from '@/server/db/types';
+import { Protocard, GameSnapshot, PhysCard } from '@/server/db/types';
+import { ProtocardId } from '@/shared/types/id-prefixes';
+import { GameSnapshotId } from '@/shared/types/db';
 import { DatabaseError, NotFoundError } from '@/server/errors/http-errors';
+import { IDGenerator, ID_PREFIXES } from '@/shared/types/id-prefixes';
 import {
   validateProtocard,
   validateRowCount,
@@ -156,6 +159,83 @@ export class DatabaseRepository {
         });
         resolve({ deleted: deletedCard });
       });
+    });
+  }
+
+  // Game history operations
+  async createGameSnapshot(physCards: PhysCard[], priorSnapshotId?: GameSnapshotId): Promise<GameSnapshot> {
+    return new Promise((resolve, reject) => {
+      const snapshotId = IDGenerator.generate(ID_PREFIXES.GAME_SNAPSHOT) as GameSnapshotId;
+      const serializedCards = JSON.stringify(physCards);
+      
+      this.db.run(
+        QUERIES.GAME_SNAPSHOTS.INSERT_WITH_ID,
+        [snapshotId, priorSnapshotId || null, serializedCards],
+        function (err) {
+          if (err) {
+            reject(new DatabaseError('creating game snapshot', err));
+            return;
+          }
+
+          resolve({
+            id: snapshotId,
+            prior_snapshot_id: priorSnapshotId || null,
+            phys_cards: physCards,
+            created_at: new Date().toISOString() as any,
+          });
+        }
+      );
+    });
+  }
+
+  async getGameSnapshot(id: GameSnapshotId): Promise<GameSnapshot | null> {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        QUERIES.GAME_SNAPSHOTS.GET_BY_ID,
+        [id],
+        (err, row: any) => {
+          if (err) {
+            reject(new DatabaseError('getting game snapshot', err));
+            return;
+          }
+
+          if (!row) {
+            resolve(null);
+            return;
+          }
+
+          resolve({
+            id: row.id as GameSnapshotId,
+            prior_snapshot_id: row.prior_snapshot_id as GameSnapshotId | null,
+            phys_cards: JSON.parse(row.phys_cards),
+            created_at: row.created_at,
+          });
+        }
+      );
+    });
+  }
+
+  async getSnapshotChain(snapshotId: GameSnapshotId): Promise<GameSnapshot[]> {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        QUERIES.GAME_SNAPSHOTS.GET_CHAIN,
+        [snapshotId],
+        (err, rows: any[]) => {
+          if (err) {
+            reject(new DatabaseError('getting snapshot chain', err));
+            return;
+          }
+
+          const snapshots = rows.map(row => ({
+            id: row.id as GameSnapshotId,
+            prior_snapshot_id: row.prior_snapshot_id as GameSnapshotId | null,
+            phys_cards: JSON.parse(row.phys_cards),
+            created_at: row.created_at,
+          }));
+
+          resolve(snapshots);
+        }
+      );
     });
   }
 }

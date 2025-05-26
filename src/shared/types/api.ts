@@ -1,6 +1,6 @@
 // API request/response types
 
-import { ProtocardId } from '@/shared/types/db';
+import { ProtocardId } from '@/shared/types/id-prefixes';
 import { PrefixedProtocardId } from '@/shared/types/id-prefixes';
 import { MessageID } from '@/shared/types/responses';
 
@@ -53,3 +53,33 @@ export interface CountRequest {}
 export type CountResponse = {
   total: number;
 };
+
+// Game history route types
+import { GameSnapshotId, PhysCardId, CardPosition } from '@/shared/types/db';
+
+export type PhysCardTransportType = 'transport.physcard' & { __brand: never };
+
+export type PhysCardTransport = {
+  id: PhysCardId;
+  protocardId: ProtocardId;
+  position: CardPosition;
+  positionIndex: number;
+  type: PhysCardTransportType;
+};
+
+export type GameSnapshotTransportType = 'transport.gamesnapshot' & { __brand: never };
+
+export type GameSnapshotTransport = {
+  id: GameSnapshotId;
+  priorSnapshotId: GameSnapshotId | null;
+  physCards: PhysCardTransport[];
+  createdAt: string;
+  type: GameSnapshotTransportType;
+};
+
+export interface CreateGameSnapshotRequest {
+  priorSnapshotId?: GameSnapshotId;
+  physCards: PhysCardTransport[];
+}
+
+export type CreateGameSnapshotResponse = GameSnapshotTransport;
