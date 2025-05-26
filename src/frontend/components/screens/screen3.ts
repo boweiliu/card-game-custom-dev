@@ -14,6 +14,7 @@ import * as cardStyles from './screen3.module.less';
 import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
 import type { ProtocardTransport } from '@/shared/types/api';
+import type { PrefixedProtocardId } from '@/shared/types/id-prefixes';
 
 export function getScreen3Content(): string {
   return `
@@ -52,7 +53,7 @@ export function getScreen3Content(): string {
 export class Screen3Manager {
   private protocards: ProtocardTransport[] = [];
   private $gridContainer: JQuery | null = null;
-  private selectedProtocardId: number | null = null;
+  private selectedProtocardId: PrefixedProtocardId | null = null;
   private $modalOverlay: JQuery | null = null;
   private $modalTextInput: JQuery | null = null;
 
@@ -92,8 +93,8 @@ export class Screen3Manager {
   private renderProtocards() {
     if (!this.$gridContainer) return;
 
-    // Sort protocards by ID by default
-    const sortedProtocards = [...this.protocards].sort((a, b) => a.entityId - b.entityId);
+    // Sort protocards by ID by default (string comparison for prefixed IDs)
+    const sortedProtocards = [...this.protocards].sort((a, b) => a.entityId.localeCompare(b.entityId));
 
     const cardElements = sortedProtocards.map(protocard => {
       return `
@@ -117,7 +118,7 @@ export class Screen3Manager {
     if (this.$gridContainer) {
       this.$gridContainer.on('click', `.${cardStyles.protocard}`, (event) => {
         const cardElement = $(event.currentTarget);
-        const protocardId = parseInt(cardElement.data('id'), 10);
+        const protocardId = cardElement.data('id') as PrefixedProtocardId;
         this.selectCard(protocardId);
       });
     }
@@ -143,7 +144,7 @@ export class Screen3Manager {
     });
   }
 
-  private selectCard(protocardId: number) {
+  private selectCard(protocardId: PrefixedProtocardId) {
     const protocard = this.protocards.find(p => p.entityId === protocardId);
     if (!protocard) {
       console.error('Protocard not found:', protocardId);
