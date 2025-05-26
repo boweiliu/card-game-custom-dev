@@ -47,20 +47,14 @@ export class IDGenerator {
    */
   static generate<T extends IDPrefix>(prefix: T): PrefixedId<T> {
     const timestamp = Date.now().toString(36);
+    // Math.random().toString(36) gives "0.abc123..." so .substring(2) removes "0."
     const random1 = Math.random().toString(36).substring(2);
     const random2 = Math.random().toString(36).substring(2);
+    // Combine timestamp + 2 random strings, then truncate to exactly 56 chars
     const combined = (timestamp + random1 + random2).substring(0, 56);
     return `${prefix}${combined}` as PrefixedId<T>;
   }
   
-  /**
-   * Generate a random ID with the specified prefix (for distributed scenarios)
-   */
-  static generateRandom<T extends IDPrefix>(prefix: T): PrefixedId<T> {
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substring(2);
-    return `${prefix}${timestamp}_${random}` as PrefixedId<T>;
-  }
   
   /**
    * Validate that an ID has the expected prefix
