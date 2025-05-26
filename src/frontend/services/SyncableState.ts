@@ -1,4 +1,4 @@
-import { PendingEntityId } from '@/shared/types/db';
+import { PendingEntityId } from '@/shared/types/id-prefixes';
 import { MessageID, PendingMessageID } from '@/shared/types/responses';
 
 /**

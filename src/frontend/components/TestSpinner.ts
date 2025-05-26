@@ -1,7 +1,7 @@
 import { Spinner } from '@/frontend/components/spinner/spinner';
 import { cardTemplate } from '@/frontend/components/cards';
 import { $id, ADD_CARD, CARD, LOADING } from '@/frontend/utils/div-ids';
-import { ProtocardId } from '@/shared/types/db';
+import { ProtocardId } from '@/shared/types/id-prefixes';
 import { miscApi } from '@/frontend/api/misc';
 import { ApiError } from '@/frontend/api/client';
 import {

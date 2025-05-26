@@ -1,5 +1,5 @@
 import { protocardApi } from '@/frontend/api/protocards';
-import { ProtocardId } from '@/shared/types/db';
+import { ProtocardId } from '@/shared/types/id-prefixes';
 import { ProtocardTransport } from '@/shared/types/api';
 import { MessageID } from '@/shared/types/responses';
 import { SyncableState } from '@/frontend/services/SyncableState';

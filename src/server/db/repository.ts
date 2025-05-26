@@ -165,7 +165,7 @@ export class DatabaseRepository {
   // Game history operations
   async createGameSnapshot(physCards: PhysCard[]): Promise<GameSnapshot> {
     return new Promise((resolve, reject) => {
-      const snapshotId = IDGenerator.generate(ID_PREFIXES.GAME_SNAPSHOT) as GameSnapshotId;
+      const snapshotId = IDGenerator.generate(ID_PREFIXES.GAME_SNAPSHOT);
       const serializedCards = JSON.stringify(physCards);
       
       this.db.run(
@@ -195,7 +195,7 @@ export class DatabaseRepository {
     actionData: object
   ): Promise<GameAction> {
     return new Promise((resolve, reject) => {
-      const actionId = IDGenerator.generate(ID_PREFIXES.GAME_ACTION) as GameActionId;
+      const actionId = IDGenerator.generate(ID_PREFIXES.GAME_ACTION);
       const serializedData = JSON.stringify(actionData);
       
       this.db.run(
