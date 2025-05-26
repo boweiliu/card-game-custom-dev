@@ -22,8 +22,8 @@ export const TABLE_SCHEMAS = {
     id TEXT PRIMARY KEY,
     parent_action_id TEXT, -- can be null for root actions
     snapshot_id TEXT NOT NULL,
-    action_type TEXT NOT NULL CHECK (action_type IN ('user', 'triggered', 'system')),
-    action_name TEXT NOT NULL CHECK (action_name IN ('draw_card', 'play_card', 'shuffle_deck', 'move_card', 'create_card')),
+    action_type TEXT NOT NULL,
+    action_name TEXT NOT NULL,
     action_data TEXT NOT NULL, -- JSON serialized action-specific data
     created_at DATETIME DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now', 'utc') || 'Z'),
     FOREIGN KEY (parent_action_id) REFERENCES game_actions(id),
