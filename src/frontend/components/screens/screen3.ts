@@ -10,7 +10,7 @@ import {
   MODAL_CANCEL_BTN,
 } from '@/frontend/utils/div-ids';
 import * as styles from '@/frontend/components/container/container.module.less';
-import * as cardStyles from './screen3.module.less';
+import * as cardStyles from '@/frontend/components/screens/screen3.module.less';
 import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
 import type { ProtocardTransport } from '@/shared/types/api';
@@ -61,7 +61,7 @@ export class Screen3Manager {
     this.$gridContainer = $(`#${PROTOCARD_GRID}`);
     this.$modalOverlay = $(`#${MODAL_OVERLAY}`);
     this.$modalTextInput = $(`#${MODAL_TEXT_INPUT}`);
-    
+
     if (this.$gridContainer.length === 0) {
       console.error('Protocard grid container not found');
       return;
@@ -94,10 +94,13 @@ export class Screen3Manager {
     if (!this.$gridContainer) return;
 
     // Sort protocards by ID by default (string comparison for prefixed IDs)
-    const sortedProtocards = [...this.protocards].sort((a, b) => a.entityId.localeCompare(b.entityId));
+    const sortedProtocards = [...this.protocards].sort((a, b) =>
+      a.entityId.localeCompare(b.entityId)
+    );
 
-    const cardElements = sortedProtocards.map(protocard => {
-      return `
+    const cardElements = sortedProtocards
+      .map((protocard) => {
+        return `
         <div class="${cardStyles.protocard}" data-id="${protocard.entityId}">
           <div class="${cardStyles.cardBorder}">
             <div class="${cardStyles.cardContent}">
@@ -108,7 +111,8 @@ export class Screen3Manager {
           </div>
         </div>
       `;
-    }).join('');
+      })
+      .join('');
 
     this.$gridContainer.html(cardElements);
   }
@@ -126,7 +130,7 @@ export class Screen3Manager {
     // Modal button handlers
     $(`#${MODAL_SAVE_BTN}`).on('click', () => this.saveCard());
     $(`#${MODAL_CANCEL_BTN}`).on('click', () => this.hideModal());
-    
+
     // Close modal on overlay click
     if (this.$modalOverlay) {
       this.$modalOverlay.on('click', (event) => {
@@ -138,14 +142,18 @@ export class Screen3Manager {
 
     // Close modal on Escape key
     $(document).on('keydown', (event) => {
-      if (event.key === 'Escape' && this.$modalOverlay && this.$modalOverlay.hasClass(cardStyles.show)) {
+      if (
+        event.key === 'Escape' &&
+        this.$modalOverlay &&
+        this.$modalOverlay.hasClass(cardStyles.show)
+      ) {
         this.hideModal();
       }
     });
   }
 
   private selectCard(protocardId: PrefixedProtocardId) {
-    const protocard = this.protocards.find(p => p.entityId === protocardId);
+    const protocard = this.protocards.find((p) => p.entityId === protocardId);
     if (!protocard) {
       console.error('Protocard not found:', protocardId);
       return;
@@ -175,9 +183,11 @@ export class Screen3Manager {
 
     const newText = this.$modalTextInput.val() as string;
     console.log('Save card:', this.selectedProtocardId, 'with text:', newText);
-    
+
     // Update the card in the local state (frontend only for now)
-    const protocardIndex = this.protocards.findIndex(p => p.entityId === this.selectedProtocardId);
+    const protocardIndex = this.protocards.findIndex(
+      (p) => p.entityId === this.selectedProtocardId
+    );
     if (protocardIndex !== -1) {
       this.protocards[protocardIndex].text_body = newText;
       this.renderProtocards();

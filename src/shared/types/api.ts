@@ -67,7 +67,9 @@ export type PhysCardTransport = {
   type: PhysCardTransportType;
 };
 
-export type GameSnapshotTransportType = 'transport.gamesnapshot' & { __brand: never };
+export type GameSnapshotTransportType = 'transport.gamesnapshot' & {
+  __brand: never;
+};
 
 export type GameSnapshotTransport = {
   id: GameSnapshotId;

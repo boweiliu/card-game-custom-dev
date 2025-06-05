@@ -16,21 +16,20 @@ app.use(express.json());
 // Basic middleware
 
 // Initialize database
-const dbPath =
-  process.env.DB_PATH || path.join(process.cwd(), 'db/app.db');
+const dbPath = process.env.DB_PATH || path.join(process.cwd(), 'db/app.db');
 
 async function startServer() {
   try {
     const { db, repository } = await initializeDatabase(dbPath);
-    
+
     // Mount route modules
     app.use(ROUTES.BASE, createMiscRoutes(repository));
     app.use(ROUTES.PROTOCARDS.BASE, createProtocardRoutes(repository));
     app.use(ROUTES.SSE, createSSERoutes());
-    
+
     // Error handling middleware (must be last)
     app.use(errorHandler);
-    
+
     // All non-API endpoints should serve the index.html
     app.get('/*', (req, res) => {
       // if in dev mode, serve a redirect to the correct port

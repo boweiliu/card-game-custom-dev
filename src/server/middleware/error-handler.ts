@@ -9,12 +9,12 @@ import {
 function logErrorChain(error: Error, depth = 0): void {
   const prefix = `[${depth}]`;
   console.error(`${prefix} [Error Handler] ${error.name}: ${error.message}`);
-  
+
   if (error.stack) {
     console.error(`${prefix} Stack trace:`);
     console.error(error.stack);
   }
-  
+
   const cause = (error as any).cause;
   if (cause && cause instanceof Error) {
     console.error(`${prefix} Caused by:`);

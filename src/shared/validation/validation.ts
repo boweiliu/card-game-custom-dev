@@ -3,12 +3,12 @@
 import { DateString } from '@/shared/types/db';
 import { ProtocardId } from '@/shared/types/id-prefixes';
 import { MessageID } from '@/shared/types/responses';
-import { 
-  IDGenerator, 
-  ID_PREFIXES, 
+import {
+  IDGenerator,
+  ID_PREFIXES,
   PrefixedId,
   type IDPrefix,
-  type PrefixedProtocardId
+  type PrefixedProtocardId,
 } from '@/shared/types/id-prefixes';
 
 // Base validation error types
@@ -30,7 +30,10 @@ export namespace GenericValidation {
     fieldName = 'field'
   ): boolean {
     if (typeof value !== 'boolean') {
-      throw new ValidationError(`${fieldName} must be a boolean. Got: ${JSON.stringify(value)}`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a boolean. Got: ${JSON.stringify(value)}`,
+        fieldName
+      );
     }
     return value;
   }
@@ -38,7 +41,10 @@ export namespace GenericValidation {
   // String validation
   export function validateString(value: unknown, fieldName = 'field'): string {
     if (typeof value !== 'string') {
-      throw new ValidationError(`${fieldName} must be a string. Got: ${JSON.stringify(value)}`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be a string. Got: ${JSON.stringify(value)}`,
+        fieldName
+      );
     }
     return value;
   }
@@ -49,7 +55,10 @@ export namespace GenericValidation {
   ): string {
     const str = validateString(value, fieldName);
     if (str.trim().length === 0) {
-      throw new ValidationError(`${fieldName} cannot be empty. Got: ${JSON.stringify(value)}`, fieldName);
+      throw new ValidationError(
+        `${fieldName} cannot be empty. Got: ${JSON.stringify(value)}`,
+        fieldName
+      );
     }
     return str.trim();
   }
@@ -97,7 +106,10 @@ export namespace GenericValidation {
   export function validateInteger(value: unknown, fieldName = 'field'): number {
     const num = validateNumber(value, fieldName);
     if (!Number.isInteger(num)) {
-      throw new ValidationError(`${fieldName} must be an integer. Got: ${JSON.stringify(value)}`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be an integer. Got: ${JSON.stringify(value)}`,
+        fieldName
+      );
     }
     return num;
   }
@@ -176,7 +188,10 @@ export namespace GenericValidation {
     fieldName = 'field'
   ): Record<string, unknown> {
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
-      throw new ValidationError(`${fieldName} must be an object. Got: ${JSON.stringify(value)}`, fieldName);
+      throw new ValidationError(
+        `${fieldName} must be an object. Got: ${JSON.stringify(value)}`,
+        fieldName
+      );
     }
     return value as Record<string, unknown>;
   }
@@ -236,7 +251,7 @@ export namespace BrandedTypeValidation {
     }
     return value as MessageID;
   }
-  
+
   /**
    * Validate a prefixed ID with specific prefix requirement
    */
@@ -246,17 +261,17 @@ export namespace BrandedTypeValidation {
     fieldName = 'id'
   ): PrefixedId<T> {
     const str = GenericValidation.validateString(value, fieldName);
-    
+
     if (!IDGenerator.validatePrefix(str, expectedPrefix)) {
       throw new ValidationError(
         `${fieldName} must start with prefix "${expectedPrefix}". Got: "${str}"`,
         fieldName
       );
     }
-    
+
     return str as PrefixedId<T>;
   }
-  
+
   /**
    * Validate a protocard ID with correct prefix (new prefixed version)
    */

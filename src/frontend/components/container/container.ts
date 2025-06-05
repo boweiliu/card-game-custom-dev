@@ -20,7 +20,10 @@ import { sseService } from '@/frontend/services/sse-service';
 import { getStartScreenContent } from '@/frontend/components/screens/start-screen';
 import { getScreen1Content } from '@/frontend/components/screens/screen1';
 import { getScreen2Content } from '@/frontend/components/screens/screen2';
-import { getScreen3Content, Screen3Manager } from '@/frontend/components/screens/screen3';
+import {
+  getScreen3Content,
+  Screen3Manager,
+} from '@/frontend/components/screens/screen3';
 import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
 

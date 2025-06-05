@@ -143,7 +143,7 @@ This is a full-stack TypeScript card game/sticky note simulator with:
 ## Development Branch Guidance
 
 - Work off of dev branch, not main, which is production
-- When in a git worktree working against dev branch: 
+- When in a git worktree working against dev branch:
   - Do NOT pull or switch to dev branch
   - DO remember to fetch origin and merge dev
 

@@ -94,7 +94,7 @@
 
 .screen3 {
   background-color: @bg-green-light;
-  
+
   /* Make the inner div take full width for screen 3 */
   > div {
     width: 100%;
@@ -125,9 +125,11 @@
 .globalBodyStyle {
   font-family: Arial, sans-serif;
   box-sizing: border-box;
-  
+
   /* Propagate border-box to all elements */
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 }

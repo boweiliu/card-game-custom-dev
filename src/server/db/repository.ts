@@ -163,11 +163,16 @@ export class DatabaseRepository {
   }
 
   // Game history operations
-  async createGameSnapshot(physCards: PhysCard[], priorSnapshotId?: GameSnapshotId): Promise<GameSnapshot> {
+  async createGameSnapshot(
+    physCards: PhysCard[],
+    priorSnapshotId?: GameSnapshotId
+  ): Promise<GameSnapshot> {
     return new Promise((resolve, reject) => {
-      const snapshotId = IDGenerator.generate(ID_PREFIXES.GAME_SNAPSHOT) as GameSnapshotId;
+      const snapshotId = IDGenerator.generate(
+        ID_PREFIXES.GAME_SNAPSHOT
+      ) as GameSnapshotId;
       const serializedCards = JSON.stringify(physCards);
-      
+
       this.db.run(
         QUERIES.GAME_SNAPSHOTS.INSERT_WITH_ID,
         [snapshotId, priorSnapshotId || null, serializedCards],
@@ -190,28 +195,24 @@ export class DatabaseRepository {
 
   async getGameSnapshot(id: GameSnapshotId): Promise<GameSnapshot | null> {
     return new Promise((resolve, reject) => {
-      this.db.get(
-        QUERIES.GAME_SNAPSHOTS.GET_BY_ID,
-        [id],
-        (err, row: any) => {
-          if (err) {
-            reject(new DatabaseError('getting game snapshot', err));
-            return;
-          }
-
-          if (!row) {
-            resolve(null);
-            return;
-          }
-
-          resolve({
-            id: row.id as GameSnapshotId,
-            prior_snapshot_id: row.prior_snapshot_id as GameSnapshotId | null,
-            phys_cards: JSON.parse(row.phys_cards),
-            created_at: row.created_at,
-          });
+      this.db.get(QUERIES.GAME_SNAPSHOTS.GET_BY_ID, [id], (err, row: any) => {
+        if (err) {
+          reject(new DatabaseError('getting game snapshot', err));
+          return;
         }
-      );
+
+        if (!row) {
+          resolve(null);
+          return;
+        }
+
+        resolve({
+          id: row.id as GameSnapshotId,
+          prior_snapshot_id: row.prior_snapshot_id as GameSnapshotId | null,
+          phys_cards: JSON.parse(row.phys_cards),
+          created_at: row.created_at,
+        });
+      });
     });
   }
 
@@ -226,7 +227,7 @@ export class DatabaseRepository {
             return;
           }
 
-          const snapshots = rows.map(row => ({
+          const snapshots = rows.map((row) => ({
             id: row.id as GameSnapshotId,
             prior_snapshot_id: row.prior_snapshot_id as GameSnapshotId | null,
             phys_cards: JSON.parse(row.phys_cards),

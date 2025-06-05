@@ -1,6 +1,11 @@
 // Server-side database entity types
 import { ProtocardId } from '@/shared/types/id-prefixes';
-import { DateString, GameSnapshotId, PhysCardId, CardPosition } from '@/shared/types/db';
+import {
+  DateString,
+  GameSnapshotId,
+  PhysCardId,
+  CardPosition,
+} from '@/shared/types/db';
 
 export interface Protocard {
   id: ProtocardId;
@@ -22,4 +27,3 @@ export interface GameSnapshot {
   phys_cards: PhysCard[]; // JSON serialized array
   created_at: DateString;
 }
-
