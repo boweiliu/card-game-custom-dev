@@ -105,7 +105,7 @@ export class Screen3Manager {
           <div class="${cardStyles.cardBorder}">
             <div class="${cardStyles.cardContent}">
               <div class="${cardStyles.cardBody}">
-                ${protocard.text_body || '<em>Empty card</em>'}
+                ${protocard.textBody || '<em>Empty card</em>'}
               </div>
             </div>
           </div>
@@ -166,7 +166,7 @@ export class Screen3Manager {
   private showModal(protocard: ProtocardTransport) {
     if (!this.$modalOverlay || !this.$modalTextInput) return;
 
-    this.$modalTextInput.val(protocard.text_body);
+    this.$modalTextInput.val(protocard.textBody);
     this.$modalOverlay.addClass(cardStyles.show).show();
     this.$modalTextInput.focus();
   }
@@ -189,7 +189,7 @@ export class Screen3Manager {
       (p) => p.entityId === this.selectedProtocardId
     );
     if (protocardIndex !== -1) {
-      this.protocards[protocardIndex].text_body = newText;
+      this.protocards[protocardIndex].textBody = newText;
       this.renderProtocards();
     }
 

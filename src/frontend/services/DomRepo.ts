@@ -8,3 +8,8 @@ export class DomRepo {
   // TODO: implement
   // For instance - we should manage the protocard syncable state in here
 }
+
+/**
+ *
+ * Here is the structure of a protocard model
+ */

@@ -1,4 +1,4 @@
-@import '@/frontend/utils/colors.less';
+@import url('@/frontend/utils/colors.less');
 
 // Card dimensions and spacing variables
 @card-scale: 24px; // Base scale unit
@@ -6,12 +6,19 @@
 @card-height: @card-scale * 12; // 12 units tall
 @card-gap: 12px;
 @card-padding: 8px;
+
 @container-padding: 10px;
+
 @button-padding-v: 8px;
+
 @button-padding-h: 16px;
+
 @button-gap: 10px;
+
 @button-row-padding: 15px;
+
 @border-radius: 4px;
+
 @card-border-radius: 8px;
 
 .screenContainer {
@@ -34,8 +41,7 @@
 .gridContainer {
   flex: 1;
   width: 90%;
-  overflow-x: scroll; /* Always show horizontal scrollbar */
-  overflow-y: hidden;
+  overflow: scroll hidden; /* Always show horizontal scrollbar */
   background: @bg-grid-container;
   border: 2px solid @border-primary;
   min-height: 0; /* Important for flex children with overflow */
@@ -51,8 +57,7 @@
   width: calc(100% - @card-gap * 2);
   height: calc(100% - @card-gap * 2);
   align-content: flex-start;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto hidden;
 }
 
 .protocard {
@@ -152,7 +157,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   display: none;
   justify-content: center;
   align-items: center;
@@ -169,10 +174,10 @@
   padding: 20px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
 
   h3 {
-    margin: 0 0 15px 0;
+    margin: 0 0 15px;
     color: @text-primary;
     text-align: center;
   }

@@ -68,8 +68,8 @@ export function createProtocardRoutes(repository: DatabaseRepository): Router {
         validatedData: CreateProtocardRequest,
         params: {}
       ): Promise<CreateProtocardResponse> => {
-        const { text_body } = validatedData;
-        const result = await repository.createProtocord(text_body);
+        const { textBody } = validatedData;
+        const result = await repository.createProtocord(textBody);
         return transformProtocard(result);
       },
     })
@@ -86,8 +86,8 @@ export function createProtocardRoutes(repository: DatabaseRepository): Router {
         params: ProtocardParams
       ): Promise<UpdateProtocardResponse> => {
         const { entityId } = params;
-        const { text_body } = validatedData;
-        const result = await repository.updateProtocord(entityId, text_body);
+        const { textBody } = validatedData;
+        const result = await repository.updateProtocord(entityId, textBody);
         return transformProtocard(result);
       },
     })

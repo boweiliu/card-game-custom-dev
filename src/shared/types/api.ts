@@ -13,7 +13,7 @@ export type ProtocardTransportType = 'transport.protocard' & { __brand: never };
 
 export type ProtocardTransport = {
   entityId: PrefixedProtocardId;
-  text_body: string;
+  textBody: string;
   type: ProtocardTransportType;
 };
 
@@ -27,14 +27,14 @@ export type GetProtocardCountResponse = { count: number };
 export interface CreateProtocardRequest {
   // an idempotency id, not the entity id, which is auto-generated
   id?: MessageID;
-  text_body: string;
+  textBody: string;
 }
 export type CreateProtocardResponse = ProtocardTransport;
 
 export interface UpdateProtocardRequest {
   // an idempotency id, not the entity id, which is auto-generated
   id?: MessageID;
-  text_body: string;
+  textBody: string;
 }
 export type UpdateProtocardResponse = ProtocardTransport;
 

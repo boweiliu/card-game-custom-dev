@@ -54,11 +54,11 @@ function validateProtocardBody(
   inData: unknown
 ): CreateProtocardRequest | UpdateProtocardRequest {
   const data = GenericValidation.validateObject(inData, 'request body');
-  const { text_body, id } = data;
+  const { textBody, id } = data;
 
   return {
     id: BrandedTypeValidation.validateOptionalMessageID(id, 'id'),
-    text_body: GenericValidation.validateString(text_body, 'text_body'),
+    textBody: GenericValidation.validateString(textBody, 'textBody'),
   };
 }
 
