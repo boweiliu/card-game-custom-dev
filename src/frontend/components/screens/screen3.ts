@@ -8,6 +8,10 @@ import {
   MODAL_TEXT_INPUT,
   MODAL_SAVE_BTN,
   MODAL_CANCEL_BTN,
+  SCREEN3_ADD_BTN,
+  SCREEN3_EDIT_BTN,
+  SCREEN3_DELETE_BTN,
+  SCREEN3_SORT_BTN,
 } from '@/frontend/utils/div-ids';
 import * as styles from '@/frontend/components/container/container.module.less';
 import * as cardStyles from '@/frontend/components/screens/screen3.module.less';
@@ -15,6 +19,7 @@ import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
 import type { ProtocardTransport } from '@/shared/types/api';
 import type { PrefixedProtocardId } from '@/shared/types/id-prefixes';
+import { $id } from '@/frontend/utils/div-ids';
 
 export function getScreen3Content(): string {
   return `
@@ -27,10 +32,10 @@ export function getScreen3Content(): string {
           </div>
         </div>
         <div id="${BUTTON_ROW}" class="${cardStyles.buttonRow}">
-          <button class="${cardStyles.actionButton}">Add Card</button>
-          <button class="${cardStyles.actionButton}">Edit Mode</button>
-          <button class="${cardStyles.actionButton}">Delete Mode</button>
-          <button class="${cardStyles.actionButton}">Sort</button>
+          <button id="${SCREEN3_ADD_BTN}" class="${cardStyles.actionButton}">Add Card</button>
+          <button id="${SCREEN3_EDIT_BTN}" class="${cardStyles.actionButton}">Edit Mode</button>
+          <button id="${SCREEN3_DELETE_BTN}" class="${cardStyles.actionButton}">Delete Mode</button>
+          <button id="${SCREEN3_SORT_BTN}" class="${cardStyles.actionButton}">Sort</button>
         </div>
       </div>
       <div id="${LOADING}"></div>
@@ -58,9 +63,9 @@ export class Screen3Manager {
   private $modalTextInput: JQuery | null = null;
 
   async initialize() {
-    this.$gridContainer = $(`#${PROTOCARD_GRID}`);
-    this.$modalOverlay = $(`#${MODAL_OVERLAY}`);
-    this.$modalTextInput = $(`#${MODAL_TEXT_INPUT}`);
+    this.$gridContainer = $id(PROTOCARD_GRID);
+    this.$modalOverlay = $id(MODAL_OVERLAY);
+    this.$modalTextInput = $id(MODAL_TEXT_INPUT);
 
     if (this.$gridContainer.length === 0) {
       console.error('Protocard grid container not found');
@@ -74,19 +79,19 @@ export class Screen3Manager {
 
   private async loadProtocards() {
     try {
-      $(`#${LOADING}`).text('Loading protocards...');
+      $id(LOADING).text('Loading protocards...');
       this.protocards = await protocardApi.getAll();
       console.log(`Loaded ${this.protocards.length} protocards`);
     } catch (error) {
       if (error instanceof ApiError) {
         console.error('Failed to fetch protocards:', error.message);
-        $(`#${LOADING}`).text(`Error: ${error.message}`);
+        $id(LOADING).text(`Error: ${error.message}`);
       } else {
         console.error('Unexpected error fetching protocards:', error);
-        $(`#${LOADING}`).text('Unexpected error occurred');
+        $id(LOADING).text('Unexpected error occurred');
       }
     } finally {
-      $(`#${LOADING}`).text('');
+      $id(LOADING).text('');
     }
   }
 
@@ -99,9 +104,9 @@ export class Screen3Manager {
     );
 
     const cardElements = sortedProtocards
-      .map((protocard) => {
+      .map((protocard, index) => {
         return `
-        <div class="${cardStyles.protocard}" data-id="${protocard.entityId}">
+        <div class="${cardStyles.protocard}" data-id="${protocard.entityId}" data-index="${index}">
           <div class="${cardStyles.cardBorder}">
             <div class="${cardStyles.cardContent}">
               <div class="${cardStyles.cardBody}">
@@ -123,13 +128,14 @@ export class Screen3Manager {
       this.$gridContainer.on('click', `.${cardStyles.protocard}`, (event) => {
         const cardElement = $(event.currentTarget);
         const protocardId = cardElement.data('id') as PrefixedProtocardId;
-        this.selectCard(protocardId);
+        const index = cardElement.data('index') as number;
+        this.selectCard(protocardId, index);
       });
     }
 
     // Modal button handlers
-    $(`#${MODAL_SAVE_BTN}`).on('click', () => this.saveCard());
-    $(`#${MODAL_CANCEL_BTN}`).on('click', () => this.hideModal());
+    $id(MODAL_SAVE_BTN).on('click', () => this.saveCard());
+    $id(MODAL_CANCEL_BTN).on('click', () => this.hideModal());
 
     // Close modal on overlay click
     if (this.$modalOverlay) {
@@ -141,6 +147,7 @@ export class Screen3Manager {
     }
 
     // Close modal on Escape key
+    // TODO(bowei): properly scope keyboard events
     $(document).on('keydown', (event) => {
       if (
         event.key === 'Escape' &&
@@ -152,10 +159,10 @@ export class Screen3Manager {
     });
   }
 
-  private selectCard(protocardId: PrefixedProtocardId) {
-    const protocard = this.protocards.find((p) => p.entityId === protocardId);
+  private selectCard(protocardId: PrefixedProtocardId, index: number) {
+    const protocard = this.protocards.find((p, i) => p.entityId === protocardId && i === index);
     if (!protocard) {
-      console.error('Protocard not found:', protocardId);
+      console.error('Protocard not found:', { protocardId, index });
       return;
     }
 

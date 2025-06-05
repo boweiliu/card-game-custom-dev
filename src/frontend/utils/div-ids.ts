@@ -22,6 +22,10 @@ export const MODAL_OVERLAY = 'modal-overlay';
 export const MODAL_TEXT_INPUT = 'modal-text-input';
 export const MODAL_SAVE_BTN = 'modal-save-btn';
 export const MODAL_CANCEL_BTN = 'modal-cancel-btn';
+export const SCREEN3_ADD_BTN = 'screen3-add-btn';
+export const SCREEN3_EDIT_BTN = 'screen3-edit-btn';
+export const SCREEN3_DELETE_BTN = 'screen3-delete-btn';
+export const SCREEN3_SORT_BTN = 'screen3-sort-btn';
 
 // Helper function to get jQuery selector string by ID
 export const getJQuerySelector = (id: string): string => `#${id}`;
