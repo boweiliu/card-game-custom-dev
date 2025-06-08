@@ -55,14 +55,23 @@ export function getScreen3Content(): string {
   `;
 }
 
+// Handler for add card button that creates the card in the local data store and then 
+// invokes parent screen manager to show the modal for editing the card.
 function forAddButton(id: string = SCREEN3_ADD_BTN, deps: { screenManager: Screen3Manager }): () => void {
   const button = $id<HTMLButtonElement>(id);
 
   const handler = () => {
     console.log('Add card clicked');
 
+    // make a new protocard on the frontend
+    const protocard = localRepo.protocards.create({
+      textBody: '',
+    });
+    
+
     deps.screenManager.showModal({
-      entityId: '' as unknown as PrefixedProtocardId,
+      entityId: protocard.entityId,
+      transportId: protocard.transportId,
       textBody: '',
       type: 'transport.protocard' as ProtocardTransportType,
     });
@@ -265,7 +274,13 @@ export class Screen3Manager {
   }
 
   private saveCard() {
-    if (!this.selectedProtocardId || !this.$modalTextInput) return;
+    if (!this.selectedProtocardId || !this.$modalTextInput) {
+      console.error('Save card failed: missing required data', {
+        selectedProtocardId: this.selectedProtocardId,
+        modalTextInput: this.$modalTextInput,
+      });
+      return;
+    }
 
     const newText = this.$modalTextInput.val() as string;
     console.log('Save card:', this.selectedProtocardId, 'with text:', newText);
