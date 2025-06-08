@@ -31,4 +31,5 @@ export const SCREEN3_SORT_BTN = 'screen3-sort-btn';
 export const getJQuerySelector = (id: string): string => `#${id}`;
 
 // Syntax sugar for jQuery ID selection
-export const $id = (id: string) => $(getJQuerySelector(id));
+// Use type hint with care - there's no guarantee
+export const $id = <TElement extends HTMLElement = HTMLElement>(id: string): JQuery<TElement> => $(getJQuerySelector(id));

@@ -17,7 +17,7 @@ import * as styles from '@/frontend/components/container/container.module.less';
 import * as cardStyles from '@/frontend/components/screens/screen3.module.less';
 import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
-import type { ProtocardTransport } from '@/shared/types/api';
+import type { ProtocardTransport, ProtocardTransportType } from '@/shared/types/api';
 import type { PrefixedProtocardId } from '@/shared/types/id-prefixes';
 import { $id } from '@/frontend/utils/div-ids';
 
@@ -53,6 +53,40 @@ export function getScreen3Content(): string {
       </div>
     </div>
   `;
+}
+
+class ButtonRowManager {
+  private $addBtn!: JQuery<HTMLButtonElement>;
+  private $editBtn!: JQuery<HTMLButtonElement>;
+  private $deleteBtn!: JQuery<HTMLButtonElement>;
+  private $sortBtn!: JQuery<HTMLButtonElement>;
+
+  private screenManager: Screen3Manager;
+
+
+  constructor(screenManager: Screen3Manager) {
+    this.screenManager = screenManager;
+    this.$addBtn = $id<HTMLButtonElement>(SCREEN3_ADD_BTN);
+    this.$editBtn = $id<HTMLButtonElement>(SCREEN3_EDIT_BTN);
+    this.$deleteBtn = $id<HTMLButtonElement>(SCREEN3_DELETE_BTN);
+    this.$sortBtn = $id<HTMLButtonElement>(SCREEN3_SORT_BTN);
+  }
+
+  setupEventListeners() {
+    this.$addBtn.on('click', () => this.addCard());
+    // this.$editBtn.on('click', () => this.editCard());
+    // this.$deleteBtn.on('click', () => this.deleteCard());
+    // this.$sortBtn.on('click', () => this.sortCards());
+  }
+
+  private addCard() {
+    console.log('Add card clicked');
+    this.screenManager.showModal({
+      entityId: '' as unknown as PrefixedProtocardId,
+      textBody: '',
+      type: 'transport.protocard' as ProtocardTransportType,
+    });
+  }
 }
 
 export class Screen3Manager {
@@ -170,12 +204,12 @@ export class Screen3Manager {
     this.showModal(protocard);
   }
 
-  private showModal(protocard: ProtocardTransport) {
+  showModal(protocard: ProtocardTransport): void {
     if (!this.$modalOverlay || !this.$modalTextInput) return;
 
     this.$modalTextInput.val(protocard.textBody);
     this.$modalOverlay.addClass(cardStyles.show).show();
-    this.$modalTextInput.focus();
+    this.$modalTextInput.trigger('focus');
   }
 
   private hideModal() {
