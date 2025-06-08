@@ -55,39 +55,57 @@ export function getScreen3Content(): string {
   `;
 }
 
-class ButtonRowManager {
-  private $addBtn!: JQuery<HTMLButtonElement>;
-  private $editBtn!: JQuery<HTMLButtonElement>;
-  private $deleteBtn!: JQuery<HTMLButtonElement>;
-  private $sortBtn!: JQuery<HTMLButtonElement>;
+function forAddButton(id: string = SCREEN3_ADD_BTN, deps: { screenManager: Screen3Manager }): () => void {
+  const button = $id<HTMLButtonElement>(id);
 
-  private screenManager: Screen3Manager;
-
-
-  constructor(screenManager: Screen3Manager) {
-    this.screenManager = screenManager;
-    this.$addBtn = $id<HTMLButtonElement>(SCREEN3_ADD_BTN);
-    this.$editBtn = $id<HTMLButtonElement>(SCREEN3_EDIT_BTN);
-    this.$deleteBtn = $id<HTMLButtonElement>(SCREEN3_DELETE_BTN);
-    this.$sortBtn = $id<HTMLButtonElement>(SCREEN3_SORT_BTN);
-  }
-
-  setupEventListeners() {
-    this.$addBtn.on('click', () => this.addCard());
-    // this.$editBtn.on('click', () => this.editCard());
-    // this.$deleteBtn.on('click', () => this.deleteCard());
-    // this.$sortBtn.on('click', () => this.sortCards());
-  }
-
-  private addCard() {
+  const handler = () => {
     console.log('Add card clicked');
-    this.screenManager.showModal({
+
+    deps.screenManager.showModal({
       entityId: '' as unknown as PrefixedProtocardId,
       textBody: '',
       type: 'transport.protocard' as ProtocardTransportType,
     });
-  }
+  };
+
+  button.on('click', handler);
+
+  return () => button.off('click', handler);
 }
+
+// class ButtonRowManager {
+//   private $addBtn!: JQuery<HTMLButtonElement>;
+//   private $editBtn!: JQuery<HTMLButtonElement>;
+//   private $deleteBtn!: JQuery<HTMLButtonElement>;
+//   private $sortBtn!: JQuery<HTMLButtonElement>;
+// 
+//   private screenManager: Screen3Manager;
+// 
+// 
+//   constructor(screenManager: Screen3Manager) {
+//     this.screenManager = screenManager;
+//     this.$addBtn = $id<HTMLButtonElement>(SCREEN3_ADD_BTN);
+//     this.$editBtn = $id<HTMLButtonElement>(SCREEN3_EDIT_BTN);
+//     this.$deleteBtn = $id<HTMLButtonElement>(SCREEN3_DELETE_BTN);
+//     this.$sortBtn = $id<HTMLButtonElement>(SCREEN3_SORT_BTN);
+//   }
+// 
+//   setupEventListeners() {
+//     this.$addBtn.on('click', () => this.addCard());
+//     // this.$editBtn.on('click', () => this.editCard());
+//     // this.$deleteBtn.on('click', () => this.deleteCard());
+//     // this.$sortBtn.on('click', () => this.sortCards());
+//   }
+// 
+//   private addCard() {
+//     console.log('Add card clicked');
+//     this.screenManager.showModal({
+//       entityId: '' as unknown as PrefixedProtocardId,
+//       textBody: '',
+//       type: 'transport.protocard' as ProtocardTransportType,
+//     });
+//   }
+// }
 
 export class Screen3Manager {
   private protocards: ProtocardTransport[] = [];
@@ -95,6 +113,19 @@ export class Screen3Manager {
   private selectedProtocardId: PrefixedProtocardId | null = null;
   private $modalOverlay: JQuery | null = null;
   private $modalTextInput: JQuery | null = null;
+
+  private cleanups: (() => void)[] = [];
+
+
+  async liveIf(condition: boolean) {
+    if (condition) {
+      return await this.initialize();
+    }
+    else {
+      // clean up
+      return await this.cleanup();
+    }
+  }
 
   async initialize() {
     this.$gridContainer = $id(PROTOCARD_GRID);
@@ -109,6 +140,20 @@ export class Screen3Manager {
     await this.loadProtocards();
     this.renderProtocards();
     this.setupEventListeners();
+
+    this.cleanups.push(
+      forAddButton(SCREEN3_ADD_BTN, { screenManager: this })
+    );
+  }
+
+  private async cleanup() {
+    this.$gridContainer = null;
+    this.$modalOverlay = null;
+    this.$modalTextInput = null;
+    this.protocards = [];
+    this.selectedProtocardId = null;
+    this.cleanups.forEach(cleanup => cleanup());
+    this.cleanups = [];
   }
 
   private async loadProtocards() {

@@ -130,15 +130,21 @@ class ScreenManager {
       default:
         content = getStartScreenContent();
     }
+
+
     this.$placeholderContainer.html(content);
 
     // Initialize screen-specific managers
+
+
     if (screenNumber === 3) {
       if (!this.screen3Manager) {
         this.screen3Manager = new Screen3Manager();
       }
       await this.screen3Manager.initialize();
     }
+
+    await this.screen3Manager?.liveIf(screenNumber === 3);
   }
 }
 
