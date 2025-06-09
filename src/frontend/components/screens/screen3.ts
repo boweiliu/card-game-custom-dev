@@ -20,7 +20,7 @@ import { ApiError } from '@/frontend/api/client';
 import type { ProtocardTransport, ProtocardTransportType } from '@/shared/types/api';
 import type { PrefixedProtocardId } from '@/shared/types/id-prefixes';
 import { $id } from '@/frontend/utils/div-ids';
-import { ProtocardClientModel } from '@/frontend/services/protocard-state';
+import { ProtocardClientModel, ProtocardTransportId } from '@/frontend/services/protocard-state';
 import { protocardsRepo } from '@/frontend/services/protocard-state';
 
 export function getScreen3Content(): string {
@@ -117,7 +117,7 @@ function forAddButton(id: string = SCREEN3_ADD_BTN, deps: { screenManager: Scree
 export class Screen3Manager {
   private protocards: ProtocardTransport[] = [];
   private $gridContainer: JQuery | null = null;
-  private selectedProtocardId: PrefixedProtocardId | null = null;
+  private selectedProtocardId: ProtocardTransportId | null = null;
   private $modalOverlay: JQuery | null = null;
   private $modalTextInput: JQuery | null = null;
 
@@ -252,8 +252,8 @@ export class Screen3Manager {
       return;
     }
 
-    this.selectedProtocardId = protocardId;
     // TODO(bowei): fix this
+    // this.selectedProtocardId = protocardId;
     // this.showModal(protocard);
   }
 
@@ -275,6 +275,7 @@ export class Screen3Manager {
       }
     }
 
+    this.selectedProtocardId = protocard.id;
     this.$modalTextInput.val(protocard.data.textBody);
     this.$modalOverlay.addClass(cardStyles.show).show();
     this.$modalTextInput.trigger('focus');
@@ -300,13 +301,16 @@ export class Screen3Manager {
     console.log('Save card:', this.selectedProtocardId, 'with text:', newText);
 
     // Update the card in the local state (frontend only for now)
-    const protocardIndex = this.protocards.findIndex(
-      (p) => p.entityId === this.selectedProtocardId
-    );
-    if (protocardIndex !== -1) {
-      this.protocards[protocardIndex].textBody = newText;
-      this.renderProtocards();
-    }
+    protocardsRepo.update(this.selectedProtocardId, {
+      textBody: newText,
+    });
+    // const protocardIndex = this.protocards.findIndex(
+    //   (p) => p.entityId === this.selectedProtocardId
+    // );
+    // if (protocardIndex !== -1) {
+    //   this.protocards[protocardIndex].textBody = newText;
+    //   this.renderProtocards();
+    // }
 
     this.hideModal();
   }
