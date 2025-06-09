@@ -21,6 +21,7 @@ export const EDIT_MODAL = 'edit-modal';
 export const MODAL_OVERLAY = 'modal-overlay';
 export const MODAL_TEXT_INPUT = 'modal-text-input';
 export const MODAL_SAVE_BTN = 'modal-save-btn';
+export const MODAL_APPLY_BTN = 'modal-apply-btn';
 export const MODAL_CANCEL_BTN = 'modal-cancel-btn';
 export const SCREEN3_ADD_BTN = 'screen3-add-btn';
 export const SCREEN3_EDIT_BTN = 'screen3-edit-btn';

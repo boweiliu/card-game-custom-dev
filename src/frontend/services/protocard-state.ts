@@ -7,6 +7,26 @@ import { PrefixedId } from '@/shared/types/id-prefixes';
 import { IDGenerator } from '@/shared/types/id-prefixes';
 import { ID_PREFIXES } from '@/shared/types/id-prefixes';
 
+/**
+ * CONCEPTS
+ * 
+ * 1. immutable data, append-only rows. that means separating out entity vs snapshot types.
+ * 2. manage db-side ids and client-side ids separately (otherwise creation calls are annoying);
+ *    Ambivalent on whether communication happens primarily using client side ids or backend ids, or both
+ *    It kinda makes the most sense to SEND data using whichver id you control, since creation messages
+ *    have to work like that (hopefully both parties know what they are talking about)
+ * 3. all messages should have a request id and then be acknowledged by a ack id
+ * 4. use a client-specific orderKey to resolve message out of order/being superceded. It needs
+ *    to be client-specific to avoid having to deal with cross client merge conflicts (unavoidable)
+ *    but ALSO keep a serverside timestamp/orderKey, cuz clients might lie
+ * ---
+ * BUT in the client-side application, we shouldn't need to know about any of that, we can work with models and 
+ * updating them and querying the clientRepo for whether things are synced or not. 
+ * An intermediate layer should break apart the updates into idempotent bits, with order, and surface conflicts,
+ * and handle retries and error states etc.
+ */
+
+
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type ProtocardTransportId = PrefixedId<typeof ID_PREFIXES.PROTOCARD_TRANSPORT>;

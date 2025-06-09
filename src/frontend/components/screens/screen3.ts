@@ -12,6 +12,7 @@ import {
   SCREEN3_EDIT_BTN,
   SCREEN3_DELETE_BTN,
   SCREEN3_SORT_BTN,
+  MODAL_APPLY_BTN,
 } from '@/frontend/utils/div-ids';
 import * as styles from '@/frontend/components/container/container.module.less';
 import * as cardStyles from '@/frontend/components/screens/screen3.module.less';
@@ -49,6 +50,7 @@ export function getScreen3Content(): string {
           <textarea id="${MODAL_TEXT_INPUT}" class="${cardStyles.modalTextInput}" placeholder="Enter card text..."></textarea>
           <div class="${cardStyles.modalButtons}">
             <button id="${MODAL_SAVE_BTN}" class="${cardStyles.modalButton} ${cardStyles.saveButton}">Save</button>
+            <button id="${MODAL_APPLY_BTN}" class="${cardStyles.modalButton} ${cardStyles.cancelButton}">Apply</button>
             <button id="${MODAL_CANCEL_BTN}" class="${cardStyles.modalButton} ${cardStyles.cancelButton}">Cancel</button>
           </div>
         </div>
@@ -221,6 +223,7 @@ export class Screen3Manager {
 
     // Modal button handlers
     $id(MODAL_SAVE_BTN).on('click', () => this.saveCard());
+    $id(MODAL_APPLY_BTN).on('click', () => this.applyCard());
     $id(MODAL_CANCEL_BTN).on('click', () => this.hideModal());
 
     // Close modal on overlay click
@@ -289,6 +292,11 @@ export class Screen3Manager {
   }
 
   private saveCard() {
+    this.applyCard();
+    this.hideModal();
+  }
+
+  private applyCard() {
     if (!this.selectedProtocardId || !this.$modalTextInput) {
       console.error('Save card failed: missing required data', {
         selectedProtocardId: this.selectedProtocardId,
@@ -311,7 +319,5 @@ export class Screen3Manager {
     //   this.protocards[protocardIndex].textBody = newText;
     //   this.renderProtocards();
     // }
-
-    this.hideModal();
   }
 }
