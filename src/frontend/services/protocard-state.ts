@@ -19,6 +19,10 @@ import { ID_PREFIXES } from '@/shared/types/id-prefixes';
  * 4. use a client-specific orderKey to resolve message out of order/being superceded. It needs
  *    to be client-specific to avoid having to deal with cross client merge conflicts (unavoidable)
  *    but ALSO keep a serverside timestamp/orderKey, cuz clients might lie
+ * 5. Migrations should be able to happen client-side. hold a immutable append-only schema table as well, 
+ *    which links entityid to schema version and table name. Don't migrate old data, only write
+ *    new versions of it into the new schema. Code should be able to handle old versions fine.
+ *    When communicating with the backend, make sure to specify version.
  * ---
  * BUT in the client-side application, we shouldn't need to know about any of that, we can work with models and 
  * updating them and querying the clientRepo for whether things are synced or not. 
