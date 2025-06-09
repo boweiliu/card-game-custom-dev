@@ -1,13 +1,7 @@
 import { Spinner } from '@/frontend/components/spinner/spinner';
-import { cardTemplate } from '@/frontend/components/cards';
-import { $id, ADD_CARD, CARD, LOADING } from '@/frontend/utils/div-ids';
-import { ProtocardId } from '@/shared/types/id-prefixes';
+import { $id, LOADING } from '@/frontend/utils/div-ids';
 import { miscApi } from '@/frontend/api/misc';
 import { ApiError } from '@/frontend/api/client';
-import {
-  protocardState,
-  ProtocardState,
-} from '@/frontend/services/protocard-state';
 import { sseService } from '@/frontend/services/sse-service';
 
 export class TestSpinner {
@@ -66,7 +60,6 @@ export class TestSpinner {
   private async testSpinner() {
     this.spinner.show();
     try {
-      await protocardState.loadInitialState();
       console.log('Initial protocard state loaded');
     } catch (error) {
       console.error('Failed to load initial protocard state:', error);
