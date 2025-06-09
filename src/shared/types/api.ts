@@ -11,7 +11,7 @@ export interface ProtocardParams {
 
 export type ProtocardTransportType = 'transport.protocard' & { __brand: never };
 
-export type ProtocardTransport = {
+export interface ProtocardTransport {
   entityId: PrefixedProtocardId;
   textBody: string;
   type: ProtocardTransportType;
