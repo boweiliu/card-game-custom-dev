@@ -1,11 +1,18 @@
 import { protocardApi } from '@/frontend/api/protocards';
-import { ProtocardId } from '@/shared/types/id-prefixes';
 import { ProtocardTransport, ProtocardTransportType } from '@/shared/types/api';
 import { MessageID } from '@/shared/types/responses';
 import { SyncableState } from '@/frontend/services/SyncableState';
-import { PrefixedId } from '@/shared/types/id-prefixes';
-import { IDGenerator } from '@/shared/types/id-prefixes';
-import { ID_PREFIXES } from '@/shared/types/id-prefixes';
+import { 
+  ProtocardSnapshotClientId,
+  ProtocardEntityClientId,
+  ID_PREFIXES_V2,
+  ProtocardEntityClientOrder,
+  ProtocardSnapshotClientOrder,
+  ProtocardEntityId,
+  ProtocardEntityOrder,
+  } from '@/shared/types/id-prefixes-v2';
+import { IDGenerator, ProtocardSnapshotId, ProtocardSnapshotOrder } from '@/shared/types/id-prefixes';
+import { DateString } from '@/shared/types/db';
 
 /**
  * CONCEPTS
@@ -33,68 +40,205 @@ import { ID_PREFIXES } from '@/shared/types/id-prefixes';
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-export type ProtocardTransportId = PrefixedId<typeof ID_PREFIXES.PROTOCARD_TRANSPORT>;
-
-export function generateTransportId(): ProtocardTransportId {
-  return IDGenerator.generate(ID_PREFIXES.PROTOCARD_TRANSPORT);
-}
-
 
 // Frontend state representation of a protocard
 export class ProtocardClientModel {
-  id: ProtocardTransportId;
-  data: Optional<ProtocardTransport, 'entityId' | 'type'>;
-  isSynced: boolean;
+  readonly textBody: string;
+  readonly id: ProtocardEntityClientId;
 
-  constructor() {
-    this.id = generateTransportId();
-    this.data = {
-      textBody: '',
-    };
-    this.isSynced = false;
+  constructor(textBody: string, id: ProtocardEntityClientId = IDGenerator.generate(ID_PREFIXES_V2.PROTOCARD_ENTITY_CLIENT)) {
+    this.textBody = textBody;
+    this.id = id;
+  }
+}
+
+// Internal repo storage interfaces
+type ProtocardEntity = Readonly<{
+  id: ProtocardEntityClientId;
+  orderKey: ProtocardEntityClientOrder;
+  createdAt: DateString;
+  isDeleted: boolean;
+} & ({
+  serverSynced: true;
+  serverId: ProtocardEntityId;
+  serverOrderKey: ProtocardEntityOrder;
+  serverCreatedAt: DateString;
+} | {
+  serverSynced: false;
+})>;
+
+type ProtocardSnapshot = Readonly<{
+  id: ProtocardSnapshotClientId;
+  entityId: ProtocardEntityClientId;
+  orderKey: ProtocardSnapshotClientOrder;
+  createdAt: DateString;
+  isDeleted: boolean;
+
+  model: Readonly<ProtocardClientModel>;
+} & ({
+  serverSynced: true;
+  serverId: ProtocardSnapshotId;
+  serverOrderKey: ProtocardSnapshotOrder;
+  serverCreatedAt: DateString;
+} | {
+  serverSynced: false;
+})>;
+
+class MessageQueue {
+
+  private messages: Record<string, {
+    syncId: string,
+    message: { id: string | number, value: unknown },
+    status: 'pending' | 'acked' | 'failed',
+    failedCount: number,
+    ackId?: string,
+  }> = {};
+
+  private retries: Set<string> = new Set();
+
+  public async append(message: { id: string | number, value: unknown }) {
+    const syncId = IDGenerator.generate(ID_PREFIXES_V2.SYNC_CLIENT_MESSAGE);
+    this.messages[syncId] = { syncId, message, status: 'pending', failedCount: 0 };
+
+    // try to fire it over the API
+    let response;
+    try {
+      response = await this.api.send(message);
+    } catch (e) {
+      // retry later
+      this.messages[syncId] = { syncId, message, status: 'failed', failedCount: 1 };
+      this.retries.add(syncId);
+    }
+
+    // If successful, mark it as such
+    const { ackId } = response;
+    this.messages[syncId] = { syncId, message, status: 'acked', ackId, failedCount: 0 };
+
+
+
+
+
+
+
+    
+  }
+}
+  
+
+class RepoMap<T extends { id: string | number }, KT extends T['id'] = T['id']> {
+  private map: Record<KT, T> = {} as Record<KT, T>;
+  private messageQueue: MessageQueue = new MessageQueue(); // TODO: DI
+
+  public async get(id: KT): Promise<T | undefined> {
+    return this.map[id];
+  }
+
+  public async append(value: T): Promise<void> {
+    this.map[(value.id as KT)] = value;
+    await this.messageQueue.append({
+      id: value.id,
+      value: value,
+    });
   }
 }
 
 class DataRepo {
-  private records: Record<ProtocardTransportId, ProtocardClientModel> = {};
+  private entityMap: RepoMap<ProtocardEntity> = new RepoMap<ProtocardEntity>();
+  private snapshotMap: RepoMap<ProtocardSnapshot> = new RepoMap<ProtocardSnapshot>();
+  private newestSnapshotMap: Record<ProtocardEntityClientId, ProtocardSnapshot> = {};
 
-  public async create(): Promise<ProtocardClientModel> {
-    const protocard = new ProtocardClientModel();
-    this.records[protocard.id] = protocard;
-
-    // TODO: start sending (and handling) the storage up to the server
-    return Promise.resolve(protocard);
-  }
-
-  public get(id: ProtocardTransportId): ProtocardClientModel | undefined {
-    return this.records[id];
-  }
-
-  public async update(id: ProtocardTransportId, data: Omit<ProtocardTransport, 'entityId' | 'type'>): Promise<void> {
-    const protocard = this.records[id];
-    if (!protocard) {
-      throw new Error(`Protocard not found: ${id}`);
-    }
-    protocard.data = {
-      ...protocard.data,
-      ...data,
+  public async create(data: Omit<ProtocardClientModel, 'id'>): Promise<ProtocardClientModel> {
+    const entity: ProtocardEntity = {
+      id: IDGenerator.generate(ID_PREFIXES_V2.PROTOCARD_ENTITY_CLIENT),
+      orderKey: 1 as unknown as ProtocardEntityClientOrder, // TODO
+      createdAt: new Date().toISOString() as DateString, // TODO
+      isDeleted: false,
+      serverSynced: false,
     };
-    
+    await this.entityMap.append(entity.id, entity);
+    const snapshot: ProtocardSnapshot = {
+      id: IDGenerator.generate(ID_PREFIXES_V2.PROTOCARD_SNAPSHOT_CLIENT),
+      entityId: entity.id,
+      orderKey: 1 as unknown as ProtocardSnapshotClientOrder, // TODO
+      createdAt: new Date().toISOString() as DateString, // TODO
+      isDeleted: false,
+      serverSynced: false,
+      model: {
+        ...data,
+        id: entity.id,
+      },
+    };
+    await this.snapshotMap.append(snapshot.id, snapshot);
+    this.newestSnapshotMap[entity.id] = snapshot;
+
     // TODO: start sending (and handling) the storage up to the server
-    return Promise.resolve();
+    return snapshot.model;
   }
 
-  public isSynced(id: ProtocardTransportId, cb: (isSynced: boolean) => void) {
-    // hmm
+  public async get(id: ProtocardClientModel['id']): Promise<ProtocardClientModel | undefined> {
+    const snapshot = this.newestSnapshotMap[id];
+    if (!snapshot || snapshot.isDeleted) {
+      return undefined;
+    }
+    return snapshot.model;
   }
+
+  public async update(id: ProtocardClientModel['id'], data: Omit<ProtocardClientModel, 'id'>): Promise<ProtocardClientModel | undefined> {
+    const snapshot = this.newestSnapshotMap[id];
+    if (!snapshot || snapshot.isDeleted) {
+      return undefined;
+    }
+    const updatedSnapshot: ProtocardSnapshot = {
+      ...snapshot,
+      id: IDGenerator.generate(ID_PREFIXES_V2.PROTOCARD_SNAPSHOT_CLIENT),
+      orderKey: (~~(snapshot.orderKey) + 1) as unknown as ProtocardSnapshotClientOrder,
+      createdAt: new Date().toISOString() as DateString,
+      serverSynced: false,
+      model: {
+        ...snapshot.model,
+        ...data,
+      },
+    };
+    await this.snapshotMap.append(updatedSnapshot.id, updatedSnapshot);
+    this.newestSnapshotMap[id] = updatedSnapshot;
     
+    // TODO: start sending (and handling) the storage up to the server
+    return updatedSnapshot.model;
+  }
+
+  public async delete(id: ProtocardClientModel['id']): Promise<ProtocardClientModel | undefined> {
+    const snapshot = this.newestSnapshotMap[id];
+    if (!snapshot || snapshot.isDeleted) {
+      return undefined;
+    }
+    const updatedSnapshot: ProtocardSnapshot = {
+      ...snapshot,
+      id: IDGenerator.generate(ID_PREFIXES_V2.PROTOCARD_SNAPSHOT_CLIENT),
+      orderKey: (~~(snapshot.orderKey) + 1) as unknown as ProtocardSnapshotClientOrder,
+      createdAt: new Date().toISOString() as DateString,
+      serverSynced: false,
+      model: snapshot.model,
+      isDeleted: true,
+    };
+    await this.snapshotMap.append(updatedSnapshot.id, updatedSnapshot);
+    this.newestSnapshotMap[id] = updatedSnapshot;
+    
+    // TODO: start sending (and handling) the storage up to the server
+    return snapshot.model;
+  }
 }
 
 export const protocardsRepo = new DataRepo();
 
 async function test() {
-  const protocard = await protocardsRepo.create();
-  await protocardsRepo.update(protocard.id, {
+  const protocard = await protocardsRepo.create({
     textBody: 'test',
   });
+  console.log(await protocardsRepo.get(protocard.id));
+  await protocardsRepo.update(protocard.id, {
+    textBody: 'test2',
+  });
+  console.log(await protocardsRepo.get(protocard.id));
+  await protocardsRepo.delete(protocard.id);
+  console.log(await protocardsRepo.get(protocard.id));
 }

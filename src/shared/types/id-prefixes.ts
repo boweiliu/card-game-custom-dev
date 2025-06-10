@@ -3,20 +3,51 @@
 // ID prefix constants
 export const ID_PREFIXES = {
   // Database entity prefixes
-  PROTOCARD: 'pc_',
-  PROTOCARD_TRANSPORT: 'pc-',
+  PROTOCARD: 'pc_', // deprecated
+  PROTOCARD_TRANSPORT: 'pc_', // deprecated
   GAME_CARD: 'gc_',
   GAME_HISTORY: 'gh_',
   GAME_SNAPSHOT: 'gs_',
   GAME_ACTION: 'ga_',
 
+
   // Message correlation ID prefixes
-  MESSAGE: 'msg_',
-  PENDING_MESSAGE: 'pmsg_',
+  MESSAGE: 'msg_', // deprecated
+  PENDING_MESSAGE: 'pmsg_', // deprecated
 
   // Temporary/pending entity prefixes
-  TEMPORARY_ENTITY: 'tmp_',
+  TEMPORARY_ENTITY: 'tmp_', // deprecated
+
+  // New style
+  // DB
+  PROTOCARD_ENTITY: 'pce_',
+  PROTOCARD_VERSION: 'pcv_',
+  PROTOCARD_SNAPSHOT: 'pcs_',
+  // Client
+  PROTOCARD_ENTITY_CLIENT: 'pcf_',
+  PROTOCARD_VERSION_CLIENT: 'pcw_',
+  PROTOCARD_SNAPSHOT_CLIENT: 'pct_',
+
+  // generic messages
+  // from server to client
+  SYNC_SERVER_MESSAGE: "mgs_", 
+  ACK_SERVER_MESSAGE: "mga_",
+  // from client to server
+  SYNC_CLIENT_MESSAGE: "mgt_", 
+  ACK_CLIENT_MESSAGE: "mgb_",
 } as const;
+
+export type ProtocardEntityId = PrefixedId<typeof ID_PREFIXES.PROTOCARD_ENTITY>;
+export type ProtocardVersionId = PrefixedId<typeof ID_PREFIXES.PROTOCARD_VERSION>;
+export type ProtocardSnapshotId = PrefixedId<typeof ID_PREFIXES.PROTOCARD_SNAPSHOT>;
+export type ProtocardEntityClientId = PrefixedId<typeof ID_PREFIXES.PROTOCARD_ENTITY_CLIENT>;
+export type ProtocardVersionClientId = PrefixedId<typeof ID_PREFIXES.PROTOCARD_VERSION_CLIENT>;
+export type ProtocardSnapshotClientId = PrefixedId<typeof ID_PREFIXES.PROTOCARD_SNAPSHOT_CLIENT>;
+
+export type SyncServerMessageId = PrefixedId<typeof ID_PREFIXES.SYNC_SERVER_MESSAGE>;
+export type AckServerMessageId = PrefixedId<typeof ID_PREFIXES.ACK_SERVER_MESSAGE>;
+export type SyncClientMessageId = PrefixedId<typeof ID_PREFIXES.SYNC_CLIENT_MESSAGE>;
+export type AckClientMessageId = PrefixedId<typeof ID_PREFIXES.ACK_CLIENT_MESSAGE>;
 
 // Helper type to extract prefix values
 export type IDPrefix = (typeof ID_PREFIXES)[keyof typeof ID_PREFIXES];
