@@ -3,6 +3,23 @@
 1. lay out a diagram for the 5 step pipeline (frontend screen -> client repo -> messaging service -> api layer -> backend api -> backend db)
 2. write abstract intermediate services. They don't have to typecheck. in particular - api layer might end up generic, i.e. a single messaging endpoint rather than type specific CRUD endpoints BUT maybe the validation still needs to happen
 3. clean up all the types so we dont have to redefine so much ids and stuff
+
+To clearly distinguish compile-time scripts from production code and prevent them from being accidentally imported into production builds, you can adopt the following naming scheme and organizational practices:
+
+Naming Scheme
+Suffix: Use a suffix like .gen.ts or .script.ts for compile-time scripts. This makes it clear that these files are not part of the runtime code.
+Example: generate.gen.ts or generate.script.ts
+Directory: Place all compile-time scripts in a dedicated directory, such as scripts or codegen, outside of the main source directories.
+Example: scripts/generate.gen.ts
+Prefix: Optionally, use a prefix like build- or compile- to emphasize their purpose.
+Example: build-generate.ts
+Organizational Practices
+Separate Directory: Keep all compile-time scripts in a separate directory like scripts or codegen at the project root. This helps avoid accidental imports.
+Exclude from Build: Ensure that your build configuration (e.g., Webpack, TypeScript compiler) excludes these directories from being bundled into production builds.
+By following these naming and organizational practices, you can effectively separate compile-time scripts from production code. Let me know if you need further assistance or if you'd like to implement these changes!
+
+
+
 4. start looking at client repo persistence (localStorage? compression? offline web worker? sqlite?)
 5. flesh out schema version migration a little, make sure it works
 6. figure out asynchronous acks via event stream
