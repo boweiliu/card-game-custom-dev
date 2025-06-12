@@ -1,7 +1,8 @@
 # BRANCH-specific TODO
 
-1. lay out a diagram for the 5 step pipeline (frontend screen -> client repo -> messaging service -> api layer -> backend api -> backend db)
+1. [DONE] lay out a diagram for the 5 step pipeline (frontend screen -> client repo -> messaging service -> api layer -> backend api -> backend db)
 2. write abstract intermediate services. They don't have to typecheck. in particular - api layer might end up generic, i.e. a single messaging endpoint rather than type specific CRUD endpoints BUT maybe the validation still needs to happen
+2. write the v1 generated thing src/frontend/data-layer/protocards/v1.ts and hook it up to any actual use case
 3. clean up all the types so we dont have to redefine so much ids and stuff
 
 To clearly distinguish compile-time scripts from production code and prevent them from being accidentally imported into production builds, you can adopt the following naming scheme and organizational practices:
