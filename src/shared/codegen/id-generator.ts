@@ -76,6 +76,11 @@ function findDataLayerFiles(dir: string, files: string[] = []): string[] {
     const fullPath = path.join(dir, entry.name);
     
     if (entry.isDirectory()) {
+      // Skip generated directories to avoid infinite loops
+      if (entry.name === 'generated') {
+        continue;
+      }
+      
       if (entry.name === 'data-layer' || fullPath.includes('data-layer')) {
         // Found data-layer directory, scan for .ts files
         findTsFiles(fullPath, files);
@@ -96,6 +101,10 @@ function findTsFiles(dir: string, files: string[] = []): string[] {
     const fullPath = path.join(dir, entry.name);
     
     if (entry.isDirectory()) {
+      // Skip generated directories to avoid infinite loops
+      if (entry.name === 'generated') {
+        continue;
+      }
       findTsFiles(fullPath, files);
     } else if (entry.isFile() && entry.name.endsWith('.ts')) {
       files.push(fullPath);
@@ -237,6 +246,104 @@ function generateIdFileFromFile(filePath: string): string {
   }
 }
 
+function watchDataLayerFiles(rootDir: string = 'src'): void {
+  console.log(`🔍 Watching ${rootDir}/**/data-layer/**/*.ts for changes...`);
+  
+  // Initial generation
+  try {
+    generateIdFileFromScan(rootDir, true);
+  } catch (error) {
+    console.error('Initial generation failed:', error instanceof Error ? error.message : String(error));
+  }
+  
+  // Set up file watcher
+  const watchedFiles = new Set<string>();
+  
+  function updateWatchedFiles() {
+    try {
+      const files = findDataLayerFiles(rootDir);
+      const newFiles = files.filter(f => !watchedFiles.has(f));
+      const removedFiles = Array.from(watchedFiles).filter(f => !files.includes(f));
+      
+      // Add new files to watch
+      newFiles.forEach(file => {
+        watchedFiles.add(file);
+        fs.watchFile(file, { interval: 1000 }, (curr, prev) => {
+          if (curr.mtime !== prev.mtime) {
+            console.log(`📝 File changed: ${path.relative(process.cwd(), file)}`);
+            try {
+              generateIdFileFromScan(rootDir, true);
+            } catch (error) {
+              console.error('Generation failed:', error instanceof Error ? error.message : String(error));
+            }
+          }
+        });
+        console.log(`👀 Watching: ${path.relative(process.cwd(), file)}`);
+      });
+      
+      // Remove old files from watch
+      removedFiles.forEach(file => {
+        watchedFiles.delete(file);
+        fs.unwatchFile(file);
+        console.log(`❌ Stopped watching: ${path.relative(process.cwd(), file)}`);
+      });
+    } catch (error) {
+      console.error('Failed to update watched files:', error instanceof Error ? error.message : String(error));
+    }
+  }
+  
+  // Initial setup
+  updateWatchedFiles();
+  
+  // Also watch for new data-layer directories
+  function watchDataLayerDirectories(dir: string) {
+    try {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        
+        if (entry.isDirectory()) {
+          // Skip generated directories to avoid infinite loops
+          if (entry.name === 'generated') {
+            continue;
+          }
+          
+          if (entry.name === 'data-layer' || fullPath.includes('data-layer')) {
+            // Watch data-layer directories for new files
+            fs.watch(fullPath, { recursive: true }, (eventType, filename) => {
+              if (filename && filename.endsWith('.ts') && !filename.includes('generated/')) {
+                console.log(`📂 Data-layer file ${eventType}: ${filename}`);
+                setTimeout(updateWatchedFiles, 100); // Debounce
+              }
+            });
+          } else {
+            // Recurse into other directories
+            try {
+              watchDataLayerDirectories(fullPath);
+            } catch (error) {
+              // Skip directories we can't access
+            }
+          }
+        }
+      }
+    } catch (error) {
+      // Skip directories we can't access
+    }
+  }
+  
+  watchDataLayerDirectories(rootDir);
+  
+  console.log('💡 Press Ctrl+C to stop watching');
+  
+  // Keep the process alive
+  process.on('SIGINT', () => {
+    console.log('\n🛑 Stopping file watcher...');
+    watchedFiles.forEach(file => fs.unwatchFile(file));
+    process.exit(0);
+  });
+}
+
 function generateIdFileFromScan(rootDir: string = 'src', writeFiles: boolean = false): string | void {
   const configs = scanDataLayerFiles(rootDir);
   
@@ -364,16 +471,18 @@ if (require.main === module) {
     console.error('  node id-generator.ts --file path/to/file.ts');
     console.error('  node id-generator.ts --scan [rootDir]');
     console.error('  node id-generator.ts --scan --write [rootDir]');
+    console.error('  node id-generator.ts --scan --watch [rootDir]');
     console.error('Examples:');
     console.error('  node id-generator.ts "Protocard: \'pc\'"');
     console.error('  node id-generator.ts --file src/shared/data-layer/protocards/protocards.ts');
     console.error('  node id-generator.ts --scan src');
     console.error('  node id-generator.ts --scan --write src  # Write files to generated/ dirs');
+    console.error('  node id-generator.ts --scan --watch src  # Watch and auto-generate');
     process.exit(1);
   }
   
   try {
-    let generated: string | void;
+    let generated: string | void = undefined;
     
     if (input === '--file') {
       const filePath = process.argv[3];
@@ -384,12 +493,26 @@ if (require.main === module) {
       generated = generateIdFileFromFile(filePath);
     } else if (input === '--scan') {
       const hasWriteFlag = process.argv.includes('--write');
-      const rootDirIndex = hasWriteFlag ? 
-        Math.max(process.argv.indexOf('--write') + 1, process.argv.indexOf('--scan') + 1) :
-        process.argv.indexOf('--scan') + 1;
+      const hasWatchFlag = process.argv.includes('--watch');
+      
+      if (hasWatchFlag && !hasWriteFlag) {
+        console.error('Error: --watch requires --write flag');
+        process.exit(1);
+      }
+      
+      const rootDirIndex = Math.max(
+        hasWriteFlag ? process.argv.indexOf('--write') + 1 : 0,
+        hasWatchFlag ? process.argv.indexOf('--watch') + 1 : 0,
+        process.argv.indexOf('--scan') + 1
+      );
       const rootDir = process.argv[rootDirIndex] || 'src';
       
-      generated = generateIdFileFromScan(rootDir, hasWriteFlag);
+      if (hasWatchFlag) {
+        watchDataLayerFiles(rootDir);
+        // watchDataLayerFiles never returns (runs until Ctrl+C)
+      } else {
+        generated = generateIdFileFromScan(rootDir, hasWriteFlag);
+      }
     } else {
       generated = generateIdFile(input);
     }
@@ -404,4 +527,4 @@ if (require.main === module) {
 }
 
 // Export for programmatic use
-export { generateIdFile, generateIdFileFromFile, generateIdFileFromScan, parseEntityConfig, parseEntityFromFile, scanDataLayerFiles };
+export { generateIdFile, generateIdFileFromFile, generateIdFileFromScan, watchDataLayerFiles, parseEntityConfig, parseEntityFromFile, scanDataLayerFiles };

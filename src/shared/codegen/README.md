@@ -19,11 +19,15 @@ npx ts-node src/shared/codegen/id-generator.ts --scan [rootDir]
 # Scan and write files to generated/ directories
 npx ts-node src/shared/codegen/id-generator.ts --scan --write [rootDir]
 
+# Watch data-layer files and auto-regenerate
+npx ts-node src/shared/codegen/id-generator.ts --scan --write --watch [rootDir]
+
 # Via npm scripts
 npm run generate:ids "EntityName: 'prefix'"
 npm run generate:ids:file path/to/file.ts
 npm run generate:ids:scan [rootDir]
 npm run generate:ids:write [rootDir]
+npm run generate:ids:watch [rootDir]
 ```
 
 ### Examples
@@ -44,6 +48,10 @@ npm run generate:ids:scan
 # Generate and write files (recommended for development)
 npm run generate:ids:write
 npm run generate:ids:write src
+
+# Watch mode for active development (recommended)
+npm run generate:ids:watch
+npm run generate:ids:watch src
 ```
 
 ## Input Formats
@@ -144,6 +152,25 @@ src/backend/data-layer/users/generated/ids.ts  # Generated output
 ```
 
 The `generated/` directory is created automatically if it doesn't exist.
+
+## Watch Mode
+
+Watch mode (`--watch`) continuously monitors data-layer files for changes and automatically regenerates ID files:
+
+```bash
+npm run generate:ids:watch  # Watch src/**/data-layer/**/*.ts
+```
+
+Features:
+- **Initial generation**: Generates all files on startup
+- **File watching**: Monitors existing data-layer files for changes
+- **Dynamic discovery**: Automatically watches new data-layer files as they're created
+- **Loop prevention**: Excludes `generated/` directories to avoid infinite regeneration loops
+- **Error handling**: Continues watching even if generation fails
+- **Clean output**: Shows which files changed and were regenerated
+- **Graceful shutdown**: Press Ctrl+C to stop watching
+
+Perfect for active development where you're frequently updating entity prefixes!
 
 ## Programmatic Usage
 
