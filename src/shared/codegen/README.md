@@ -16,10 +16,14 @@ npx ts-node src/shared/codegen/id-generator.ts --file path/to/file.ts
 # Scan all data-layer files
 npx ts-node src/shared/codegen/id-generator.ts --scan [rootDir]
 
+# Scan and write files to generated/ directories
+npx ts-node src/shared/codegen/id-generator.ts --scan --write [rootDir]
+
 # Via npm scripts
 npm run generate:ids "EntityName: 'prefix'"
 npm run generate:ids:file path/to/file.ts
 npm run generate:ids:scan [rootDir]
+npm run generate:ids:write [rootDir]
 ```
 
 ### Examples
@@ -32,6 +36,14 @@ npm run generate:ids "GameCard: 'gc'"
 # Generate from file
 npm run generate:ids:file src/shared/data-layer/protocards/protocards.ts
 npm run generate:ids:file src/shared/data-layer/gamecards/gamecards.ts
+
+# Scan all data-layer files (recommended)
+npm run generate:ids:scan src
+npm run generate:ids:scan
+
+# Generate and write files (recommended for development)
+npm run generate:ids:write
+npm run generate:ids:write src
 ```
 
 ## Input Formats
@@ -59,6 +71,20 @@ export const GameCardMetaPrefix = 'gc';
 ```
 
 The generator will find all `{EntityName}MetaPrefix` exports and generate IDs for each.
+
+### GEN Markers
+Files must have `// GEN: source` marker to be included in scanning:
+```typescript
+// GEN: source
+export const ProtocardMetaPrefix = 'pc';
+
+// GEN: ignore  
+// export const CardMetaPrefix = 'ca';  // This line is ignored
+```
+
+- `// GEN: source`: Marks file as ID source (required for scanning)
+- `// GEN: ignore`: Excludes specific lines from generation
+- Regular `//` comments: Also excluded from generation
 
 ## Generated Output
 
@@ -103,7 +129,21 @@ Each entity generates 6 ID types following this pattern:
 
 ## Integration
 
-The generated code imports from `@/shared/types/id-prefixes` and follows the existing ID system patterns. Output can be saved to files like `src/shared/data-layer/{entity}/generated/ids.ts`.
+The generated code imports from `@/shared/types/id-prefixes` and follows the existing ID system patterns.
+
+## File Output
+
+When using `--write` flag, files are automatically written to `generated/ids.ts` relative to the source file:
+
+```
+src/shared/data-layer/protocards/protocards.ts  # Source with // GEN: source
+src/shared/data-layer/protocards/generated/ids.ts  # Generated output
+
+src/backend/data-layer/users/users.ts  # Source with // GEN: source  
+src/backend/data-layer/users/generated/ids.ts  # Generated output
+```
+
+The `generated/` directory is created automatically if it doesn't exist.
 
 ## Programmatic Usage
 

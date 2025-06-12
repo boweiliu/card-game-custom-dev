@@ -1,7 +1,9 @@
 import { PrefixedId } from "@/shared/types/id-prefixes";
 
+
 /**
- * Generated from protocards/protocards.ts
+ * Generated from: src/shared/data-layer/protocards/protocards.ts
+ * Entity: Protocard with prefix 'pc'
  */
 
 export const _PREFIXES = {

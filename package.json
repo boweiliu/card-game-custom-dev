@@ -12,6 +12,7 @@
     "generate:ids": "npx ts-node src/shared/codegen/id-generator.ts",
     "generate:ids:file": "npx ts-node src/shared/codegen/id-generator.ts --file",
     "generate:ids:scan": "npx ts-node src/shared/codegen/id-generator.ts --scan",
+    "generate:ids:write": "npx ts-node src/shared/codegen/id-generator.ts --scan --write",
     "build": "npm run generate && npm run build:fe && npm run build:be",
     "build:be": "tsc && tsc-alias",
     "build:fe": "NODE_ENV=production webpack --config webpack.config.js --mode production",
