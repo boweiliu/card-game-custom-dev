@@ -1,7 +1,10 @@
 import { PrefixedId } from "@/shared/types/id-prefixes";
 
+/**
+ * Generated from protocards/protocards.ts
+ */
 
-const PREFIXES = {
+export const _PREFIXES = {
   // DB
   PROTOCARD_ENTITY: 'pce_',
   PROTOCARD_VERSION: 'pcv_',
@@ -12,12 +15,12 @@ const PREFIXES = {
   PROTOCARD_SNAPSHOT_CLIENT: 'pct_',
 }
 
-export type ProtocardEntityId = PrefixedId<typeof PREFIXES.PROTOCARD_ENTITY>;
-export type ProtocardVersionId = PrefixedId<typeof PREFIXES.PROTOCARD_VERSION>;
-export type ProtocardSnapshotId = PrefixedId<typeof PREFIXES.PROTOCARD_SNAPSHOT>;
-export type ProtocardEntityClientId = PrefixedId<typeof PREFIXES.PROTOCARD_ENTITY_CLIENT>;
-export type ProtocardVersionClientId = PrefixedId<typeof PREFIXES.PROTOCARD_VERSION_CLIENT>;
-export type ProtocardSnapshotClientId = PrefixedId<typeof PREFIXES.PROTOCARD_SNAPSHOT_CLIENT>;
+export type ProtocardEntityId = PrefixedId<typeof _PREFIXES.PROTOCARD_ENTITY>;
+export type ProtocardVersionId = PrefixedId<typeof _PREFIXES.PROTOCARD_VERSION>;
+export type ProtocardSnapshotId = PrefixedId<typeof _PREFIXES.PROTOCARD_SNAPSHOT>;
+export type ProtocardEntityClientId = PrefixedId<typeof _PREFIXES.PROTOCARD_ENTITY_CLIENT>;
+export type ProtocardVersionClientId = PrefixedId<typeof _PREFIXES.PROTOCARD_VERSION_CLIENT>;
+export type ProtocardSnapshotClientId = PrefixedId<typeof _PREFIXES.PROTOCARD_SNAPSHOT_CLIENT>;
 
 export type ProtocardEntityOrder = (number | string) & { __protocard_entity_order: true };
 export type ProtocardVersionOrder = (number | string) & { __protocard_version_order: true };
