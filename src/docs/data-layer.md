@@ -1,8 +1,8 @@
 SPECS
 
-1. Data append only
+1. Data append only ; internal representation is mostly append only (some ids, metadata etc. might be updated inplace)
 2. Messages should be idempotent and reorderable
-2. CRURM interface - create, read, update, resolve conflicts, migrate schema
+2. synchronous local CRURM interface - create, read, update, resolve conflicts, migrate schema. Machinery happens async behind the hood. Can query synced state etc.
 3. Enttity schema supports versioning, migrating, and backporting, per-entity
 4. Messages can have atomic composite payloads
 5. Each row has an author and a reviewer
@@ -16,6 +16,8 @@ SPECS
 13. The connection of the server to its database is not in scope -- server can simply not ack the message if its database connection is bad.
 14. How do clients query "indexes - getAll()" type stuff? How do clients deal with data loss?
 15. Support peer to peer connections at the transport layer too
+16. How does reviewer selection aka leader election work?
+17. archival/data loss recovery/compaction is the same problem as client onboarding/"i dont know what this id refers to"
 
 
 
