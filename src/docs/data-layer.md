@@ -21,8 +21,11 @@ SPECS
 18. Transport layer is based on sync -> ack/nack/clarify handshakes. Bidir protocal, can be run over channels which are fire-forget, or request-response, or full bidir.
 19. The nature of computed data... that should be an application concern. If it's truly computed, don't store it ; if it does need to be cached, then its not computed and something should manage that
 20. WHAT IF : we stored the "linear" history as a separate thing from all the snapshots? again, separate the concerns, cuz merges are a completely separate entity usually (they require different UX, etc.). This would make linear history single-write which is nice.
+    ANS: NO WAY!! linear history is a lie in a p2p context (split brain can happen at any time). Instead we should do explicit A, B -> (AB) merge pairs. Record coordinated acks somehow.
 21. Make the schema versioning also store a human-readable data dictionary description; this helps with semantic changes where the shape is the same but the meaning is different
 22. For the love of god let's make sure to version the transport protocal and really this whole data layer so we can make changes later if needed.
+23. User-facing merge conflict flows are not in scope. data layer just handles conflict bag-of-X style
+24. the overall goal = make it easy to write frontend that is optimistic, local-first, p2p, and doesn't have to worry about maanging my own transactions/bugs caused by stale state/batching etc.
 
 
 
