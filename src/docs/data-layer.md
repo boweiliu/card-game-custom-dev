@@ -19,6 +19,10 @@ SPECS
 16. How does reviewer selection aka leader election work?
 17. archival/data loss recovery/compaction is the same problem as client onboarding/"i dont know what this id refers to"
 18. Transport layer is based on sync -> ack/nack/clarify handshakes. Bidir protocal, can be run over channels which are fire-forget, or request-response, or full bidir.
+19. The nature of computed data... that should be an application concern. If it's truly computed, don't store it ; if it does need to be cached, then its not computed and something should manage that
+20. WHAT IF : we stored the "linear" history as a separate thing from all the snapshots? again, separate the concerns, cuz merges are a completely separate entity usually (they require different UX, etc.). This would make linear history single-write which is nice.
+21. Make the schema versioning also store a human-readable data dictionary description; this helps with semantic changes where the shape is the same but the meaning is different
+22. For the love of god let's make sure to version the transport protocal and really this whole data layer so we can make changes later if needed.
 
 
 
