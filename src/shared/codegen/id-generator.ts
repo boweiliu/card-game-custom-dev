@@ -154,7 +154,7 @@ function generatePrefixConstants(config: EntityConfig): string {
   ${upperName}_ENTITY_CLIENT: '${prefix}f_',
   ${upperName}_VERSION_CLIENT: '${prefix}w_',
   ${upperName}_SNAPSHOT_CLIENT: '${prefix}t_',
-}`;
+} as const`;
 }
 
 function generateTypes(config: EntityConfig): string {
@@ -184,7 +184,9 @@ export type ${pascalName}SnapshotClientOrder = (number | string) & { __${lowerNa
 function generateIdFile(input: string): string {
   const config = parseEntityConfig(input);
   
-  const header = `import { PrefixedId } from "@/shared/types/id-prefixes";
+  const header = `
+import { PrefixedId } from "@/shared/types/id-prefixes;
+import { AssertExtends, TypeBlob } from "@/shared/data-layer/types";
 
 
 /**
@@ -197,8 +199,34 @@ function generateIdFile(input: string): string {
   const prefixes = generatePrefixConstants(config);
   const types = generateTypes(config);
   const orderTypes = generateOrderTypes(config);
+  const typeBlob = generateTypeBlob(config);
   
   return header + prefixes + '\n\n' + types + '\n\n' + orderTypes + '\n';
+}
+
+function generateTypeBlob(config: EntityConfig): string {
+  const pascalName = config.name;
+  const lowerName = config.name.toLowerCase();
+  
+  return `
+export type ${pascalName}TypeBlob = {
+  'clientEntityId': ${pascalName}EntityClientId;
+  'clientVersionId': ${pascalName}VersionClientId;
+  'clientSnapshotId': ${pascalName}SnapshotClientId;
+  'serverEntityId': ${pascalName}EntityId;
+  'serverVersionId': ${pascalName}VersionId;
+  'serverSnapshotId': ${pascalName}SnapshotId;
+
+  'clientEntityOrder': ${pascalName}EntityClientOrder;
+  'clientVersionOrder': ${pascalName}VersionClientOrder;
+  'clientSnapshotOrder': ${pascalName}SnapshotClientOrder;
+  'serverEntityOrder': ${pascalName}EntityOrder;
+  'serverVersionOrder': ${pascalName}VersionOrder;
+  'serverSnapshotOrder': ${pascalName}SnapshotOrder;
+}
+
+type _check = AssertExtends<${pascalName}TypeBlob, TypeBlob>;
+`;
 }
 
 function generateIdFileFromFile(filePath: string): string {

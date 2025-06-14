@@ -53,10 +53,14 @@ export type AckClientMessageId = PrefixedId<typeof ID_PREFIXES.ACK_CLIENT_MESSAG
 export type IDPrefix = (typeof ID_PREFIXES)[keyof typeof ID_PREFIXES];
 
 // Generic branded ID type with prefix validation
+export type GenericPrefixedId = string & {
+  __prefixed_id: true;
+}
 export type PrefixedId<T extends string> = string & {
   __prefixed_id: true;
   __prefix: T;
-};
+} satisfies GenericPrefixedId;
+
 
 // New prefixed ID types (for future use)
 export type PrefixedProtocardId = PrefixedId<typeof ID_PREFIXES.PROTOCARD>;
