@@ -1,3 +1,18 @@
+SPECS
+
+1. Data append only
+2. Messages should be idempotent and reorderable
+3. Enttity schema supports versioning, migrating, and backporting, per-entity
+4. Messages can have atomic composite payloads
+5. Each row has an author and a reviewer
+6. Agnostic to server -- server is just a convenient name for the canonical reviewer
+7. All merge conficts / race conditions happen in application layer
+8. id == uuid; orderKey is for autoincrementing; timestamp for logs; whoami id 
+9. Client sessions may be shortlived for anonymity
+10. Low mutual client trust -- store an internal personal id as well
+
+
+
 # Data Transfer Layers Documentation
 
 This document outlines the data transfer layers within our project, spanning the frontend, backend, and database. It provides an overview of how data flows through the system and the key components involved.
