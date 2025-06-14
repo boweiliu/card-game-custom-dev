@@ -18,6 +18,7 @@ SPECS
 15. Support peer to peer connections at the transport layer too
 16. How does reviewer selection aka leader election work?
 17. archival/data loss recovery/compaction is the same problem as client onboarding/"i dont know what this id refers to"
+18. Transport layer is based on sync -> ack/nack/clarify handshakes. Bidir protocal, can be run over channels which are fire-forget, or request-response, or full bidir.
 
 
 
