@@ -141,6 +141,11 @@ function scanDataLayerFiles(rootDir: string = 'src'): EntityConfig[] {
   return allConfigs;
 }
 
+function generateImports(): string {
+  return `import { PrefixedId } from "@/shared/types/id-prefixes";
+import { AssertExtends, TypeBlob } from "@/shared/data-layer/types";`;
+}
+
 function generatePrefixConstants(config: EntityConfig): string {
   const upperName = config.name.toUpperCase();
   const prefix = config.prefix;
@@ -186,8 +191,7 @@ function generateIdFile(input: string): string {
   const config = parseEntityConfig(input);
   
   const header = `
-import { PrefixedId } from "@/shared/types/id-prefixes;
-import { AssertExtends, TypeBlob } from "@/shared/data-layer/types";
+${generateImports()}
 
 
 /**
@@ -240,7 +244,7 @@ function generateIdFileFromFile(filePath: string): string {
   if (configs.length === 1) {
     // Single entity - generate normally
     const config = configs[0];
-    const header = `import { PrefixedId } from "@/shared/types/id-prefixes";
+    const header = `${generateImports()}
 
 
 /**
@@ -257,7 +261,7 @@ function generateIdFileFromFile(filePath: string): string {
     return header + prefixes + '\n\n' + types + '\n\n' + orderTypes + '\n';
   } else {
     // Multiple entities - generate all in one file
-    const header = `import { PrefixedId } from "@/shared/types/id-prefixes";
+    const header = `${generateImports()}
 
 
 /**
@@ -402,7 +406,7 @@ function generateIdFileFromScan(rootDir: string = 'src', writeFiles: boolean = f
       let content: string;
       if (fileConfigs.length === 1) {
         const config = fileConfigs[0];
-        const header = `import { PrefixedId } from "@/shared/types/id-prefixes";
+        const header = `${generateImports()}
 
 
 /**
@@ -417,7 +421,7 @@ function generateIdFileFromScan(rootDir: string = 'src', writeFiles: boolean = f
         
         content = header + prefixes + '\n\n' + types + '\n\n' + orderTypes + '\n';
       } else {
-        const header = `import { PrefixedId } from "@/shared/types/id-prefixes";
+        const header = `${generateImports()}
 
 
 /**
@@ -447,7 +451,7 @@ function generateIdFileFromScan(rootDir: string = 'src', writeFiles: boolean = f
   if (configs.length === 1) {
     // Single entity found across all files
     const config = configs[0];
-    const header = `import { PrefixedId } from "@/shared/types/id-prefixes";
+    const header = `${generateImports()}
 
 
 /**
@@ -472,7 +476,7 @@ function generateIdFileFromScan(rootDir: string = 'src', writeFiles: boolean = f
       return acc;
     }, {} as Record<string, EntityConfig[]>);
     
-    const header = `import { PrefixedId } from "@/shared/types/id-prefixes";
+    const header = `${generateImports()}
 
 
 /**
