@@ -11,6 +11,8 @@ SPECS
 8. id == uuid; orderKey is for autoincrementing; timestamp for logs; whoami id 
 9. Client sessions may be shortlived for anonymity; base it off the whoamiId
 10. Low mutual client trust -- store an internal personal id as well
+11. store "parentCanonicalIds" for tracking merge necessity
+12. Use checksums, diffs, whatever at the transport layer as needed
 
 
 
@@ -35,7 +37,7 @@ Frontend Data Repo Service
 +-------------------+
 |                   |
 | Convert to        |
-| Immutable Blobs   |
+
 |                   |
 +-------------------+
         |
