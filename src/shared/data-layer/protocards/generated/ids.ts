@@ -1,5 +1,4 @@
 import { PrefixedId } from "@/shared/types/id-prefixes";
-import { AssertExtends, TypeBlob } from "@/shared/data-layer/types";
 
 
 /**
@@ -31,20 +30,3 @@ export type ProtocardSnapshotOrder = (number | string) & { __protocard_snapshot_
 export type ProtocardEntityClientOrder = (number | string) & { __protocard_entity_client_order: true };
 export type ProtocardVersionClientOrder = (number | string) & { __protocard_version_client_order: true };
 export type ProtocardSnapshotClientOrder = (number | string) & { __protocard_snapshot_client_order: true };
-
-export type ProtocardTypeBlob = {
-  'clientEntityId': ProtocardEntityClientId;
-  'clientVersionId': ProtocardVersionClientId;
-  'clientSnapshotId': ProtocardSnapshotClientId;
-  'serverEntityId': ProtocardEntityId;
-  'serverVersionId': ProtocardVersionId;
-  'serverSnapshotId': ProtocardSnapshotId;
-  'clientEntityOrder': ProtocardEntityClientOrder;
-  'clientVersionOrder': ProtocardVersionClientOrder;
-  'clientSnapshotOrder': ProtocardSnapshotClientOrder;
-  'serverEntityOrder': ProtocardEntityOrder;
-  'serverVersionOrder': ProtocardVersionOrder;
-  'serverSnapshotOrder': ProtocardSnapshotOrder;  
-}
-
-type _check = AssertExtends<ProtocardTypeBlob, TypeBlob>;

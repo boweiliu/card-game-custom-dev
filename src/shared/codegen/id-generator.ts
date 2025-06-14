@@ -181,6 +181,7 @@ export type ${pascalName}VersionClientOrder = (number | string) & { __${lowerNam
 export type ${pascalName}SnapshotClientOrder = (number | string) & { __${lowerName}_snapshot_client_order: true };`;
 }
 
+// NOTE(bowei): this is the good one
 function generateIdFile(input: string): string {
   const config = parseEntityConfig(input);
   
@@ -201,7 +202,7 @@ import { AssertExtends, TypeBlob } from "@/shared/data-layer/types";
   const orderTypes = generateOrderTypes(config);
   const typeBlob = generateTypeBlob(config);
   
-  return header + prefixes + '\n\n' + types + '\n\n' + orderTypes + '\n';
+  return header + prefixes + '\n\n' + types + '\n\n' + orderTypes + '\n\n' + typeBlob;
 }
 
 function generateTypeBlob(config: EntityConfig): string {
