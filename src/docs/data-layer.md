@@ -15,6 +15,7 @@ SPECS
 12. Use checksums, diffs, whatever at the transport layer as needed
 13. The connection of the server to its database is not in scope -- server can simply not ack the message if its database connection is bad.
 14. How do clients query "indexes - getAll()" type stuff? How do clients deal with data loss?
+15. Support peer to peer connections at the transport layer too
 
 
 
