@@ -26,6 +26,21 @@ SPECS
 22. For the love of god let's make sure to version the transport protocal and really this whole data layer so we can make changes later if needed.
 23. User-facing merge conflict flows are not in scope. data layer just handles conflict bag-of-X style
 24. the overall goal = make it easy to write frontend that is optimistic, local-first, p2p, and doesn't have to worry about maanging my own transactions/bugs caused by stale state/batching etc.
+25. Other goals:
+  a. Standardize sync vs async interface, and make it possible to prefer the sync one (separate those concerns)
+  b. Similar interface on backend vs frontend, and the style that everyone understand (crud-like).
+  c. All async data backends (file systems, database) should be treated to be as unreliable as a client. This might mean 2 backend clients: one which does biz logic and another which just persists to DB.
+  d. you can just run multiple backends or multiple clients that talk to each other locally; very flexible on transport. Easy scaling of server AND databases.
+
+Here's a sample flow with Clients A, B, and S:
+
+* A creates the entity row, creates an id and marks it as creator: A
+  * If other clients create other rows, they are entirely independent entities; resolving those is out scope
+* A initializes the version schema and the initial snapshot state.
+  Entity id <- referenced by version row. Tagged with creator
+  Version id <- referenced by snapshot row. Tagged with creator.
+  Version status: is now "primary" (it supports "primary", "mirroring" (backporting with equivalence), "supporting" (backporting but degraded), "deprecated" (not backporting), and maybe "deleted")
+* A sends it to B and S
 
 
 
