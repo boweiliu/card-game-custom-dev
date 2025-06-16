@@ -42,6 +42,8 @@ SPECS
 27. be more careful about archiving old states, especially try not to delete the hashes if possible.
 28. Also: rely on the synchro log.
 29. Linear history is a lie but each client has linear history, maybe track that and track when folks synced with each other; have a snapshot, then each client has 1 branch (per version) (or maybe a finite number of branches), then keep "i send this snapshot to this other client and he reviewed it" <- these are "syncrho logs".
+30. Content-hashing the stuff where it makes sense (but still tag it with _creator to debug better)
+31. Valet parking for database usage: have a database-only adapter which just acts like A's private data repo, and have those API routes separate from A actually talking to S to verify/validate/operate on the data.
 
 Here's a sample flow with Clients A, B, and S:
 
