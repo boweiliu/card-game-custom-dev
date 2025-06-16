@@ -31,6 +31,17 @@ SPECS
   b. Similar interface on backend vs frontend, and the style that everyone understand (crud-like).
   c. All async data backends (file systems, database) should be treated to be as unreliable as a client. This might mean 2 backend clients: one which does biz logic and another which just persists to DB.
   d. you can just run multiple backends or multiple clients that talk to each other locally; very flexible on transport. Easy scaling of server AND databases.
+26.  Other differences from automerge:
+  a. state migration friendly.
+  b. Standardish API interfaces at client/server as well as database and dom. This makes it easy to debug or introspect (curl + sql, unlike automerge)
+  c. Untrusted write/verify can lead to anticheat stuff later.
+  d. Opinionated ORM-like interface into both frontend and backend. (see b above)
+  e. Language agnostic and automerge compatible. (The crdt is another pluggable component)
+  f. Don't care about cross-local file system stuff which automerge has fancy handling for.
+  g. Planning to handle broadcast style one-to-many transports too.
+27. be more careful about archiving old states, especially try not to delete the hashes if possible.
+28. Also: rely on the synchro log.
+29. Linear history is a lie but each client has linear history, maybe track that and track when folks synced with each other; have a snapshot, then each client has 1 branch (per version) (or maybe a finite number of branches), then keep "i send this snapshot to this other client and he reviewed it" <- these are "syncrho logs".
 
 Here's a sample flow with Clients A, B, and S:
 
