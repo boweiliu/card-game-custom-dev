@@ -99,9 +99,19 @@ In another universe, A and B each make changes and send them to each other.
 * Maybe A has done the same on their side, writing A1, then receiving B1, so creating A2 = A1 + B1 before receiving B2.
 * A should know that B2 is a A1 + B1 merge (i guess we should record it in the row). if it's the same contentHash as A2, then both A and B should use whoever's whoamiId is lower to decide the winner, and send one final snapshot with isCreator: false (aka a reviewal)
 * If the conflict is irresolvable (say, someone set the field to X and someone else to Y) then someone needs to inform their users of the collision and get them to resolve. If the resolution is delayed it looks a lot like a hard fork ("I took the red lego block for my farmhouse, you took the red block for your ambulance. both of us built a lot of stuff on top. Now someone has to give up their block, or we can both continue in our own worlds until we decide whose is better"). During the fork the 2 parties really can't resolve conflicts at all -- if A3 comes after A2, but B has noticed that A2 is in conflict with (B2, B3....), then A3 should be nacked.
-  - How? We should definitely store the last synchro row. For B3 for instance, the last synchro row from A is A1 (created by A but NOT reviewed by B since it was in conflict at the time), and the last full synchro is 0, and the last attempted merge was B2. For the A3 message, they think the last synchro from usB was B1, and the last full synchro was 0, and the last attempted merge was A2. In other words, us accepting A3 is contingent on us accepting the merge A2, because A2 contains B1. OR - equivalently; A3 is a descendent of B1 but not anything else in our history, but we know B2 (and posssibly more stuff) came after B1, so we will try to merge in A3 and find the same merge conflict during B2 = 0 | B1 + A1, but now it looks like B9 = B1 | B8 + A3 . We know we sent B2 first and didn't get a response yet. but we can still send B9 (since it's tagged as a B8 + A3 merged) and maybe it's acceptable.
+  - How? We should definitely store the last synchro row. For B3 for instance, the last synchro row from A is A1 (created by A but NOT reviewed by B since it was in conflict at the time), and the last full synchro is 0, and the last attempted merge from our side was B2. For the A3 message, they think the last synchro from us(B) was B1, and the last full synchro was 0, and the last attempted merge was A2. In other words, us accepting A3 is contingent on us accepting the merge A2, because A2 contains B1. OR - equivalently; A3 is a descendent of B1 but not anything else in our history, but we know B2 (and posssibly more stuff) came after B1, so we will try to merge in A3 and find the same merge conflict during B2 = 0 | B1 + A1, but now it looks like B9 = B1 | B8 + A3 . We know we sent B2 first and didn't get a response yet. but we can still send B9 (since it's tagged as a B8 + A3 merged) and maybe it's acceptable.
   - Of course this is all in the case where A and B are equal clients and neither wants to accept the other's merge resolutions. If it's a server vs client case (hopefully prenegotiated that one client has priority), then B's merge algorithm should be to accept merge resolutions from S over any local merges.
 
+* To summarize,
+  - Snapshots have types:
+    Creations
+    Merges (they store the 2 (+?) branches and the common ancestor)
+    Reviewals (of either creations or merges)
+  - When sending snapshots to you, atomically also send:
+    The last synchro from us (something either created or reviewed by both of us)
+    The last creation from you (if different from above)
+  - If I am trying to resolve/review a merge and have a bunch of history missing, there's a special transport query syntax to request a range of stuff that i've forgotten/need you to resend
+    
 
 
 
