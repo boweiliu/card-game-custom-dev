@@ -52,13 +52,57 @@ SPECS
 
 Here's a sample flow with Clients A, B, and S:
 
-* A creates the entity row, creates an id and marks it as creator: A
-  * If other clients create other rows, they are entirely independent entities; resolving those is out scope
-* A initializes the version schema and the initial snapshot state.
-  Entity id <- referenced by version row. Tagged with creator
-  Version id <- referenced by snapshot row. Tagged with creator.
-  Version status: is now "primary" (it supports "primary", "mirroring" (backporting with equivalence), "supporting" (backporting but degraded), "deprecated" (not backporting), and maybe "deleted")
-* A sends it to B and S
+
+* Application code calls create()
+* Client A remembers its whoamiId (equivalently: sessionId) and creates 4 rows:
+  1 Entity row with a uuid (created by client A)
+  2 Version row, hashed as content: (entityId, version) -> versionHashId. Unmarked [except for debugging]
+  3 State row, hashed as content: (versionHashId, ...state) -> stateHashId.  Unmarked [except for debugging].
+  4 Snapshot row, with uuid, orderKey, stateHashId, whoamiId: A, isCreator: true
+    This represents that we've made a change locally, but no other clients have synchro'd with our snapshot.
+* Store those 4 rows in memory
+* Invoke async data backup valet to store it persistently, by using the idempotent connection layer:
+  - Find a data backup valet (maybe this is just another client btw)
+  - bundle up 4 rows as an atomic message -> syncMessageId
+  - store ( syncMessageId -> message ) in the transport layer buffer
+  - send (syncId, whoamiId) to the valet, wait for it to be acked with (syncId, whoamiId, ackId, whoareuId)
+  - once it's acked, remove it from the transport layer buffer, and instead replace it with ( syncMessageId <-> ackMessageId ) in the transport layer buffer
+  - if it's not acked immediately, or it's nacked, put it in a retry queue, with the requested nack logic if present
+* concurrently: send those 4 atomic rows to another client B
+  - use the same transport idempotency logic as above
+  - However, this time, since B is a client and not just a valet, B is responsible for generating its own ids .
+  - B's state should look like:
+    1 Entity row with A's uuid, A's whoamiId, but also it gets the standard internal metadata: _uuid, _orderKey, _createdAt (which are all relative to B)
+    2 Version row, no change, except we verify the hash matches. if not - nack with error, but also rehash (so we will have duplicate rows + alias column of incorrect -> correct hash) and continue
+    3 State row, no change, similarly check hash match and continue if error
+    4 Snapshot row with A's uuid, A's orderKey, A's whoamId, [possibly incorrect] stateHashId, isCreator: true
+    5 Now B adds their own snapshot row that looks like: B's uuid, B's orderKey, B's whoamId, stateHashId, isCreator: false. This signifies that B has seen the snapshot and aligned it in B's ordering of states, and reviewed A's biz logic if appropriate.
+* B needs to send back row 5 (B's snpashot) to A using the same idempotent transport. A stores it (and backs it up)
+    
+Next, suppose A makes 2 quick updates.
+* Application code calls update() and then update()
+* If these are in the same sync thread, then the 2 updates get batched at the data layer and create just a single update.
+* More interestingly though, let's suppose these are 2 separate async updates (say the user did a double click or something)
+* A's datalayer generates 4 rows, in 2 pairs:
+  6 state hash
+  7 snapshot pointing to stateHash6
+  8 state hash
+  9 snapshot pointing to stateHash8
+* A backs up its 2+2 rows as usual and sends them to B in 2 atomic pairs.
+* Suppose B receives the atomic 8 + 9 first. B replies with 10: B's snapshot synchronizing 9, which A stores.
+* Now B receives the atomic 6 + 7. B checks the order keys and notes that this is a retroactive update, so B will not write a synchro row; it will simply ack the message, save the row, and move on.
+
+In another universe, A and B each make changes and send them to each other.
+* B has made and send B1 but now receives A1.
+* B records A1 and generates B2 = B1 + A1 (merge determined by B) and tags it with orderKey, whoamiId, and isCreator: true
+* B sends B2 to A, implicitly requesting synchro
+* Maybe A has done the same on their side, writing A1, then receiving B1, so creating A2 = A1 + B1 before receiving B2.
+* A should know that B2 is a A1 + B1 merge (i guess we should record it in the row). if it's the same contentHash as A2, then both A and B should use whoever's whoamiId is lower to decide the winner, and send one final snapshot with isCreator: false (aka a reviewal)
+* If the conflict is irresolvable (say, someone set the field to X and someone else to Y) then someone needs to inform their users of the collision and get them to resolve. If the resolution is delayed it looks a lot like a hard fork ("I took the red lego block for my farmhouse, you took the red block for your ambulance. both of us built a lot of stuff on top. Now someone has to give up their block, or we can both continue in our own worlds until we decide whose is better"). During the fork the 2 parties really can't resolve conflicts at all -- if A3 comes after A2, but B has noticed that A2 is in conflict with (B2, B3....), then A3 should be nacked.
+  - How? We should definitely store the last synchro row. For B3 for instance, the last synchro row from A is A1 (created by A but NOT reviewed by B since it was in conflict at the time), and the last full synchro is 0, and the last attempted merge was B2. For the A3 message, they think the last synchro from usB was B1, and the last full synchro was 0, and the last attempted merge was A2. In other words, us accepting A3 is contingent on us accepting the merge A2, because A2 contains B1. OR - equivalently; A3 is a descendent of B1 but not anything else in our history, but we know B2 (and posssibly more stuff) came after B1, so we will try to merge in A3 and find the same merge conflict during B2 = 0 | B1 + A1, but now it looks like B9 = B1 | B8 + A3 . We know we sent B2 first and didn't get a response yet. but we can still send B9 (since it's tagged as a B8 + A3 merged) and maybe it's acceptable.
+  - Of course this is all in the case where A and B are equal clients and neither wants to accept the other's merge resolutions. If it's a server vs client case (hopefully prenegotiated that one client has priority), then B's merge algorithm should be to accept merge resolutions from S over any local merges.
+
+
 
 
 
