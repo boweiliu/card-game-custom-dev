@@ -44,6 +44,11 @@ SPECS
 29. Linear history is a lie but each client has linear history, maybe track that and track when folks synced with each other; have a snapshot, then each client has 1 branch (per version) (or maybe a finite number of branches), then keep "i send this snapshot to this other client and he reviewed it" <- these are "syncrho logs".
 30. Content-hashing the stuff where it makes sense (but still tag it with _creator to debug better)
 31. Valet parking for database usage: have a database-only adapter which just acts like A's private data repo, and have those API routes separate from A actually talking to S to verify/validate/operate on the data.
+  but watch out for abuse
+32. Security/auth? Like what if a client says "whoami" and then someone else pretends to be that client? ans: plz handle at transport layer
+33. We should have a neat CLI that interfaces with servers and clients equally; both session-ful and sessionless. Like if i want to CURl a single GET to a client, i should be able to do that, somehow
+34. Separate about the clients: backend one should handle biz logic and be MOSTLY sync (with async inbound and outbound). Another backend one should handle database persistence, valet-style (that one is a lot of async). Client one should be sync, either backed by in mem or dom or sync indexdb, again with async inbound/outbound only. And those async parts should be structured to be easy to run in another non-js language, i.e. there's some awareness of event loop, doNext(), doAll(), doForever() type stuff.
+35. Dont forget to solve the "write-then-read" problem. Should be trivial, but to be extra sure, build in debug flags to force clients to be slow on the reply.
 
 Here's a sample flow with Clients A, B, and S:
 
