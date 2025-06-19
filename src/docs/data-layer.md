@@ -111,8 +111,8 @@ In another universe, A and B each make changes and send them to each other.
     Merges (they store the 2 (+?) branches and the common ancestor)
     Reviewals (of either creations or merges)
   - When sending snapshots to you, atomically also send:
-    The last synchro from us (something either created or reviewed by both of us)
-    The last creation from you (if different from above)
+    The last synchro from us (something {created or reviewed} by both of us)
+    The last creation from you (if more recent from above)
   - If I am trying to resolve/review a merge and have a bunch of history missing, there's a special transport query syntax to request a range of stuff that i've forgotten/need you to resend
     
 
