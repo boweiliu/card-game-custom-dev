@@ -59,7 +59,7 @@ Here's a sample flow with Clients A, B, and S:
 * Client A remembers its whoamiId (equivalently: sessionId) and creates 4 rows:
   1 Entity row with a uuid (created by client A)
   2 Version row, hashed as content: (entityId, version) -> versionHashId. Unmarked [except for debugging]
-    should also contain data dictionary info and cosupport/lossport/deprecate info
+    Should also contain data dictionary info and cosupport/lossport/deprecate info. All that is defined in code, so should be consistent and hashable. Good to back it up into data layer anyways -- encourages updating the version upon any semantic changes.
   3 State row, hashed as content: (versionHashId, ...state) -> stateHashId.  Unmarked [except for debugging].
   4 Snapshot row, with uuid, orderKey, stateHashId, whoamiId: A, isCreator: true
     This represents that we've made a change locally, but no other clients have synchro'd with our snapshot.
