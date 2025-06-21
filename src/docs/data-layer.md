@@ -130,6 +130,7 @@ export type IntId = int;                    // Auto-incrementing positive intege
 export type LocalTimestamp = string;        // Datetime in utc, recorded locally, ms precision. ISO string.
 export type Timestamp = string;             // Datetime in utc, recorded on a remote machine, so maybe not reliable
 export type Hash<T> = string;               // Arbitrarily lets decide on md5 hash of JSON.stringify(indent=False, sortKeys=True, js implementation)
+                                            // All zeroes is reserved for the empty object
 
 // Entity head - defines what we are talking about.
 // Main use is provides a tracking key for all data relevant to this instance.
@@ -143,7 +144,7 @@ export interface EntityRow<T> {
   _key: Key<this> computedAs ';'.join("T", entityId, creatorId);
   _id: IntId;
   _recordedAt: LocalTimestamp;
-  _trueOrder: Sortable;       // the globally correct bitemporal order that we think things are in
+  _localOrder: Sortable;       // the globally correct bitemporal order that we think things are in
   _debug: any; // Any log-line appropriate information, e.g. the triggering threadId, api endpoint, stacktrace, whatever
 }
 
@@ -175,7 +176,7 @@ export interface EntitySchemaBlob<T> {
   _recordedAt: LocalTimestamp;
   _id: IntId;
   _debug: any;
-  // this is not a bitemporal (or temporal, at all) row, so doesn't need creatorOrder/trueOrder.
+  // this is not a bitemporal (or temporal, at all) row, so doesn't need creatorOrder/localOrder.
 
   // For debug + convenience
   _creatorId: WhoamiId;       // who sent us this and when. Might be ourselves.
@@ -195,7 +196,7 @@ export interface EntityVersionBlob<T> {
   _recordedAt: LocalTimestamp;
   _id: IntId;
   _debug: any;
-  // this is not a bitemporal (or temporal, at all) row, so doesn't need creatorOrder/trueOrder.
+  // this is not a bitemporal (or temporal, at all) row, so doesn't need creatorOrder/localOrder.
 
   // For debug + convenience
   _version: Version computedAs schemaHash.version;
@@ -207,7 +208,7 @@ export interface EntityVersionBlob<T> {
 export interface EntityStateBlob<T> {
   [key]: any;
 
-  _hash: Hash<this> computedAs hash(this);
+  _hash: Hash<this> computedAs hash(this); // maybe also be the empty hash (all zeroes)
 
   _key: Key<this> = _hash;
   _recordedAt: LocalTimestamp;
@@ -221,11 +222,20 @@ export interface EntityStateBlob<T> {
   _createdAt: Timestamp;
 }
 
+export interface CommitBlob {
+  stateHash: Hash<EntityStateBlob>;
+  parents: SingeletonOrArray<Hash<?>>; // often just a singleton. If array, order matters.
+  leastAncestor?: Hash<?> // empty if just 1 parent (it's implied to be just the parent)
+}
+
 // Expresses the fact that the entity id + entity version is now in a given state.
 export interface EntityStateRow {
-  entityStateId: Id<this>;
+  versionHash: Hash<EntityVersionBlob>; // the topic of what we are talking about 
+  entityStateId: Id<this>; // rowId
+
   stateHash: Hash<EntityStateBlob>;
-  versionHash: Hash<EntityVersionBlob>;
+
+
   creatorId: WhoamiId;
   createdAt: Timestamp;
   createdOrder: Timestamp;
