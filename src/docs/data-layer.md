@@ -107,7 +107,7 @@ In another universe, A and B each make changes and send them to each other.
 
 * To summarize,
   - Snapshots have types:
-    Creations
+    Creations (content hash, creator)
     Merges (they store the 2 (+?) branches and the common ancestor)
     Reviewals (of either creations or merges)
   - When sending snapshots to you, atomically also send:
@@ -115,83 +115,147 @@ In another universe, A and B each make changes and send them to each other.
     The last creation from you (if more recent from above)
   - If I am trying to resolve/review a merge and have a bunch of history missing, there's a special transport query syntax to request a range of stuff that i've forgotten/need you to resend
     
+## Explicit data shapes
 
+Below is **pseudocode** (TypeScript-flavoured) that captures the core tables / rows and transport envelopes described in the spec.  It is intentionally high-level and omits implementation details such as persistence adapters or concrete codecs.
 
+```typescript
+// ---------- Core identifiers ----------
+export type UUID = string;          // 128-bit globally unique id
+export type WhoamiId = UUID;       // Identifies a logical client instance
+export type OrderKey = number;     // Real-valued; establishes bitemporal ordering
+export type IntId = number;        // Auto-incrementing primary key for local logs
 
+// ---------- Entity-level schema and state ----------
 
-# Data Transfer Layers Documentation
+/**
+ * Logical entity – immutable once written.
+ */
+export interface EntityRow {
+  uuid: UUID;             // Canonical entity id (shared by all clients)
+  createdAt: Date;        // First time this entity was seen **locally**
+  creator: WhoamiId;      // Client that introduced the entity to this repo
+}
 
-This document outlines the data transfer layers within our project, spanning the frontend, backend, and database. It provides an overview of how data flows through the system and the key components involved.
+/**
+ * Version metadata for an entity; supports semantic migrations/backports.
+ */
+export interface VersionRow {
+  versionHashId: UUID;           // Content hash of (entityId + version data)
+  entityId: UUID;          // FK → EntityRow._uuid
+  version: number;         // Monotonically increasing semantic version
+  dataDictionary: string;  // Human-readable description (see §21)
+  coSupport?: string;      // Optional semantic metadata
+  deprecateAfter?: number; // Optional semver that marks deprecation
+}
 
-## Data Flow Diagram
+/**
+ * Concrete, hashable business state (often CRDT payload).
+ */
+export interface StateRow {
+  stateHashId: UUID;           // Content hash of (versionHashId + state)
+  versionHashId: UUID;     // FK → VersionRow.versionHashId
+  stateJson: string;       // Opaque app data; must be deterministic
+}
 
-Below is an improved ASCII diagram representing the data flow pipeline:
+/**
+ * Snapshot = pointer to a StateRow plus ordering + provenance data.
+ */
+export interface SnapshotRow {
+  uuid: UUID;             // Snapshot id (unique per client)
+  stateHashId: UUID;       // FK → StateRow._hashId
+  orderKey: OrderKey;      // Dense, globally mergeable ordering value
+  whoamiId: WhoamiId;      // Authoring client
+  isCreator: boolean;      // True when first produced by the author
+  createdAt: Date;
+}
 
+/**
+ * Synchro rows record bilateral acknowledgement of snapshots between peers.
+ */
+export interface SynchroRow {
+  uuid: UUID;
+  snapshotId: UUID;        // FK → SnapshotRow._uuid (the item being synced)
+  from: WhoamiId;          // Sender of the synchro
+  to: WhoamiId;            // Receiver who ACKed
+  ackOrderKey: OrderKey;   // Receiver-local ordering of the ACK
+  createdAt: Date;
+}
+
+/**
+ * Merge rows capture an explicit merge operation: the child snapshot that
+ * reconciles two (or more) divergent parent snapshots plus an optional
+ * lowest common ancestor (§20, §108-110).
+ */
+export interface MergeRow {
+  uuid: UUID;                     // Merge row id (unique per client)
+  snapshotId: UUID;                // Child snapshot produced by the merge
+  orderKey: OrderKey;             // Ordering value of the merge operation
+  parentSnapshotIds: UUID[];       // ≥2 parent snapshot ids being reconciled
+  commonAncestorId?: UUID;         // Optional lowest common ancestor snapshot id
+  whoamiId: WhoamiId;              // Client performing the merge
+  createdAt: Date;
+}
+
+// ---------- Transport & messaging ----------
+
+/**
+ * Atomic unit shipped over the wire – a logically immutable batch.
+ */
+export interface AtomicMessage {
+  id: UUID;                       // Message idempotency key (§2)
+  author: WhoamiId;               // Primary author (§5)
+  rows: DataRow[];                // Any combination of *Row items
+  reviewers: WhoamiId[];          // Peers that have reviewed/ACKed
+  timestamp: Date;                // First creation time on author
+}
+
+/** Permitted row unions carried by a message */
+export type DataRow =
+  | EntityRow
+  | VersionRow
+  | StateRow
+  | SnapshotRow
+  | MergeRow
+  | SynchroRow;
+
+/**
+ * Wire-level envelope with handshake semantics (ACK/NACK/CLARIFY – §18).
+ */
+export interface TransportEnvelope {
+  message: AtomicMessage;
+  handshake?: {
+    code: "ack" | "nack" | "clarify";
+    partial?: boolean;      // True when sender only has a partial range
+    reason?: string;        // Filled on nack/clarify
+  };
+}
+
+// ---------- Local change log ----------
+
+export interface ChangeLogEntry {
+  intId: IntId;                   // Local monotonic id (§8)
+  orderKey: OrderKey;             // Mirrors Snapshot.orderKey when relevant
+  messageId: UUID;               // FK → AtomicMessage.id
+  whoamiId: WhoamiId;             // Author / executor of the change
+  hashChecksum?: string;          // Optional integrity checksum (§12)
+  timestamp: Date;
+}
+
+// ---------- Client session ----------
+
+export interface ClientSession {
+  whoamiId: WhoamiId;             // Stable per logical device / tab
+  internalId: UUID;               // Extra anonymised id (§10)
+  shortLived: boolean;            // True for anonymous / incognito sessions (§9)
+  startedAt: Date;
+}
+
+// ---------- Utility helpers (pseudo-only) ----------
+
+export function createEntity(initialState: unknown): SnapshotRow { /* ... */ }
+export function updateEntity(entityId: UUID, patch: unknown): SnapshotRow { /* ... */ }
+export function resolveConflict(/* ... */): SnapshotRow { /* ... */ }
 ```
-Frontend Screen Components
-+-------------------+
-|                   |
-|   CRUD Operations |
-|                   |
-+-------------------+
-        |
-        v
-Frontend Data Repo Service
-+-------------------+
-|                   |
-| Convert to        |
 
-|                   |
-+-------------------+
-        |
-        v
-Messaging Service
-+-------------------+
-|                   |
-| Enqueue & Track   |
-| Sync/Ack States   |
-|                   |
-+-------------------+
-        |
-        v
-API Layer
-+-------------------+
-|                   |
-| Network Transfer  |
-|                   |
-+-------------------+
-        |
-        v
-Backend API
-+-------------------+
-|                   |
-| Passthrough       |
-|                   |
-+-------------------+
-        |
-        v
-DB Persistence Layer
-+-------------------+
-|                   |
-| Save to Database  |
-|                   |
-+-------------------+
-        |
-        v
-Backend Acknowledgement
-+-------------------+
-|                   |
-| Acknowledge       |
-| Message           |
-|                   |
-+-------------------+
-
-```
-
-## Security Considerations
-
-Discuss any security measures in place to protect data during transfer, such as encryption, authentication, and validation mechanisms.
-
-## Future Improvements
-
-Outline potential improvements or optimizations to enhance the efficiency and security of data transfers.
+> NOTE  These shapes purposefully model *rows* rather than fully-hydrated objects so that they map 1-to-1 onto the append-only storage and transport behaviour described in the specification.
