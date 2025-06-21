@@ -223,9 +223,11 @@ export interface EntityStateBlob<T> {
 }
 
 export interface CommitBlob {
-  stateHash: Hash<EntityStateBlob>;
-  parents: SingeletonOrArray<Hash<?>>; // often just a singleton. If array, order matters.
-  leastAncestor?: Hash<?> // empty if just 1 parent (it's implied to be just the parent)
+  fromStates: SingeletonOrArray<Hash<?>>; // often just a singleton. If array, order matters.
+  mergeAncestor?: Hash<?> // empty if just 1 parent (it's implied to be just the parent)
+  toState: Hash<EntityStateBlob>;
+
+  _diff: Hash<EntityDiffBlob>; // TODO: this will compress things quite a bit
 }
 
 // Expresses the fact that the entity id + entity version is now in a given state.
