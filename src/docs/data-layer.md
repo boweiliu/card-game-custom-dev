@@ -120,42 +120,125 @@ In another universe, A and B each make changes and send them to each other.
 Below is **pseudocode** (TypeScript-flavoured) that captures the core tables / rows and transport envelopes described in the spec.  It is intentionally high-level and omits implementation details such as persistence adapters or concrete codecs.
 
 ```typescript
-// ---------- Core identifiers ----------
-export type UUID = string;          // 128-bit globally unique id
-export type WhoamiId = UUID;       // Identifies a logical client instance
-export type OrderKey = number;     // Real-valued; establishes bitemporal ordering
-export type IntId = number;        // Auto-incrementing primary key for local logs
+// ---------- Component types ----------
+export type string<T> = "T";                // string literal constant 
+export type Id<T> = string;                 // branded id type, usually a prefixed string. [; ] reserved chars for separators.
+export type WhoamiId = Id<"client">;        // identifier for a client, or so they claim. [; ] reserved chars for separators.
+export type Key<T> = string;                // computed, guarnateed to be globally unique across ALL tables (Ids can be reused per-client)
+export type Sortable = number;              // Floating point, used so we can back insert bitemporal keys into a strict linear order. Obviously ints are a subtype.
+export type IntId = int;                    // Auto-incrementing positive integer; only useful for local ordering
+export type LocalTimestamp = string;        // Datetime in utc, recorded locally, ms precision. ISO string.
+export type Timestamp = string;             // Datetime in utc, recorded on a remote machine, so maybe not reliable
+export type Hash<T> = string;               // Arbitrarily lets decide on md5 hash of JSON.stringify(indent=False, sortKeys=True, js implementation)
 
-// ---------- Entity-level schema and state ----------
+// Entity head - defines what we are talking about.
+// Main use is provides a tracking key for all data relevant to this instance.
+export interface EntityRow<T> {
+  creatorId: WhoamiId;
+  entityId: Id<this>;         // only unique per-creator
+  createdAt: Timestamp;       // local to creator
+  createdOrder: Sortable;     // bitemporal linear order, but only per-creator
 
-/**
- * Logical entity – immutable once written.
- */
-export interface EntityRow {
-  uuid: UUID;             // Canonical entity id (shared by all clients)
-  createdAt: Date;        // First time this entity was seen **locally**
-  creator: WhoamiId;      // Client that introduced the entity to this repo
+  // Local only
+  _key: Key<this> computedAs ';'.join("T", entityId, creatorId);
+  _id: IntId;
+  _recordedAt: LocalTimestamp;
+  _trueOrder: Sortable;       // the globally correct bitemporal order that we think things are in
+  _debug: any; // Any log-line appropriate information, e.g. the triggering threadId, api endpoint, stacktrace, whatever
 }
 
-/**
- * Version metadata for an entity; supports semantic migrations/backports.
- */
-export interface VersionRow {
-  versionHashId: UUID;           // Content hash of (entityId + version data)
-  entityId: UUID;          // FK → EntityRow._uuid
-  version: number;         // Monotonically increasing semantic version
-  dataDictionary: string;  // Human-readable description (see §21)
-  coSupport?: string;      // Optional semantic metadata
-  deprecateAfter?: number; // Optional semver that marks deprecation
+// A bundle of data that represents a version of the schema
+// All of the following data should match whatever is in the code
+export interface EntitySchemaBlob<T> {
+  entityType: string<T>;      // What type of thing we are talking about
+  version: Version = string;  // whatever we need; either integer, or major.minor.patch. 0 , "" are reserved for "default ver". [; ] reserved chars for separators.
+                              // This all comes from the same codebase, so it SHOULD be globally well-ordered!
+  gitCommit: string;          // JUST in case we are doing migrations off of git branches or something...
+  docstring: string;          // multiline docs indicating the semantic meaning and intended use of all the fields.
+                              // If any docs are updated -> we need a new version!!
+
+  // Which other versions of this entity are in what state, in sorted order.
+  // The current version is always primary (otherwise, why are you, locally, creating this row?)
+  // Next is a list of other live versions that are capable of storing the exact same data as the current primary version
+  // Then comes older versions which we want to support, but may have, say missing states due to newly added fields, or incorrect fields that we removed
+  // Optionally, finally, a list of states which are now EOL and we will or are not capable of backporting. If not listed, all other versions are asssumed to be EOL.
+  // This array MUST be sorted and MUST contain the full list of all live, and backporting versions. It must also contain newly EOL'd versions.
+  _deprecates: { version: Version; status: "primary" | "colive" | "backporting" | "eol" }[];
+
+  deprecatesColive: ';'.join(Version[]);       // Flat stye for flat DB's.
+  deprecatesBackporting: ';'.join(Version[]);
+  deprecatesEol: ';'.join(Version[]);
+
+  _hash: Hash<this> computedAs hash(this); // Hashes the non-underscore fields only!!
+
+  _key: Key<this> = _hash;
+  _recordedAt: LocalTimestamp;
+  _id: IntId;
+  _debug: any;
+  // this is not a bitemporal (or temporal, at all) row, so doesn't need creatorOrder/trueOrder.
+
+  // For debug + convenience
+  _creatorId: WhoamiId;       // who sent us this and when. Might be ourselves.
+  _createdAt: Timestamp;
 }
 
-/**
- * Concrete, hashable business state (often CRDT payload).
- */
-export interface StateRow {
-  stateHashId: UUID;           // Content hash of (versionHashId + state)
-  versionHashId: UUID;     // FK → VersionRow.versionHashId
-  stateJson: string;       // Opaque app data; must be deterministic
+// A tracking key to coordinate any data saying that entity "entityId" is under the version "version".
+// Intentionally not tagged with creator, etc. because it will be content-addressed. we want any client independently
+// to be able to promote any entity instance independently to a specific version.
+export interface EntityVersionBlob<T> {
+  entityId: Key<Entity> references ... ;
+  schemaHash: Hash<EntitySchemaBlob> references ... ;
+
+  _hash: Hash<this> computedAs hash(this);
+
+  _key: Key<this> = _hash;
+  _recordedAt: LocalTimestamp;
+  _id: IntId;
+  _debug: any;
+  // this is not a bitemporal (or temporal, at all) row, so doesn't need creatorOrder/trueOrder.
+
+  // For debug + convenience
+  _version: Version computedAs schemaHash.version;
+  _creatorId: WhoamiId;       // who sent us this and when. Might be ourselves.
+  _createdAt: Timestamp;
+}
+
+// Concrete, hashable business state (may be CRDT payload). Content-addressed.
+export interface EntityStateBlob<T> {
+  [key]: any;
+
+  _hash: Hash<this> computedAs hash(this);
+
+  _key: Key<this> = _hash;
+  _recordedAt: LocalTimestamp;
+  _id: IntId;
+  _debug: any;
+
+  // For debug + convenience
+  _entityType: string<T> computedAs ...
+  _version: Version computedAs ...
+  _creatorId: WhoamiId;
+  _createdAt: Timestamp;
+}
+
+// Expresses the fact that the entity id + entity version is now in a given state.
+export interface EntityStateRow {
+  entityStateId: Id<this>;
+  stateHash: Hash<EntityStateBlob>;
+  versionHash: Hash<EntityVersionBlob>;
+  creatorId: WhoamiId;
+  createdAt: Timestamp;
+  createdOrder: Timestamp;
+
+  // For debug + convenience
+  _version: Version computedAs ...
+  _entityId: Id computedAs ...
+
+  // Local only
+  _key: Key<this> computedAs ';'.join("T", entityId, creatorId);
+  _id: IntId;
+  _recordedAt: LocalTimestamp;
+  _debug: any; // Any log-line appropriate information, e.g. the triggering threadId, api endpoint, stacktrace, whatever
 }
 
 /**
