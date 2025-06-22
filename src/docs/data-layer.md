@@ -240,8 +240,6 @@ export interface EntityStateRow {
     fromStates: SingeletonOrArray<Hash<CommitBlob>>;
     mergeAncestor?: Hash<CommitBlob>;
     toState: Hash<EntityStateBlob>;
-  
-
 
   creatorId: WhoamiId;
   createdAt: Timestamp;
