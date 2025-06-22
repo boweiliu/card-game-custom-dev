@@ -223,8 +223,8 @@ export interface EntityStateBlob<T> {
 }
 
 export interface CommitBlob {
-  fromStates: SingeletonOrArray<Hash<?>>; // often just a singleton. If array, order matters.
-  mergeAncestor?: Hash<?> // empty if just 1 parent (it's implied to be just the parent)
+  fromStates: SingeletonOrArray<Hash<CommitBlob>>; // often just a singleton. If array, order matters.
+  mergeAncestor?: Hash<CommitBlob> // empty if just 1 parent (it's implied to be just the parent)
   toState: Hash<EntityStateBlob>;
 
   _diff: Hash<EntityDiffBlob>; // TODO: this will compress things quite a bit
@@ -235,7 +235,12 @@ export interface EntityStateRow {
   versionHash: Hash<EntityVersionBlob>; // the topic of what we are talking about 
   entityStateId: Id<this>; // rowId
 
-  stateHash: Hash<EntityStateBlob>;
+  commitHash: Hash<CommitBlob>
+  // Reminder that this contains:
+    fromStates: SingeletonOrArray<Hash<CommitBlob>>;
+    mergeAncestor?: Hash<CommitBlob>;
+    toState: Hash<EntityStateBlob>;
+  
 
 
   creatorId: WhoamiId;
