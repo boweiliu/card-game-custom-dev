@@ -318,6 +318,14 @@ export interface EntityStateRow {
  * 1b) I don't have it at all. Then you are informing me of a new commit you made.
  *    Transition: (me, empty) + (you, empty) --> (me, ack-accepted/changes-requested) + (you, ack-accepted)
  * I have to process the change. Here is the logic:
+ *   First I check what I think is your most recent change (i.e. from my view of your linear history, what is the
+ *   highest sequential creatorOrder). If that's more recent than this message, I'm going to copy the state of 
+ *   that most-recent message and resend that tip back. Basically do nothing and redo that thing.
+ *   
+ *   Otherwise, it seems you are sending me your newest update. You should have also sent me 
+ *   what was the latest change ack-accepted by me that is in the component history of this change.
+ *   If your latest view of me is accurate, then I simply ack-accept.
+ *   Otherwise, I need to merge my latest with yours, 3-way using the base you told me, and send back the merge.
  * 
  * Case 2: you are sending "changes-requested" by you; by assumption your state was previously (you, empty).
  * Since you don't have it as "ack-accepted" by you, that must mean it was created by me.
