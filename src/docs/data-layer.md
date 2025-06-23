@@ -222,7 +222,11 @@ export interface EntityStateBlob<T> {
   _createdAt: Timestamp;
 }
 
+// Also known as: EntityStateHistoryBlob. Linked list style version history;
+// content-addressed by sequence of changes.
 export interface CommitBlob {
+  // must reference an actual CommitBlob not just a EntityStateBlob, otherwise 
+  // if we make the exact same incremental change twice there's no way to diff them
   fromStates: SingeletonOrArray<Hash<CommitBlob>>; // often just a singleton. If array, order matters.
   mergeAncestor?: Hash<CommitBlob> // empty if just 1 parent (it's implied to be just the parent)
   toState: Hash<EntityStateBlob>;
@@ -232,7 +236,15 @@ export interface CommitBlob {
 
 // Expresses the fact that the entity id + entity version is now in a given state.
 export interface EntityStateRow {
-  versionHash: Hash<EntityVersionBlob>; // the topic of what we are talking about 
+  versionHash: Hash<EntityVersionBlob>; // the topic of what we are talking about .
+  // Reminder that this contains:
+    entityId: Id<T>
+    schemaHash: Hash
+      version: VersionString
+      docstring: string
+      deprecates: ...
+      
+
   entityStateId: Id<this>; // rowId
 
   commitHash: Hash<CommitBlob>
@@ -243,18 +255,81 @@ export interface EntityStateRow {
 
   creatorId: WhoamiId;
   createdAt: Timestamp;
-  createdOrder: Timestamp;
+  createdOrder: IntId;
+  // For rows that I write (with creatorId === me),
+  // the createdOrder is integer sequential
+
+  // For any specific commitHash, here are the valid states:
+  // createdBy = me ONLY, type = ack-accepted. (I just authored the commit and haven't received a remote review yet)
+  //   shorthand: (me, ack-accepted)
+  // 
+  // Note that either you or I must have authored it, so either you or I must have it as accepted.
+  //
+  // (me, accepted) + (you, empty) == I just authored and you haven't responded yet.
+  //                                  OR you're still working on the merge.
+  // (me, accepted) + (you, accepted) == We both agree on the change.
+  // (me, accepted) + (you, change-requested) == I made the change and you merged it in and sent me the merge.
+  // (me, change-requested) + (you, accepted) == you made the change and I had a merge which i sent to you.
+  // (me, empty) + (you, accepted) == you made the change and I'm still in the process of merging
+  // (me, empty) + (you, empty) == it doesn't exist lol
+  //
+  // Invalid/3rd party states:
+  // (me, empty) + (you, change-requested) == 3rd party again
+  // (me, change-requested) + (you, empty) == very weird, probably means 3rd party diff
+  // (me, change-requested) + (you, change-requested) == also smells like 3rd party
+
+  // (me, ack-accepted) + (you, ack-accepted). This means I made the change and you reviewed and accepted; OR vice versa
+  // (you, ack-accepted). An intermediate state, this means I'm trying to merge this commit but haven't yet.
+  // (you, ack-accepted) + (me, ack-seen). The same as above, pretty much.
 
   // For debug + convenience
   _version: Version computedAs ...
   _entityId: Id computedAs ...
+  _originalAuthorId: WhoamiId // Might be disagreed upon
 
   // Local only
-  _key: Key<this> computedAs ';'.join("T", entityId, creatorId);
+  _key: Key<this> computedAs ';'.join("T", versionHash, commitHash, creatorId)
   _id: IntId;
   _recordedAt: LocalTimestamp;
   _debug: any; // Any log-line appropriate information, e.g. the triggering threadId, api endpoint, stacktrace, whatever
 }
+
+/**
+ * The processing logic goes as follows:
+ * 
+ * I receive a EntityStateRow.
+ * Suppose the row has as creatorId = your whoamiId.
+ *   (otherwise: there's some 3rd party logic we're not going to go into.)
+ * I look at the commit hash, which references your full linear history of all diffs.
+ * 
+ * Let's assume there's no 3rd party, so either you or I created the diff, which means
+ * one of us has it as "accepted".
+ * 
+ * Let's also assume I haven't already processed the exact same message by you.
+ * 
+ * Case 1: you are sending "ack-accepted" by you; by assumption this is new to me.
+ * So my possible previous states are: (me, ack-accepted) + (you, empty), or (me, empty) + (you, empty).
+ * 
+ * 1a) - I think it's "ack-accepted by me, the original creator.
+ *    Transition: (me, ack-accepted) + (you, empty) --> (me, ack-accepted) + (you, ack-accepted)
+ * Then you are informing me that you are responding by acknowledging one of my own previous changes.
+ * great. The result is that I will update my last-symmetrically-synced pointer to be this hash.
+ * 
+ * 1b) I don't have it at all. Then you are informing me of a new commit you made.
+ *    Transition: (me, empty) + (you, empty) --> (me, ack-accepted/changes-requested) + (you, ack-accepted)
+ * I have to process the change. Here is the logic:
+ * 
+ * Case 2: you are sending "changes-requested" by you; by assumption your state was previously (you, empty).
+ * Since you don't have it as "ack-accepted" by you, that must mean it was created by me.
+ *    Transition: (me, ack-accepted) + (you, empty) --> (me, ack-accepted) + (you, changes-requested)
+ * This means that there is guaranteed to be another commitHash ack-accepted by you, in the same atomic message,
+ * so I don't need to do anything and this is actually the case 1b)
+
+
+
+
+
+
 
 /**
  * Snapshot = pointer to a StateRow plus ordering + provenance data.
