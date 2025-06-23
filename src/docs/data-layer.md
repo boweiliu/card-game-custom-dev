@@ -326,42 +326,17 @@ export interface EntityStateRow {
  *   what was the latest change ack-accepted by me that is in the component history of this change.
  *   If your latest view of me is accurate, then I simply ack-accept.
  *   Otherwise, I need to merge my latest with yours, 3-way using the base you told me, and send back the merge.
+ *   (The actual merge algorithm is the hard part and I will leave up to implementation, documented in the 
+ *    version schema for that version. For now, assume the merge algo is trivial - symbols, counters, or maps thereof)
+ *   (Maybe the merge algo needs to know some number of intermediate merges too)
  * 
  * Case 2: you are sending "changes-requested" by you; by assumption your state was previously (you, empty).
  * Since you don't have it as "ack-accepted" by you, that must mean it was created by me.
  *    Transition: (me, ack-accepted) + (you, empty) --> (me, ack-accepted) + (you, changes-requested)
  * This means that there is guaranteed to be another commitHash ack-accepted by you, in the same atomic message,
  * so I don't need to do anything and this is actually the case 1b)
-
-
-
-
-
-
-
-/**
- * Snapshot = pointer to a StateRow plus ordering + provenance data.
  */
-export interface SnapshotRow {
-  uuid: UUID;             // Snapshot id (unique per client)
-  stateHashId: UUID;       // FK → StateRow._hashId
-  orderKey: OrderKey;      // Dense, globally mergeable ordering value
-  whoamiId: WhoamiId;      // Authoring client
-  isCreator: boolean;      // True when first produced by the author
-  createdAt: Date;
-}
 
-/**
- * Synchro rows record bilateral acknowledgement of snapshots between peers.
- */
-export interface SynchroRow {
-  uuid: UUID;
-  snapshotId: UUID;        // FK → SnapshotRow._uuid (the item being synced)
-  from: WhoamiId;          // Sender of the synchro
-  to: WhoamiId;            // Receiver who ACKed
-  ackOrderKey: OrderKey;   // Receiver-local ordering of the ACK
-  createdAt: Date;
-}
 
 /**
  * Merge rows capture an explicit merge operation: the child snapshot that
