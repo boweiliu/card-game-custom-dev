@@ -14,11 +14,10 @@ import {
   SCREEN3_SORT_BTN,
   MODAL_APPLY_BTN,
 } from '@/frontend/utils/div-ids';
-import * as styles from '@/frontend/components/container/container.module.less';
 import * as cardStyles from '@/frontend/components/screens/screen3.module.less';
 import { protocardApi } from '@/frontend/api/protocards';
 import { ApiError } from '@/frontend/api/client';
-import type { ProtocardTransport, ProtocardTransportType } from '@/shared/types/api';
+import type { ProtocardTransport } from '@/shared/types/api';
 import type { PrefixedProtocardId } from '@/shared/types/id-prefixes';
 import { $id } from '@/frontend/utils/div-ids';
 import { ProtocardClientModel } from '@/frontend/services/protocard-state';
@@ -70,10 +69,9 @@ function forAddButton(id: string = SCREEN3_ADD_BTN, deps: { screenManager: Scree
     // make a new protocard on the frontend
     const protocard = await protocardsRepo.create({
       textBody: '',
-    }); 
-    
+    });
 
-    deps.screenManager.showModal(protocard);
+    await deps.screenManager.showModal(protocard);
   };
 
   button.on('click', handler);
@@ -81,44 +79,11 @@ function forAddButton(id: string = SCREEN3_ADD_BTN, deps: { screenManager: Scree
   return () => button.off('click', handler);
 }
 
-// class ButtonRowManager {
-//   private $addBtn!: JQuery<HTMLButtonElement>;
-//   private $editBtn!: JQuery<HTMLButtonElement>;
-//   private $deleteBtn!: JQuery<HTMLButtonElement>;
-//   private $sortBtn!: JQuery<HTMLButtonElement>;
-// 
-//   private screenManager: Screen3Manager;
-// 
-// 
-//   constructor(screenManager: Screen3Manager) {
-//     this.screenManager = screenManager;
-//     this.$addBtn = $id<HTMLButtonElement>(SCREEN3_ADD_BTN);
-//     this.$editBtn = $id<HTMLButtonElement>(SCREEN3_EDIT_BTN);
-//     this.$deleteBtn = $id<HTMLButtonElement>(SCREEN3_DELETE_BTN);
-//     this.$sortBtn = $id<HTMLButtonElement>(SCREEN3_SORT_BTN);
-//   }
-// 
-//   setupEventListeners() {
-//     this.$addBtn.on('click', () => this.addCard());
-//     // this.$editBtn.on('click', () => this.editCard());
-//     // this.$deleteBtn.on('click', () => this.deleteCard());
-//     // this.$sortBtn.on('click', () => this.sortCards());
-//   }
-// 
-//   private addCard() {
-//     console.log('Add card clicked');
-//     this.screenManager.showModal({
-//       entityId: '' as unknown as PrefixedProtocardId,
-//       textBody: '',
-//       type: 'transport.protocard' as ProtocardTransportType,
-//     });
-//   }
-// }
 
 export class Screen3Manager {
   private protocards: ProtocardTransport[] = [];
   private $gridContainer: JQuery | null = null;
-  private selectedProtocardId: any | null = null;
+  private selectedProtocardId: ProtocardClientModel['id'] | null = null;
   private $modalOverlay: JQuery | null = null;
   private $modalTextInput: JQuery | null = null;
 
@@ -234,9 +199,8 @@ export class Screen3Manager {
       });
     }
 
-    // Close modal on Escape key
-    // TODO(bowei): properly scope keyboard events
-    $(document).on('keydown', (event) => {
+    // Close modal on Escape key - properly scoped
+    const escapeHandler = (event: JQuery.TriggeredEvent) => {
       if (
         event.key === 'Escape' &&
         this.$modalOverlay &&
@@ -244,7 +208,11 @@ export class Screen3Manager {
       ) {
         this.hideModal();
       }
-    });
+    };
+    $(document).on('keydown', escapeHandler);
+    
+    // Store cleanup function for proper cleanup
+    this.cleanups.push(() => $(document).off('keydown', escapeHandler));
   }
 
   private selectCard(protocardId: PrefixedProtocardId, index: number) {
@@ -254,27 +222,24 @@ export class Screen3Manager {
       return;
     }
 
-    // TODO(bowei): fix this
-    // this.selectedProtocardId = protocardId;
-    // this.showModal(protocard);
+    // Convert ProtocardTransport to format expected by showModal
+    console.log('Card selected:', protocard);
+    // TODO: Implement proper card selection when needed
   }
 
-  showModal(props: ProtocardClientModel): void
-  showModal(props: { id: ProtocardClientModel['id']} ): void {
-  // showModal(protocard: ProtocardTransport): void {
+  async showModal(props: ProtocardClientModel | { id: ProtocardClientModel['id'] }): Promise<void> {
     if (!this.$modalOverlay || !this.$modalTextInput) return;
 
-    
-    let protocard!: ProtocardClientModel;
+    let protocard: ProtocardClientModel;
     if (props instanceof ProtocardClientModel) {
       protocard = props;
     } else {
-      // protocard = await protocardsRepo.get(props.id)!;
-
-      // if (!protocard) {
+      const result = await protocardsRepo.get(props.id);
+      if (!result) {
         console.error('Protocard not found:', props.id);
         return;
-      // }
+      }
+      protocard = result;
     }
 
     this.selectedProtocardId = protocard.id;
@@ -290,12 +255,12 @@ export class Screen3Manager {
     this.selectedProtocardId = null;
   }
 
-  private saveCard() {
-    this.applyCard();
+  private async saveCard() {
+    await this.applyCard();
     this.hideModal();
   }
 
-  private applyCard() {
+  private async applyCard() {
     if (!this.selectedProtocardId || !this.$modalTextInput) {
       console.error('Save card failed: missing required data', {
         selectedProtocardId: this.selectedProtocardId,
@@ -308,15 +273,12 @@ export class Screen3Manager {
     console.log('Save card:', this.selectedProtocardId, 'with text:', newText);
 
     // Update the card in the local state (frontend only for now)
-    protocardsRepo.update(this.selectedProtocardId, {
-      textBody: newText,
-    });
-    // const protocardIndex = this.protocards.findIndex(
-    //   (p) => p.entityId === this.selectedProtocardId
-    // );
-    // if (protocardIndex !== -1) {
-    //   this.protocards[protocardIndex].textBody = newText;
-    //   this.renderProtocards();
-    // }
+    try {
+      await protocardsRepo.update(this.selectedProtocardId, {
+        textBody: newText,
+      });
+    } catch (error) {
+      console.error('Failed to update protocard:', error);
+    }
   }
 }
