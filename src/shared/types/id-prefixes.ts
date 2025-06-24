@@ -59,7 +59,10 @@ export type GenericPrefixedId = string & {
 export type PrefixedId<T extends string> = string & {
   __prefixed_id: true;
   __prefix: T;
-} satisfies GenericPrefixedId;
+};
+// sanity
+const test: PrefixedId<"t"> = 0 as any;
+test satisfies GenericPrefixedId;
 
 
 // New prefixed ID types (for future use)

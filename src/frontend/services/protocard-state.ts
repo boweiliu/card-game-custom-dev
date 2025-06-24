@@ -11,7 +11,7 @@ import {
   ProtocardEntityId,
   ProtocardEntityOrder,
   } from '@/shared/types/id-prefixes-v2';
-import { IDGenerator, ProtocardSnapshotId, ProtocardSnapshotOrder } from '@/shared/types/id-prefixes';
+import { IDGenerator, ProtocardSnapshotId } from '@/shared/types/id-prefixes';
 import { DateString } from '@/shared/types/db';
 
 /**
@@ -78,7 +78,7 @@ type ProtocardSnapshot = Readonly<{
 } & ({
   serverSynced: true;
   serverId: ProtocardSnapshotId;
-  serverOrderKey: ProtocardSnapshotOrder;
+  // serverOrderKey: ProtocardSnapshotOrder;
   serverCreatedAt: DateString;
 } | {
   serverSynced: false;
@@ -103,7 +103,7 @@ class MessageQueue {
     // try to fire it over the API
     let response;
     try {
-      response = await this.api.send(message);
+      // response = await this.api.send(message);
     } catch (e) {
       // retry later
       this.messages[syncId] = { syncId, message, status: 'failed', failedCount: 1 };
@@ -111,8 +111,8 @@ class MessageQueue {
     }
 
     // If successful, mark it as such
-    const { ackId } = response;
-    this.messages[syncId] = { syncId, message, status: 'acked', ackId, failedCount: 0 };
+    // const { ackId } = response;
+    // this.messages[syncId] = { syncId, message, status: 'acked', ackId, failedCount: 0 };
 
 
 
@@ -155,7 +155,7 @@ class DataRepo {
       isDeleted: false,
       serverSynced: false,
     };
-    await this.entityMap.append(entity.id, entity);
+    await this.entityMap.append(entity);
     const snapshot: ProtocardSnapshot = {
       id: IDGenerator.generate(ID_PREFIXES_V2.PROTOCARD_SNAPSHOT_CLIENT),
       entityId: entity.id,
@@ -168,7 +168,7 @@ class DataRepo {
         id: entity.id,
       },
     };
-    await this.snapshotMap.append(snapshot.id, snapshot);
+    await this.snapshotMap.append(snapshot);
     this.newestSnapshotMap[entity.id] = snapshot;
 
     // TODO: start sending (and handling) the storage up to the server
@@ -199,7 +199,7 @@ class DataRepo {
         ...data,
       },
     };
-    await this.snapshotMap.append(updatedSnapshot.id, updatedSnapshot);
+    await this.snapshotMap.append(updatedSnapshot);
     this.newestSnapshotMap[id] = updatedSnapshot;
     
     // TODO: start sending (and handling) the storage up to the server
@@ -220,7 +220,7 @@ class DataRepo {
       model: snapshot.model,
       isDeleted: true,
     };
-    await this.snapshotMap.append(updatedSnapshot.id, updatedSnapshot);
+    await this.snapshotMap.append(updatedSnapshot);
     this.newestSnapshotMap[id] = updatedSnapshot;
     
     // TODO: start sending (and handling) the storage up to the server

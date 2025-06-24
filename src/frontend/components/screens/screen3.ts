@@ -21,7 +21,7 @@ import { ApiError } from '@/frontend/api/client';
 import type { ProtocardTransport, ProtocardTransportType } from '@/shared/types/api';
 import type { PrefixedProtocardId } from '@/shared/types/id-prefixes';
 import { $id } from '@/frontend/utils/div-ids';
-import { ProtocardClientModel, ProtocardTransportId } from '@/frontend/services/protocard-state';
+import { ProtocardClientModel } from '@/frontend/services/protocard-state';
 import { protocardsRepo } from '@/frontend/services/protocard-state';
 
 export function getScreen3Content(): string {
@@ -68,8 +68,7 @@ function forAddButton(id: string = SCREEN3_ADD_BTN, deps: { screenManager: Scree
     console.log('Add card clicked');
 
     // make a new protocard on the frontend
-    const protocard = await protocardsRepo.create();
-    await protocardsRepo.update(protocard.id, {
+    const protocard = await protocardsRepo.create({
       textBody: '',
     }); 
     
@@ -119,7 +118,7 @@ function forAddButton(id: string = SCREEN3_ADD_BTN, deps: { screenManager: Scree
 export class Screen3Manager {
   private protocards: ProtocardTransport[] = [];
   private $gridContainer: JQuery | null = null;
-  private selectedProtocardId: ProtocardTransportId | null = null;
+  private selectedProtocardId: any | null = null;
   private $modalOverlay: JQuery | null = null;
   private $modalTextInput: JQuery | null = null;
 
@@ -270,16 +269,16 @@ export class Screen3Manager {
     if (props instanceof ProtocardClientModel) {
       protocard = props;
     } else {
-      protocard = protocardsRepo.get(props.id)!;
+      // protocard = await protocardsRepo.get(props.id)!;
 
-      if (!protocard) {
+      // if (!protocard) {
         console.error('Protocard not found:', props.id);
         return;
-      }
+      // }
     }
 
     this.selectedProtocardId = protocard.id;
-    this.$modalTextInput.val(protocard.data.textBody);
+    this.$modalTextInput.val(protocard.textBody);
     this.$modalOverlay.addClass(cardStyles.show).show();
     this.$modalTextInput.trigger('focus');
   }
